@@ -180,7 +180,30 @@ body{padding-bottom:calc(68px + var(--sb))}
 .shop-entry-meta{font-size:10px;color:var(--hint);font-family:var(--mono);margin-top:2px}
 .shop-entry-amt{font-size:14px;font-weight:500;font-family:var(--mono);color:var(--green)}
 
-/* ALLOC PANEL */
+.cloud-status{display:flex;align-items:center;gap:5px;font-size:10px;font-family:var(--mono);padding:4px 9px;border-radius:20px;border:1px solid var(--border);background:var(--s2);cursor:pointer;margin-right:6px}
+.cloud-dot{width:7px;height:7px;border-radius:50%;background:var(--hint);flex-shrink:0;transition:background .3s}
+.cloud-dot.live{background:var(--green);box-shadow:0 0 6px rgba(74,222,128,.5);animation:pulse 2s infinite}
+.cloud-dot.err{background:var(--red)}
+.cloud-dot.syncing{background:var(--amber)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.cloud-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:10001;flex-direction:column;align-items:center;justify-content:center;font-family:var(--font);padding:20px}
+.cloud-modal.open{display:flex}
+.cloud-box{background:var(--s2);border:1px solid var(--b2);border-radius:18px;padding:22px 20px;width:100%;max-width:340px}
+.cloud-box h2{font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px}
+.cloud-box p{font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:16px}
+.cloud-step{background:var(--s3);border-radius:var(--rs);padding:11px 13px;margin-bottom:8px;font-size:11px;color:var(--muted);line-height:1.7}
+.cloud-step b{color:var(--text);font-weight:600}
+.cloud-inp{width:100%;background:var(--s3);border:1px solid var(--b2);border-radius:var(--rs);padding:10px 12px;font-size:13px;color:var(--text);font-family:var(--mono);margin-bottom:8px;outline:none}
+.cloud-inp:focus{border-color:var(--teal)}
+.cloud-row{display:flex;gap:8px;margin-bottom:8px}
+.cloud-row .cloud-inp{margin-bottom:0;flex:1}
+.btn-gen{padding:10px 12px;background:var(--s4);border:1px solid var(--b2);border-radius:var(--rs);color:var(--muted);font-size:11px;cursor:pointer;font-family:var(--font);white-space:nowrap}
+.btn-connect{width:100%;padding:13px;background:var(--teal);color:#000;border:none;border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);margin-bottom:8px}
+.btn-connect:disabled{opacity:.5;cursor:not-allowed}
+.btn-disconnect{width:100%;padding:10px;background:none;border:1px solid var(--rdim);border-radius:var(--rs);color:var(--red);font-size:12px;cursor:pointer;font-family:var(--font);margin-bottom:8px}
+.cloud-connected-badge{display:flex;align-items:center;gap:8px;background:var(--gdim);border:1px solid rgba(74,222,128,.25);border-radius:var(--rs);padding:10px 13px;margin-bottom:10px;font-size:12px;color:var(--green)}
+.sync-cloud-row{display:flex;align-items:center;justify-content:space-between;background:var(--s3);border-radius:var(--rs);padding:9px 12px;margin-bottom:8px;font-size:11px;color:var(--muted)}
+.sync-cloud-row.live{border:1px solid rgba(74,222,128,.2)}
 .alloc-panel{background:var(--s3);border-radius:var(--rs);padding:11px 12px;margin-top:8px;border:1px solid var(--border);display:none}
 .alloc-panel.open{display:block;animation:fi .15s ease}
 .alloc-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--gold);font-family:var(--mono);margin-bottom:9px}
@@ -275,6 +298,40 @@ body{padding-bottom:calc(68px + var(--sb))}
 </style>
 </head>
 <body>
+
+<!-- CLOUD SYNC SETUP MODAL -->
+<div id="cloud-modal" class="cloud-modal">
+  <div class="cloud-box">
+    <div id="cloud-setup-view">
+      <h2>☁️ Live Sync Setup</h2>
+      <p>Connects both phones to Firebase so any change either of you makes appears on the other phone instantly — no copy/pasting needed.</p>
+      <div class="cloud-step"><b>Step 1</b> — Go to <b>console.firebase.google.com</b><br>Sign in with Google → <b>Add project</b> → name it anything → skip Analytics → Create</div>
+      <div class="cloud-step"><b>Step 2</b> — In your project click <b>Build → Realtime Database → Create database → Start in test mode → Enable</b></div>
+      <div class="cloud-step"><b>Step 3</b> — Copy the database URL shown (looks like <b>https://xxx-default-rtdb.firebaseio.com</b>) and paste below</div>
+      <input class="cloud-inp" id="cloud-url-inp" placeholder="https://your-app-default-rtdb.firebaseio.com" type="url" autocomplete="off" autocorrect="off" spellcheck="false">
+      <div class="cloud-step" style="margin-bottom:8px"><b>Step 4</b> — Create a secret room code (keeps your data private — only you and Lauren need it)</div>
+      <div class="cloud-row">
+        <input class="cloud-inp" id="cloud-room-inp" placeholder="e.g. jake-lauren-2025" autocomplete="off" autocorrect="off" spellcheck="false">
+        <button class="btn-gen" onclick="genRoomCode()">Generate</button>
+      </div>
+      <div id="cloud-connect-err" style="font-size:11px;color:var(--red);min-height:16px;margin-bottom:8px;font-family:var(--mono)"></div>
+      <button class="btn-connect" id="cloud-connect-btn" onclick="connectCloud()">Connect &amp; go live</button>
+      <button onclick="closeCloudModal()" style="width:100%;padding:9px;background:none;border:none;color:var(--hint);font-size:12px;cursor:pointer;font-family:var(--font)">Cancel</button>
+    </div>
+    <div id="cloud-connected-view" style="display:none">
+      <h2>☁️ Live Sync Active</h2>
+      <p style="margin-bottom:12px">Both phones sync automatically. Share the details below with Lauren so she can connect too.</p>
+      <div class="cloud-connected-badge"><div class="cloud-dot live"></div><span id="cloud-info-url" style="word-break:break-all;font-family:var(--mono);font-size:10px"></span></div>
+      <div style="background:var(--s3);border-radius:var(--rs);padding:11px 13px;margin-bottom:12px">
+        <div style="font-size:10px;color:var(--hint);margin-bottom:4px">Room code</div>
+        <div id="cloud-info-room" style="font-size:16px;font-weight:600;font-family:var(--mono);color:var(--teal);letter-spacing:.05em"></div>
+      </div>
+      <button onclick="copyCloudDetails()" style="width:100%;padding:11px;background:var(--s4);border:1px solid var(--b2);border-radius:var(--rs);color:var(--text);font-size:13px;cursor:pointer;font-family:var(--font);margin-bottom:8px">📋 Copy details for Lauren</button>
+      <button class="btn-disconnect" onclick="disconnectCloud()">Disconnect live sync</button>
+      <button onclick="closeCloudModal()" style="width:100%;padding:9px;background:none;border:none;color:var(--hint);font-size:12px;cursor:pointer;font-family:var(--font)">Close</button>
+    </div>
+  </div>
+</div>
 
 <!-- PIN CHANGE MODAL -->
 <div id="pin-change-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:10000;flex-direction:column;align-items:center;justify-content:center;font-family:var(--font)">
@@ -432,9 +489,15 @@ body{padding-bottom:calc(68px + var(--sb))}
       <div class="hdr-sub" id="hdr-sub"></div>
     </div>
   </div>
-  <div class="sync-pill" onclick="toggleSync()">
-    <div class="sdot" id="sdot"></div>
-    <span class="sync-lbl" id="slbl">sync</span>
+  <div style="display:flex;align-items:center;gap:4px">
+    <div class="cloud-status" id="cloud-status-pill" onclick="openCloudModal()" title="Live sync">
+      <div class="cloud-dot" id="cloud-dot"></div>
+      <span id="cloud-lbl" style="color:var(--hint)">live</span>
+    </div>
+    <div class="sync-pill" onclick="toggleSync()">
+      <div class="sdot" id="sdot"></div>
+      <span class="sync-lbl" id="slbl">sync</span>
+    </div>
   </div>
 </header>
 
@@ -478,8 +541,12 @@ body{padding-bottom:calc(68px + var(--sb))}
       <div style="position:relative;width:100%;height:260px"><canvas id="jchart">Chart</canvas></div>
     </div>
     <div class="sync-panel" id="sync-panel">
-      <div class="sync-title">Sync to Lauren's phone</div>
-      <div class="sync-desc">Copy this code and WhatsApp it to Lauren. She taps Sync and pastes it.</div>
+      <div id="sync-cloud-status-row" class="sync-cloud-row">
+        <span id="sync-cloud-label">☁️ Live sync — not connected</span>
+        <button onclick="openCloudModal()" style="padding:5px 10px;background:var(--teal);color:#000;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font)" id="sync-cloud-btn">Setup</button>
+      </div>
+      <div class="sync-title">Manual sync (fallback)</div>
+      <div class="sync-desc">Use this if live sync isn't set up. Copy code → WhatsApp to Lauren → she pastes it.</div>
       <div class="sync-code" id="sync-code-box"></div>
       <div class="sync-btns"><div class="sync-btn copy" onclick="doSync('copy')">Copy code</div><div class="sync-btn paste" onclick="doSync('paste')">Paste code</div></div>
       <div style="margin-top:8px"><button onclick="changePin()" style="width:100%;padding:9px;background:none;border:1px solid var(--border);border-radius:var(--rs);font-size:12px;color:var(--muted);cursor:pointer;font-family:var(--font)">🔒 Change PIN</button></div>
@@ -712,7 +779,7 @@ const fmt=n=>'£'+parseFloat(n||0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',
 const fmtK=n=>n>=1000?'£'+(n/1000).toFixed(1)+'k':fmt(n);
 
 // ── Persistence ───────────────────────────────────────────
-function save(){D.lastActiveMK=MK;setSS('saving');clearTimeout(savTimer);savTimer=setTimeout(()=>{try{localStorage.setItem('jl-v6',JSON.stringify(D));}catch(e){}setSS('saved');},600);}
+function save(){D.lastActiveMK=MK;setSS('saving');clearTimeout(savTimer);savTimer=setTimeout(()=>{try{localStorage.setItem('jl-v6',JSON.stringify(D));}catch(e){}setSS('saved');cloudPush();},600);}
 function load(){setSS('saving');try{const r=localStorage.getItem('jl-v6');if(r){const s=JSON.parse(r);if(s.bills?.length)D.bills=s.bills;if(s.actuals)D.actuals=s.actuals;if(s.jake)D.jake={...D.jake,...s.jake};if(s.lauren)D.lauren={...D.lauren,...s.lauren};if(s.history)D.history=s.history;if(s.nudgeDismissed)D.nudgeDismissed=s.nudgeDismissed;if(s.lastActiveMK)D.lastActiveMK=s.lastActiveMK;if(s.nextId)D.nextId=s.nextId;
   // ── Migrations ──
   // Remove April 2026 pre-loaded pay history
@@ -992,7 +1059,174 @@ function renderAll(){renderJoint();renderPartner('jake');renderPartner('lauren')
 function toggleSync(){const p=document.getElementById('sync-panel'),open=p.style.display==='block';if(open){p.style.display='none';return;}document.getElementById('sync-code-box').textContent=btoa(unescape(encodeURIComponent(JSON.stringify(D))));p.style.display='block';p.scrollIntoView({behavior:'smooth',block:'nearest'});}
 function doSync(action){if(action==='copy'){const code=document.getElementById('sync-code-box').textContent;if(navigator.clipboard)navigator.clipboard.writeText(code).then(()=>toast('Copied — send to Lauren ✓')).catch(()=>prompt('Copy this:',code));else prompt('Copy this:',code);}else{const code=prompt('Paste the sync code:');if(!code)return;try{const d=JSON.parse(decodeURIComponent(escape(atob(code.trim()))));['bills','actuals','jake','lauren','history','nextId','lastActiveMK'].forEach(k=>{if(d[k]!==undefined)D[k]=d[k];});save();renderAll();document.getElementById('sync-panel').style.display='none';toast('Synced ✓');}catch(e){toast('Invalid code — try again');}}}
 
+
+// ── Cloud Sync (Firebase REST) ────────────────────────────
+const CLOUD_KEY='jl-cloud-cfg';
+let cloudCfg=null,cloudES=null,cloudPushTimer=null,lastPushTs=0,ignoreRemoteUntil=0;
+
+function cloudLoad(){
+  try{const s=localStorage.getItem(CLOUD_KEY);if(s)cloudCfg=JSON.parse(s);}catch(e){}
+  updateCloudUI();
+  if(cloudCfg)cloudConnect();
+}
+function cloudPath(){return`${cloudCfg.url.replace(/\/$/,'')}/${cloudCfg.room}/jldata.json`;}
+
+function updateCloudUI(){
+  const dot=document.getElementById('cloud-dot');
+  const lbl=document.getElementById('cloud-lbl');
+  const row=document.getElementById('sync-cloud-status-row');
+  const rowLbl=document.getElementById('sync-cloud-label');
+  const btn=document.getElementById('sync-cloud-btn');
+  if(!cloudCfg){
+    dot.className='cloud-dot';lbl.style.color='var(--hint)';
+    rowLbl.textContent='☁️ Live sync — not connected';btn.textContent='Setup';
+    row.classList.remove('live');
+  } else {
+    dot.className='cloud-dot live';lbl.style.color='var(--green)';
+    rowLbl.textContent='☁️ Live sync — connected';btn.textContent='Manage';
+    row.classList.add('live');
+  }
+}
+
+function cloudConnect(){
+  if(!cloudCfg)return;
+  // Close existing stream
+  if(cloudES){cloudES.close();cloudES=null;}
+  // Open SSE stream for real-time updates
+  try{
+    cloudES=new EventSource(cloudPath());
+    cloudES.addEventListener('put',e=>{
+      try{
+        const payload=JSON.parse(e.data);
+        const remote=payload.data;
+        if(!remote||!remote._ts)return;
+        if(Date.now()<ignoreRemoteUntil)return; // ignore echo of our own push
+        if(remote._ts<=(D._ts||0))return; // we already have newer data
+        // Apply remote data
+        ['bills','actuals','jake','lauren','history','nextId','lastActiveMK'].forEach(k=>{
+          if(remote[k]!==undefined)D[k]=remote[k];
+        });
+        D._ts=remote._ts;
+        localStorage.setItem('jl-v6',JSON.stringify(D));
+        renderAll();
+        toast('☁️ Synced from other phone');
+      }catch(err){}
+    });
+    cloudES.addEventListener('patch',e=>{
+      // treat patch same as put for simplicity
+      try{
+        const payload=JSON.parse(e.data);
+        const remote=payload.data;
+        if(!remote||!remote._ts)return;
+        if(Date.now()<ignoreRemoteUntil)return;
+        if(remote._ts<=(D._ts||0))return;
+        ['bills','actuals','jake','lauren','history','nextId','lastActiveMK'].forEach(k=>{
+          if(remote[k]!==undefined)D[k]=remote[k];
+        });
+        D._ts=remote._ts;
+        localStorage.setItem('jl-v6',JSON.stringify(D));
+        renderAll();
+        toast('☁️ Synced from other phone');
+      }catch(err){}
+    });
+    cloudES.onerror=()=>{
+      document.getElementById('cloud-dot').className='cloud-dot err';
+      // Retry after 10s
+      setTimeout(()=>{if(cloudCfg)cloudConnect();},10000);
+    };
+    cloudES.onopen=()=>{
+      document.getElementById('cloud-dot').className='cloud-dot live';
+    };
+  }catch(e){}
+}
+
+async function cloudPush(){
+  if(!cloudCfg)return;
+  clearTimeout(cloudPushTimer);
+  cloudPushTimer=setTimeout(async()=>{
+    try{
+      D._ts=Date.now();
+      ignoreRemoteUntil=D._ts+5000; // ignore our own echo for 5 seconds
+      await fetch(cloudPath(),{
+        method:'PUT',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(D)
+      });
+    }catch(e){}
+  },800);
+}
+
+// Modal controls
+function openCloudModal(){
+  const modal=document.getElementById('cloud-modal');
+  modal.classList.add('open');
+  document.getElementById('sync-panel').style.display='none';
+  if(cloudCfg){
+    document.getElementById('cloud-setup-view').style.display='none';
+    document.getElementById('cloud-connected-view').style.display='block';
+    document.getElementById('cloud-info-url').textContent=cloudCfg.url;
+    document.getElementById('cloud-info-room').textContent=cloudCfg.room;
+  } else {
+    document.getElementById('cloud-setup-view').style.display='block';
+    document.getElementById('cloud-connected-view').style.display='none';
+  }
+}
+function closeCloudModal(){document.getElementById('cloud-modal').classList.remove('open');}
+
+function genRoomCode(){
+  const words=['apple','river','maple','cloud','amber','tiger','pearl','solar','nova','fox'];
+  const r=()=>words[Math.floor(Math.random()*words.length)];
+  const n=Math.floor(1000+Math.random()*9000);
+  document.getElementById('cloud-room-inp').value=`${r()}-${r()}-${n}`;
+}
+
+async function connectCloud(){
+  const url=document.getElementById('cloud-url-inp').value.trim().replace(/\/$/,'');
+  const room=document.getElementById('cloud-room-inp').value.trim().replace(/[^a-zA-Z0-9\-_]/g,'');
+  const errEl=document.getElementById('cloud-connect-err');
+  const btn=document.getElementById('cloud-connect-btn');
+  if(!url||!url.startsWith('https://')){errEl.textContent='Enter a valid Firebase database URL';return;}
+  if(!room||room.length<4){errEl.textContent='Room code must be at least 4 characters';return;}
+  btn.disabled=true;btn.textContent='Testing connection…';errEl.textContent='';
+  try{
+    const testUrl=`${url}/${room}/jldata.json`;
+    const r=await fetch(testUrl,{method:'GET'});
+    if(!r.ok)throw new Error('Bad response');
+    cloudCfg={url,room};
+    localStorage.setItem(CLOUD_KEY,JSON.stringify(cloudCfg));
+    // Push current data up immediately
+    await fetch(testUrl,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({...D,_ts:Date.now()})});
+    updateCloudUI();
+    cloudConnect();
+    document.getElementById('cloud-setup-view').style.display='none';
+    document.getElementById('cloud-connected-view').style.display='block';
+    document.getElementById('cloud-info-url').textContent=cloudCfg.url;
+    document.getElementById('cloud-info-room').textContent=cloudCfg.room;
+    toast('☁️ Live sync connected!');
+  }catch(e){
+    errEl.textContent='Could not connect — check the URL and try again';
+  }
+  btn.disabled=false;btn.textContent='Connect & go live';
+}
+
+function disconnectCloud(){
+  if(!confirm('Disconnect live sync? You can reconnect anytime.'))return;
+  if(cloudES){cloudES.close();cloudES=null;}
+  cloudCfg=null;
+  localStorage.removeItem(CLOUD_KEY);
+  updateCloudUI();
+  closeCloudModal();
+  toast('Live sync disconnected');
+}
+
+function copyCloudDetails(){
+  const txt=`Jake & Lauren Finance App — Live Sync Details\n\nFirebase URL: ${cloudCfg.url}\nRoom code: ${cloudCfg.room}\n\nOpen the app → tap "live" in the top bar → Setup → paste these details.`;
+  if(navigator.clipboard)navigator.clipboard.writeText(txt).then(()=>toast('Details copied — send to Lauren ✓'));
+  else prompt('Copy these details:',txt);
+}
+
 load();
+cloudLoad();
 </script>
 </body>
 </html>
