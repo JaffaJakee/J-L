@@ -1060,16 +1060,69 @@ function toggleSync(){const p=document.getElementById('sync-panel'),open=p.style
 function doSync(action){if(action==='copy'){const code=document.getElementById('sync-code-box').textContent;if(navigator.clipboard)navigator.clipboard.writeText(code).then(()=>toast('Copied — send to Lauren ✓')).catch(()=>prompt('Copy this:',code));else prompt('Copy this:',code);}else{const code=prompt('Paste the sync code:');if(!code)return;try{const d=JSON.parse(decodeURIComponent(escape(atob(code.trim()))));['bills','actuals','jake','lauren','history','nextId','lastActiveMK'].forEach(k=>{if(d[k]!==undefined)D[k]=d[k];});save();renderAll();document.getElementById('sync-panel').style.display='none';toast('Synced ✓');}catch(e){toast('Invalid code — try again');}}}
 
 
-// ── Cloud Sync (Firebase REST) ────────────────────────────
+
+// ── Cloud Sync (Firebase polling) ────────────────────────
 const CLOUD_KEY='jl-cloud-cfg';
-let cloudCfg=null,cloudES=null,cloudPushTimer=null,lastPushTs=0,ignoreRemoteUntil=0;
+let cloudCfg=null,cloudPollTimer=null,cloudPushTimer=null,ignoreRemoteUntil=0;
+
+function cloudPath(){return`${cloudCfg.url.replace(/\/$/,'')}/${cloudCfg.room}/jldata.json`;}
 
 function cloudLoad(){
   try{const s=localStorage.getItem(CLOUD_KEY);if(s)cloudCfg=JSON.parse(s);}catch(e){}
   updateCloudUI();
-  if(cloudCfg)cloudConnect();
+  if(cloudCfg)startPolling();
 }
-function cloudPath(){return`${cloudCfg.url.replace(/\/$/,'')}/${cloudCfg.room}/jldata.json`;}
+
+function startPolling(){
+  stopPolling();
+  cloudPoll(); // immediate first poll
+  cloudPollTimer=setInterval(cloudPoll,4000);
+}
+
+function stopPolling(){
+  clearInterval(cloudPollTimer);
+  cloudPollTimer=null;
+}
+
+async function cloudPoll(){
+  if(!cloudCfg)return;
+  try{
+    const r=await fetch(cloudPath()+'?shallow=false',{cache:'no-store'});
+    if(!r.ok)throw new Error('bad');
+    const remote=await r.json();
+    if(!remote||!remote._ts)return;
+    if(Date.now()<ignoreRemoteUntil)return;
+    if(remote._ts<=(D._ts||0))return;
+    // Apply remote data
+    ['bills','actuals','jake','lauren','history','nextId','lastActiveMK'].forEach(k=>{
+      if(remote[k]!==undefined)D[k]=remote[k];
+    });
+    D._ts=remote._ts;
+    localStorage.setItem('jl-v6',JSON.stringify(D));
+    renderAll();
+    toast('☁️ Updated from other phone');
+    document.getElementById('cloud-dot').className='cloud-dot live';
+  }catch(e){
+    document.getElementById('cloud-dot').className='cloud-dot err';
+  }
+}
+
+async function cloudPush(){
+  if(!cloudCfg)return;
+  clearTimeout(cloudPushTimer);
+  cloudPushTimer=setTimeout(async()=>{
+    try{
+      D._ts=Date.now();
+      ignoreRemoteUntil=D._ts+8000;
+      const r=await fetch(cloudPath(),{
+        method:'PUT',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(D)
+      });
+      if(r.ok){document.getElementById('cloud-dot').className='cloud-dot live';}
+    }catch(e){document.getElementById('cloud-dot').className='cloud-dot err';}
+  },800);
+}
 
 function updateCloudUI(){
   const dot=document.getElementById('cloud-dot');
@@ -1088,75 +1141,6 @@ function updateCloudUI(){
   }
 }
 
-function cloudConnect(){
-  if(!cloudCfg)return;
-  // Close existing stream
-  if(cloudES){cloudES.close();cloudES=null;}
-  // Open SSE stream for real-time updates
-  try{
-    cloudES=new EventSource(cloudPath());
-    cloudES.addEventListener('put',e=>{
-      try{
-        const payload=JSON.parse(e.data);
-        const remote=payload.data;
-        if(!remote||!remote._ts)return;
-        if(Date.now()<ignoreRemoteUntil)return; // ignore echo of our own push
-        if(remote._ts<=(D._ts||0))return; // we already have newer data
-        // Apply remote data
-        ['bills','actuals','jake','lauren','history','nextId','lastActiveMK'].forEach(k=>{
-          if(remote[k]!==undefined)D[k]=remote[k];
-        });
-        D._ts=remote._ts;
-        localStorage.setItem('jl-v6',JSON.stringify(D));
-        renderAll();
-        toast('☁️ Synced from other phone');
-      }catch(err){}
-    });
-    cloudES.addEventListener('patch',e=>{
-      // treat patch same as put for simplicity
-      try{
-        const payload=JSON.parse(e.data);
-        const remote=payload.data;
-        if(!remote||!remote._ts)return;
-        if(Date.now()<ignoreRemoteUntil)return;
-        if(remote._ts<=(D._ts||0))return;
-        ['bills','actuals','jake','lauren','history','nextId','lastActiveMK'].forEach(k=>{
-          if(remote[k]!==undefined)D[k]=remote[k];
-        });
-        D._ts=remote._ts;
-        localStorage.setItem('jl-v6',JSON.stringify(D));
-        renderAll();
-        toast('☁️ Synced from other phone');
-      }catch(err){}
-    });
-    cloudES.onerror=()=>{
-      document.getElementById('cloud-dot').className='cloud-dot err';
-      // Retry after 10s
-      setTimeout(()=>{if(cloudCfg)cloudConnect();},10000);
-    };
-    cloudES.onopen=()=>{
-      document.getElementById('cloud-dot').className='cloud-dot live';
-    };
-  }catch(e){}
-}
-
-async function cloudPush(){
-  if(!cloudCfg)return;
-  clearTimeout(cloudPushTimer);
-  cloudPushTimer=setTimeout(async()=>{
-    try{
-      D._ts=Date.now();
-      ignoreRemoteUntil=D._ts+5000; // ignore our own echo for 5 seconds
-      await fetch(cloudPath(),{
-        method:'PUT',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify(D)
-      });
-    }catch(e){}
-  },800);
-}
-
-// Modal controls
 function openCloudModal(){
   const modal=document.getElementById('cloud-modal');
   modal.classList.add('open');
@@ -1185,33 +1169,38 @@ async function connectCloud(){
   const room=document.getElementById('cloud-room-inp').value.trim().replace(/[^a-zA-Z0-9\-_]/g,'');
   const errEl=document.getElementById('cloud-connect-err');
   const btn=document.getElementById('cloud-connect-btn');
-  if(!url||!url.startsWith('https://')){errEl.textContent='Enter a valid Firebase database URL';return;}
-  if(!room||room.length<4){errEl.textContent='Room code must be at least 4 characters';return;}
-  btn.disabled=true;btn.textContent='Testing connection…';errEl.textContent='';
+  if(!url||!url.startsWith('https://')){errEl.textContent='Enter a valid Firebase URL starting with https://';return;}
+  if(!room||room.length<3){errEl.textContent='Room code must be at least 3 characters';return;}
+  btn.disabled=true;btn.textContent='Connecting…';errEl.textContent='';
   try{
     const testUrl=`${url}/${room}/jldata.json`;
-    const r=await fetch(testUrl,{method:'GET'});
-    if(!r.ok)throw new Error('Bad response');
+    // Write current data first
+    D._ts=Date.now();
+    ignoreRemoteUntil=D._ts+8000;
+    const r=await fetch(testUrl,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(D)
+    });
+    if(!r.ok)throw new Error('Write failed: '+r.status);
     cloudCfg={url,room};
     localStorage.setItem(CLOUD_KEY,JSON.stringify(cloudCfg));
-    // Push current data up immediately
-    await fetch(testUrl,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({...D,_ts:Date.now()})});
     updateCloudUI();
-    cloudConnect();
+    startPolling();
     document.getElementById('cloud-setup-view').style.display='none';
     document.getElementById('cloud-connected-view').style.display='block';
     document.getElementById('cloud-info-url').textContent=cloudCfg.url;
     document.getElementById('cloud-info-room').textContent=cloudCfg.room;
     toast('☁️ Live sync connected!');
   }catch(e){
-    errEl.textContent='Could not connect — check the URL and try again';
+    errEl.textContent='Could not connect — check rules are set to true in Firebase and try again';
   }
   btn.disabled=false;btn.textContent='Connect & go live';
 }
 
 function disconnectCloud(){
-  if(!confirm('Disconnect live sync? You can reconnect anytime.'))return;
-  if(cloudES){cloudES.close();cloudES=null;}
+  if(!confirm('Disconnect live sync?'))return;
+  stopPolling();
   cloudCfg=null;
   localStorage.removeItem(CLOUD_KEY);
   updateCloudUI();
@@ -1220,9 +1209,9 @@ function disconnectCloud(){
 }
 
 function copyCloudDetails(){
-  const txt=`Jake & Lauren Finance App — Live Sync Details\n\nFirebase URL: ${cloudCfg.url}\nRoom code: ${cloudCfg.room}\n\nOpen the app → tap "live" in the top bar → Setup → paste these details.`;
-  if(navigator.clipboard)navigator.clipboard.writeText(txt).then(()=>toast('Details copied — send to Lauren ✓'));
-  else prompt('Copy these details:',txt);
+  const txt=`Jake & Lauren Finance — Live Sync\n\nFirebase URL: ${cloudCfg.url}\nRoom code: ${cloudCfg.room}\n\nIn the app tap "live" top right → Setup → paste these in.`;
+  if(navigator.clipboard)navigator.clipboard.writeText(txt).then(()=>toast('Details copied ✓'));
+  else prompt('Copy:',txt);
 }
 
 load();
