@@ -569,7 +569,7 @@ body{padding-bottom:calc(68px + var(--sb))}
     <div class="quick-pay">
       <div class="qp-title">⚡ Log this month's pay</div>
       <div class="qp-row">
-        <div class="qp-field"><label>Net pay (£) — what hit your bank</label><input type="number" id="qp-net" placeholder="e.g. 2745.36" min="0" step="0.01" oninput="qpPreview()"></div>
+        <div class="qp-field"><label>Net pay (£) — what hit your bank</label><input type="number" id="qp-net" placeholder="0.00" min="0" step="0.01" oninput="qpPreview()"></div>
         <button class="qp-btn" onclick="quickPaySave()">Save</button>
       </div>
       <div class="alloc-panel" id="qp-alloc">
@@ -1136,6 +1136,10 @@ async function cloudPoll(){
       if(remote[k]!==undefined)D[k]=remote[k];
     });
     D._ts=remote._ts;
+    // Apply migrations to remote data too
+    if(D.jake.payHistory)D.jake.payHistory=D.jake.payHistory.filter(h=>h.mk!=='2026-3');
+    if(D.jake.income)D.jake.income=D.jake.income.filter(i=>i.mk!=='2026-3');
+    const gasBill=D.bills.find(b=>b.id==='gas');if(gasBill&&gasBill.budget===163.08)gasBill.budget=163.84;
     sanitise();
     localStorage.setItem('jl-v6',JSON.stringify(D));
     renderAll();
