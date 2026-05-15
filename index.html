@@ -805,8 +805,12 @@ function load(){setSS('saving');try{const r=localStorage.getItem('jl-v6');if(r){
   // ── Migrations ──
   // Remove April 2026 pre-loaded pay history
   if(D.jake.payHistory)D.jake.payHistory=D.jake.payHistory.filter(h=>h.mk!=='2026-3');
+  // Remove May 2026 phantom £2745 pay history entry (pre-loaded data that leaked in via Firebase sync)
+  if(D.jake.payHistory)D.jake.payHistory=D.jake.payHistory.filter(h=>!(h.mk==='2026-4'&&(h.net===2745.36||h.net===2745||h.net===2745.00)));
   // Remove April 2026 pre-loaded income entry
   if(D.jake.income)D.jake.income=D.jake.income.filter(i=>i.mk!=='2026-3');
+  // Remove May 2026 phantom income entry
+  if(D.jake.income)D.jake.income=D.jake.income.filter(i=>!(i.mk==='2026-4'&&(i.amount===2745.36||i.amount===2745)));
   // Fix Gas & Electric bill to £163.84
   const gasBill=D.bills.find(b=>b.id==='gas');if(gasBill&&gasBill.budget===163.08)gasBill.budget=163.84;
   // Auto-reset actuals on new month
@@ -1138,7 +1142,9 @@ async function cloudPoll(){
     D._ts=remote._ts;
     // Apply migrations to remote data too
     if(D.jake.payHistory)D.jake.payHistory=D.jake.payHistory.filter(h=>h.mk!=='2026-3');
+    if(D.jake.payHistory)D.jake.payHistory=D.jake.payHistory.filter(h=>!(h.mk==='2026-4'&&(h.net===2745.36||h.net===2745||h.net===2745.00)));
     if(D.jake.income)D.jake.income=D.jake.income.filter(i=>i.mk!=='2026-3');
+    if(D.jake.income)D.jake.income=D.jake.income.filter(i=>!(i.mk==='2026-4'&&(i.amount===2745.36||i.amount===2745)));
     const gasBill=D.bills.find(b=>b.id==='gas');if(gasBill&&gasBill.budget===163.08)gasBill.budget=163.84;
     sanitise();
     localStorage.setItem('jl-v6',JSON.stringify(D));
