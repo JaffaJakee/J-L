@@ -780,6 +780,27 @@ const fmtK=n=>n>=1000?'£'+(n/1000).toFixed(1)+'k':fmt(n);
 
 // ── Persistence ───────────────────────────────────────────
 function save(){D.lastActiveMK=MK;setSS('saving');clearTimeout(savTimer);savTimer=setTimeout(()=>{try{localStorage.setItem('jl-v6',JSON.stringify(D));}catch(e){}setSS('saved');cloudPush();},600);}
+// ── Sanitise: ensure all required arrays exist ────────────
+function sanitise(){
+  const jDef={income:[],savings:[],investments:[],spending:[],payHistory:[],cashIncome:[],extraAlloc:null};
+  const lDef={income:[],savings:[],investments:[],spending:[],cashIncome:[],cashHistory:[],foodShop:[]};
+  Object.keys(jDef).forEach(k=>{if(!Array.isArray(D.jake[k])&&D.jake[k]!==null&&typeof D.jake[k]!=='object')D.jake[k]=jDef[k];if(D.jake[k]===undefined)D.jake[k]=jDef[k];});
+  Object.keys(lDef).forEach(k=>{if(!Array.isArray(D.lauren[k])&&D.lauren[k]!==null&&typeof D.lauren[k]!=='object')D.lauren[k]=lDef[k];if(D.lauren[k]===undefined)D.lauren[k]=lDef[k];});
+  if(!Array.isArray(D.jake.savings))D.jake.savings=[];
+  if(!Array.isArray(D.jake.investments))D.jake.investments=[];
+  if(!Array.isArray(D.jake.spending))D.jake.spending=[];
+  if(!Array.isArray(D.jake.income))D.jake.income=[];
+  if(!Array.isArray(D.jake.payHistory))D.jake.payHistory=[];
+  if(!Array.isArray(D.jake.cashIncome))D.jake.cashIncome=[];
+  if(!Array.isArray(D.lauren.savings))D.lauren.savings=[];
+  if(!Array.isArray(D.lauren.investments))D.lauren.investments=[];
+  if(!Array.isArray(D.lauren.spending))D.lauren.spending=[];
+  if(!Array.isArray(D.lauren.cashIncome))D.lauren.cashIncome=[];
+  if(!Array.isArray(D.lauren.foodShop))D.lauren.foodShop=[];
+  if(!Array.isArray(D.bills))D.bills=JSON.parse(JSON.stringify(DEFAULT_BILLS));
+  if(!Array.isArray(D.history))D.history=[];
+}
+
 function load(){setSS('saving');try{const r=localStorage.getItem('jl-v6');if(r){const s=JSON.parse(r);if(s.bills?.length)D.bills=s.bills;if(s.actuals)D.actuals=s.actuals;if(s.jake)D.jake={...D.jake,...s.jake};if(s.lauren)D.lauren={...D.lauren,...s.lauren};if(s.history)D.history=s.history;if(s.nudgeDismissed)D.nudgeDismissed=s.nudgeDismissed;if(s.lastActiveMK)D.lastActiveMK=s.lastActiveMK;if(s.nextId)D.nextId=s.nextId;
   // ── Migrations ──
   // Remove April 2026 pre-loaded pay history
@@ -800,7 +821,7 @@ function load(){setSS('saving');try{const r=localStorage.getItem('jl-v6');if(r){
   } else if(!D.lastActiveMK){
     D.lastActiveMK=MK;
   }
-  }recordHistory();}catch(e){}setSS('saved');checkNudge();renderAll();}
+  }recordHistory();}catch(e){console.error('load error',e);}sanitise();setSS('saved');checkNudge();renderAll();}
 function getActual(id){const a=D.actuals[id];return a?.mk===MK?a.amount:null;}
 function setActual(id,v){D.actuals[id]={mk:MK,amount:v};}
 function clearActual(id){delete D.actuals[id];}
@@ -901,15 +922,15 @@ function renderJoint(){
   document.getElementById('bill-list').innerHTML=bills.map(b=>{
     const a=getActual(b.id),has=a!==null,diff=has?b.budget-a:0,pct=has?Math.min(150,Math.round(a/b.budget*100)):100;
     const tCls=!has?'':diff>0?' under':diff<0?' over':'',bCls=!has?'teal':diff>0?'green':diff<0?'red':'teal';
-    return `<div class="bill"><div class="bill-top"><div class="btick${tCls}"><svg viewBox="0 0 13 13"><polyline points="1.5,6.5 5,10 11.5,3"/></svg></div><div class="binfo"><div class="bname">${b.name}</div><div class="bdue">${b.due}</div></div><div class="bamts"><div class="bactual">${has?fmt(a):fmt(b.budget)}</div><div class="bbudget">${has?'budget '+fmt(b.budget):'monthly budget'}</div>${has?(diff>0?`<div class="bdiff saved">−${fmt(diff)} saved</div>`:diff<0?`<div class="bdiff over">+${fmt(Math.abs(diff))} over</div>`:''):''}</div><div class="bbtns"><button class="ib${has?' active':''}" onclick="toggleEdit('${b.id}')">✏️</button><button class="ib" onclick="removeBill('${b.id}')">✕</button></div></div>${has?`<div class="bva"><div class="bva-track"><div class="bva-bg" style="width:100%"></div><div class="bva-bar ${bCls}" style="width:${Math.min(100,pct)}%"></div></div><div class="bva-pct">${pct}%</div></div>`:''}
+    return `<div class="bill"><div class="bill-top"><div class="btick${tCls}"><svg viewBox="0 0 13 13"><polyline points="1.5,6.5 5,10 11.5,3"/></svg></div><div class="binfo"><div class="bname">${b.name}</div><div class="bdue">${b.due}</div></div><div class="bamts"><div class="bactual">${has?fmt(a):fmt(b.budget)}</div><div class="bbudget">${has?'budget '+fmt(b.budget):'monthly budget'}</div>${has?(diff>0?`<div class="bdiff saved">−${fmt(diff)} saved</div>`:diff<0?`<div class="bdiff over">+${fmt(Math.abs(diff))} over</div>`:''):''}</div><div class="bbtns"><button class="ib${has?' active':''}" onclick="toggleEdit('${b.id}')">✏️</button><button class="ib" data-del="${b.id}" onclick="removeBill('${b.id}')" style="${_pendingDelete===b.id?'background:var(--red);color:#fff;':''}">${_pendingDelete===b.id?'Sure?':'✕'}</button></div></div>${has?`<div class="bva"><div class="bva-track"><div class="bva-bg" style="width:100%"></div><div class="bva-bar ${bCls}" style="width:${Math.min(100,pct)}%"></div></div><div class="bva-pct">${pct}%</div></div>`:''}
       <div class="edit-panel" id="ep-${b.id}"><div class="edit-lbl">What did you actually spend?</div><div class="edit-row"><div class="ef"><label>Budget: ${fmt(b.budget)}</label><input type="number" id="ei-${b.id}" placeholder="${b.budget.toFixed(2)}" min="0" step="0.01" value="${has?a.toFixed(2):''}"></div><button class="save-e" onclick="saveActual('${b.id}')">Save</button>${has?`<button class="reset-e" onclick="resetActual('${b.id}')">Reset</button>`:''}</div></div>
     </div>`;
   }).join('');
 }
 
 function toggleEdit(id){const ep=document.getElementById('ep-'+id),was=ep.classList.contains('open');document.querySelectorAll('.edit-panel.open').forEach(p=>p.classList.remove('open'));if(!was){ep.classList.add('open');setTimeout(()=>document.getElementById('ei-'+id)?.focus(),80);}}
-function saveActual(id){const v=parseFloat(document.getElementById('ei-'+id).value);if(isNaN(v)||v<0){toast('Enter a valid amount');return;}setActual(id,v);save();renderJoint();setTimeout(renderJChart,60);toast('Saved ✓');}
-function resetActual(id){clearActual(id);save();renderJoint();setTimeout(renderJChart,60);toast('Reset to budget');}
+function saveActual(id){const v=parseFloat(document.getElementById('ei-'+id).value);if(isNaN(v)||v<0){toast('Enter a valid amount');return;}setActual(id,v);save();cloudPush();renderJoint();setTimeout(renderJChart,60);toast('Saved ✓');}
+function resetActual(id){clearActual(id);save();cloudPush();renderJoint();setTimeout(renderJChart,60);toast('Reset to budget');}
 
 // ── Chart: Joint ──────────────────────────────────────────
 function renderJChart(){
@@ -922,6 +943,7 @@ function renderJChart(){
 
 // ── Render: Partner ───────────────────────────────────────
 function renderPartner(who){
+  sanitise();
   const p=D[who],pre=who==='jake'?'j':'l',col=who==='jake'?'blue':'purple';
   const sId=who==='jake'?'jk-stats':'lr-stats';
   const billBudget=D.bills.reduce((s,b)=>s+b.budget,0),billActual=D.bills.reduce((s,b)=>{const a=getActual(b.id);return s+(a!==null?a:b.budget);},0),share=billActual/2;
@@ -1002,7 +1024,23 @@ function renderYearChart(){
 // ── Actions ───────────────────────────────────────────────
 function toggleAddBill(){document.getElementById('add-bill-form').classList.toggle('open');}
 function addBill(){const n=document.getElementById('fn').value.trim(),a=parseFloat(document.getElementById('fa').value),d=document.getElementById('fd').value;if(!n||isNaN(a)||a<=0){toast('Fill in name and amount');return;}D.bills.push({id:'c'+D.nextId++,name:n,budget:a,due:d});document.getElementById('fn').value='';document.getElementById('fa').value='';document.getElementById('add-bill-form').classList.remove('open');save();renderAll();toast('Bill added ✓');}
-function removeBill(id){if(!confirm('Remove this bill?'))return;D.bills=D.bills.filter(b=>b.id!==id);clearActual(id);save();renderAll();toast('Bill removed');}
+
+let _pendingDelete=null,_pendingDeleteTimer=null;
+function removeBill(id){
+  if(_pendingDelete===id){
+    // Second tap — confirm delete
+    clearTimeout(_pendingDeleteTimer);_pendingDelete=null;
+    D.bills=D.bills.filter(b=>b.id!==id);clearActual(id);save();renderAll();toast('Bill removed');
+  } else {
+    // First tap — arm for delete
+    if(_pendingDelete)renderAll(); // reset previous
+    _pendingDelete=id;
+    const btn=document.querySelector(`button[data-del="${id}"]`);
+    if(btn){btn.textContent='Sure?';btn.style.background='var(--red)';btn.style.color='#fff';}
+    _pendingDeleteTimer=setTimeout(()=>{_pendingDelete=null;renderAll();},3000);
+    toast('Tap ✕ again to delete bill');
+  }
+}
 function removeJakeIncome(id){D.jake.income=D.jake.income.filter(i=>i.id!==id);if(!D.jake.income.find(i=>i.type==='extra'))D.jake.extraAlloc=null;save();renderPartner('jake');}
 function removeCash(id){D.lauren.cashIncome=D.lauren.cashIncome.filter(c=>c.id!==id);save();renderPartner('lauren');}
 
@@ -1048,10 +1086,10 @@ function renderFoodShop(){
   const srcLbl={joint:'Joint account',cash:'Cash from wages',mixed:'Split payment'};
   document.getElementById('food-shop-list').innerHTML=shops.length?[...shops].reverse().map(x=>`<div class="shop-entry"><div class="shop-entry-icon ${x.source}">${srcIco[x.source]}</div><div class="shop-entry-info"><div class="shop-entry-note">${x.note}</div><div class="shop-entry-meta">${srcLbl[x.source]} · ${x.date}</div></div><div class="shop-entry-amt">${fmt(x.amount)}</div><button class="rm" onclick="removeFoodShop(${x.id})">×</button></div>`).join(''):'<span class="empty">No shops logged yet this month</span>';
 }
-function addSaving(who){const pre=who==='jake'?'j':'l';const n=document.getElementById(pre+'s-n').value.trim(),a=parseFloat(document.getElementById(pre+'s-a').value),t=parseFloat(document.getElementById(pre+'s-t').value)||0;if(!n||isNaN(a)||a<=0){toast('Fill in name and amount');return;}D[who].savings.push({id:D.nextId++,name:n,amount:a,target:t||null,saved:0});document.getElementById(pre+'s-n').value='';document.getElementById(pre+'s-a').value='';document.getElementById(pre+'s-t').value='';save();renderPartner(who);toast('Saving goal added ✓');}
-function addInvestment(who){const pre=who==='jake'?'j':'l';const n=document.getElementById(pre+'inv-n').value.trim(),a=parseFloat(document.getElementById(pre+'inv-a').value),t=document.getElementById(pre+'inv-t').value;if(!n||isNaN(a)||a<=0){toast('Fill in name and amount');return;}D[who].investments.push({id:D.nextId++,name:n,amount:a,itype:t});document.getElementById(pre+'inv-n').value='';document.getElementById(pre+'inv-a').value='';save();renderPartner(who);toast('Investment added ✓');}
-function addItem(who,type){const pre=who==='jake'?'j':'l',t='d';const n=document.getElementById(pre+t+'-n').value.trim(),a=parseFloat(document.getElementById(pre+t+'-a').value);if(!n||isNaN(a)||a<=0){toast('Fill in both fields');return;}D[who][type].push({id:D.nextId++,name:n,amount:a});document.getElementById(pre+t+'-n').value='';document.getElementById(pre+t+'-a').value='';save();renderPartner(who);toast('Saved ✓');}
-function removeItem(who,type,id){D[who][type]=D[who][type].filter(i=>i.id!==id);save();renderPartner(who);}
+function addSaving(who){const pre=who==='jake'?'j':'l';const n=document.getElementById(pre+'s-n').value.trim(),a=parseFloat(document.getElementById(pre+'s-a').value),t=parseFloat(document.getElementById(pre+'s-t').value)||0;if(!n||isNaN(a)||a<=0){toast('Fill in name and amount');return;}if(!Array.isArray(D[who].savings))D[who].savings=[];D[who].savings.push({id:D.nextId++,name:n,amount:a,target:t||null,saved:0});document.getElementById(pre+'s-n').value='';document.getElementById(pre+'s-a').value='';document.getElementById(pre+'s-t').value='';save();renderPartner(who);toast('Saving goal added ✓');}
+function addInvestment(who){const pre=who==='jake'?'j':'l';const n=document.getElementById(pre+'inv-n').value.trim(),a=parseFloat(document.getElementById(pre+'inv-a').value),t=document.getElementById(pre+'inv-t').value;if(!n||isNaN(a)||a<=0){toast('Fill in name and amount');return;}if(!Array.isArray(D[who].investments))D[who].investments=[];D[who].investments.push({id:D.nextId++,name:n,amount:a,itype:t});document.getElementById(pre+'inv-n').value='';document.getElementById(pre+'inv-a').value='';save();renderPartner(who);toast('Investment added ✓');}
+function addItem(who,type){const pre=who==='jake'?'j':'l',t='d';const n=document.getElementById(pre+t+'-n').value.trim(),a=parseFloat(document.getElementById(pre+t+'-a').value);if(!n||isNaN(a)||a<=0){toast('Fill in both fields');return;}if(!Array.isArray(D[who][type]))D[who][type]=[];D[who][type].push({id:D.nextId++,name:n,amount:a});document.getElementById(pre+t+'-n').value='';document.getElementById(pre+t+'-a').value='';save();renderPartner(who);toast('Saved ✓');}
+function removeItem(who,type,id){if(!Array.isArray(D[who][type]))D[who][type]=[];D[who][type]=D[who][type].filter(i=>i.id!==id);save();renderPartner(who);}
 
 function renderAll(){renderJoint();renderPartner('jake');renderPartner('lauren');renderFoodShop();renderYear();setTimeout(renderJChart,80);}
 
@@ -1098,6 +1136,7 @@ async function cloudPoll(){
       if(remote[k]!==undefined)D[k]=remote[k];
     });
     D._ts=remote._ts;
+    sanitise();
     localStorage.setItem('jl-v6',JSON.stringify(D));
     renderAll();
     toast('☁️ Updated from other phone');
@@ -1113,7 +1152,7 @@ async function cloudPush(){
   cloudPushTimer=setTimeout(async()=>{
     try{
       D._ts=Date.now();
-      ignoreRemoteUntil=D._ts+8000;
+      ignoreRemoteUntil=D._ts+3000;
       const r=await fetch(cloudPath(),{
         method:'PUT',
         headers:{'Content-Type':'application/json'},
@@ -1176,7 +1215,7 @@ async function connectCloud(){
     const testUrl=`${url}/${room}/jldata.json`;
     // Write current data first
     D._ts=Date.now();
-    ignoreRemoteUntil=D._ts+8000;
+    ignoreRemoteUntil=D._ts+3000;
     const r=await fetch(testUrl,{
       method:'PUT',
       headers:{'Content-Type':'application/json'},
