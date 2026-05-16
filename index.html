@@ -295,6 +295,86 @@ body{padding-bottom:calc(68px + var(--sb))}
 .phi-bar-wrap{height:3px;background:var(--s3);border-radius:2px;overflow:hidden;margin-bottom:6px}
 .phi-bar{height:100%;border-radius:2px;background:var(--blue);transition:width .5s}
 .phi-chips{display:flex;gap:6px;flex-wrap:wrap}
+
+/* ── LAUREN WEEKLY TRACKING ─────────────────────────────── */
+.week-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);padding:12px 13px;margin-bottom:7px;transition:border-color .15s}
+.week-card.current-wk{border-color:rgba(167,139,250,0.38);background:linear-gradient(135deg,rgba(167,139,250,0.09),transparent)}
+.week-card.future-wk{opacity:.42}
+.wk-top{display:flex;align-items:center;justify-content:space-between}
+.wk-label{font-size:13px;font-weight:500;color:var(--text)}
+.wk-label span{font-size:10px;color:var(--hint);font-family:var(--mono);margin-left:6px}
+.wk-now{font-size:9px;background:var(--pdim);color:var(--purple);padding:1px 7px;border-radius:20px;font-family:var(--mono);font-weight:600;margin-left:6px;vertical-align:middle}
+.wk-total{font-size:15px;font-weight:600;font-family:var(--mono);color:var(--purple)}
+.wk-total.empty-wk{color:var(--hint);font-weight:400;font-size:13px}
+.wk-sources{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap;align-items:center}
+.wk-src{font-size:10px;padding:3px 9px;border-radius:20px;font-family:var(--mono);font-weight:500}
+.wk-src.cash{background:var(--pdim);color:var(--purple)}
+.wk-src.bank{background:var(--bdim);color:var(--blue)}
+.src-split-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:11px}
+.src-split{background:rgba(255,255,255,0.045);border-radius:9px;padding:9px 11px}
+.src-split-lbl{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.09em;font-family:var(--mono);margin-bottom:4px}
+.src-split-val{font-size:17px;font-weight:500;font-family:var(--mono);color:var(--text)}
+
+/* ── EXPORT BUTTON ─────────────────────────────────────── */
+.export-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:linear-gradient(135deg,rgba(0,212,160,0.18),rgba(77,159,255,0.1));border:1px solid rgba(0,212,160,0.35);border-radius:var(--r);color:var(--teal);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);margin-bottom:12px;transition:all .15s}
+.export-btn:active{opacity:.75}
+.export-btn-ico{font-size:17px;line-height:1}
+
+/* ── PRINT VIEW (hidden in app, shown when printing) ───── */
+#print-view{display:none}
+
+@media print{
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  body>*:not(#print-view){display:none!important}
+  body{padding:0!important;background:white!important;margin:0}
+  #print-view{display:block!important}
+}
+
+/* Print view component styles */
+.pv{font-family:'DM Sans',sans-serif;background:white;color:#111;padding:24px 28px;max-width:680px;margin:0 auto;font-size:13px}
+.pv-hdr{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:14px;border-bottom:2px solid #111}
+.pv-logo{width:40px;height:40px;background:#00d4a0;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#000;flex-shrink:0}
+.pv-htitle{font-size:17px;font-weight:700;color:#111;letter-spacing:-.3px}
+.pv-hperiod{font-size:12px;color:#444;font-weight:600;margin-top:2px}
+.pv-hgen{font-size:10px;color:#999;margin-top:1px}
+.pv-section{margin-bottom:20px}
+.pv-stitle{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#555;border-bottom:1px solid #ddd;padding-bottom:7px;margin-bottom:11px}
+.pv-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:8px}
+.pv-table th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#888;padding:4px 8px 5px 0;border-bottom:1px solid #ddd;font-weight:600}
+.pv-table th.r{text-align:right}
+.pv-table td{padding:7px 8px 7px 0;border-bottom:1px solid #f0f0f0;color:#222;font-size:12px}
+.pv-table td.mono{font-family:'DM Mono',monospace;text-align:right}
+.pv-table td.saved{color:#16a34a;font-family:'DM Mono',monospace;text-align:right;font-weight:600}
+.pv-table td.over{color:#dc2626;font-family:'DM Mono',monospace;text-align:right;font-weight:600}
+.pv-table td.neutral{color:#888;font-family:'DM Mono',monospace;text-align:right}
+.pv-total-row{display:flex;justify-content:space-between;align-items:center;background:#f5f5f5;padding:9px 12px;border-radius:7px;margin-top:6px}
+.pv-total-lbl{font-size:12px;font-weight:600;color:#333}
+.pv-total-val{font-size:15px;font-weight:700;font-family:'DM Mono',monospace}
+.pv-total-val.green{color:#16a34a}
+.pv-total-val.red{color:#dc2626}
+.pv-total-val.neutral{color:#666}
+.pv-two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.pv-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+.pv-stat{background:#f8f8f8;border-radius:7px;padding:9px 11px}
+.pv-stat-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:#888;margin-bottom:4px;font-weight:600}
+.pv-stat-val{font-size:14px;font-weight:600;font-family:'DM Mono',monospace;color:#111}
+.pv-stat-val.green{color:#16a34a}
+.pv-stat-val.red{color:#dc2626}
+.pv-stat-val.amber{color:#d97706}
+.pv-year-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.pv-mchip{background:#f8f8f8;border-radius:6px;padding:8px 9px}
+.pv-mchip.future{background:#fafafa}
+.pv-mname{font-size:10px;color:#999;margin-bottom:3px;font-weight:500}
+.pv-mval{font-size:12px;font-weight:700;font-family:'DM Mono',monospace;color:#bbb}
+.pv-mval.pos{color:#16a34a}
+.pv-mval.neg{color:#dc2626}
+.pv-credit-box{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.pv-credit-box.over{background:#fff1f2;border-color:#fecdd3}
+.pv-credit-lbl{font-size:11px;color:#555;font-weight:600}
+.pv-credit-val{font-size:22px;font-weight:300;font-family:'DM Mono',monospace;letter-spacing:-1px}
+.pv-credit-val.green{color:#16a34a}
+.pv-credit-val.red{color:#dc2626}
+.pv-footer{margin-top:24px;padding-top:10px;border-top:1px solid #eee;font-size:10px;color:#bbb;text-align:center;font-family:'DM Mono',monospace}
 </style>
 </head>
 <body>
@@ -550,6 +630,7 @@ body{padding-bottom:calc(68px + var(--sb))}
       <div class="sync-code" id="sync-code-box"></div>
       <div class="sync-btns"><div class="sync-btn copy" onclick="doSync('copy')">Copy code</div><div class="sync-btn paste" onclick="doSync('paste')">Paste code</div></div>
       <div style="margin-top:8px"><button onclick="changePin()" style="width:100%;padding:9px;background:none;border:1px solid var(--border);border-radius:var(--rs);font-size:12px;color:var(--muted);cursor:pointer;font-family:var(--font)">🔒 Change PIN</button></div>
+      <div style="margin-top:6px"><button onclick="generatePDF()" style="width:100%;padding:9px;background:none;border:1px solid var(--border);border-radius:var(--rs);font-size:12px;color:var(--teal);cursor:pointer;font-family:var(--font)">📄 Export month as PDF</button></div>
     </div>
     <div style="height:8px"></div>
   </div>
@@ -636,18 +717,52 @@ body{padding-bottom:calc(68px + var(--sb))}
     <div class="lsec on" id="lsec-overview">
       <div class="stats" id="lr-stats"></div>
 
-      <div class="slbl">Cash income this month <span class="badge purple" id="l-inc-b">£0</span></div>
+      <div class="slbl">Income this month <span class="badge purple" id="l-inc-b">£0</span></div>
       <div class="cash-hero">
-        <div class="cash-title">💷 Cash income log</div>
+        <div class="cash-title">💰 Income log</div>
         <div class="cash-total" id="l-cash-total">£0.00</div>
         <div class="cash-sub" id="l-cash-sub">Total earned this month</div>
+        <div class="src-split-grid">
+          <div class="src-split">
+            <div class="src-split-lbl" style="color:var(--purple)">💷 Cash in hand</div>
+            <div class="src-split-val" id="l-src-cash">£0.00</div>
+          </div>
+          <div class="src-split">
+            <div class="src-split-lbl" style="color:var(--blue)">🏦 Bank transfer</div>
+            <div class="src-split-val" id="l-src-bank">£0.00</div>
+          </div>
+        </div>
       </div>
-      <div id="l-cash-list"></div>
+
+      <div class="slbl">Log a payment</div>
       <div class="form-box open" style="margin-bottom:12px">
         <div class="fld"><label>Amount (£)</label><input type="number" id="lc-amt" placeholder="0.00" min="0" step="0.01"></div>
-        <div class="fld"><label>Note — optional (e.g. week 1, client name)</label><input type="text" id="lc-note" placeholder="e.g. Week 1, babysitting, tips"></div>
-        <button class="go purple" onclick="addCashIncome()">Log cash earned</button>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="fld"><label>How paid?</label>
+            <select id="lc-src">
+              <option value="cash">💷 Cash</option>
+              <option value="bank">🏦 Bank transfer</option>
+            </select>
+          </div>
+          <div class="fld"><label>Which week?</label>
+            <select id="lc-week">
+              <option value="1">Week 1 · 1–7</option>
+              <option value="2">Week 2 · 8–14</option>
+              <option value="3">Week 3 · 15–21</option>
+              <option value="4">Week 4 · 22–28</option>
+              <option value="5">Week 5 · 29+</option>
+            </select>
+          </div>
+        </div>
+        <div class="fld"><label>Note — optional</label><input type="text" id="lc-note" placeholder="e.g. client name, tips, overtime"></div>
+        <button class="go purple" onclick="addCashIncome()">Log income</button>
       </div>
+
+      <div class="slbl">Weekly breakdown <span class="badge purple" id="l-wk-badge"></span></div>
+      <div id="l-week-breakdown"></div>
+
+      <div class="slbl" style="margin-top:14px">All entries this month</div>
+      <div id="l-cash-list"></div>
 
       <div class="slbl">Savings goals <span class="badge teal" id="l-sav-b">£0/mo</span></div>
       <div id="l-sav-list"></div>
@@ -724,6 +839,10 @@ body{padding-bottom:calc(68px + var(--sb))}
 <!-- YEAR -->
 <section id="sec-year" class="sec">
   <div class="pad">
+    <button class="export-btn" onclick="generatePDF()">
+      <span class="export-btn-ico">📄</span>
+      Export this month as PDF
+    </button>
     <div class="year-hero">
       <div class="yh-lbl">Total credit saved this year</div>
       <div class="yh-amt" id="yr-total">£0.00</div>
@@ -739,6 +858,8 @@ body{padding-bottom:calc(68px + var(--sb))}
     <div style="height:8px"></div>
   </div>
 </section>
+
+<div id="print-view"></div>
 
 <nav class="nav">
   <button class="nb on" id="nb-joint" onclick="showSec('joint')"><div class="nb-ico">🏠</div><div class="nb-lbl">Bills</div></button>
@@ -872,14 +993,19 @@ function quickPaySave(){
 }
 
 // ── Cash income (Lauren) ──────────────────────────────────
+function getWeekOfMonth(d){return Math.min(5,Math.ceil(d.getDate()/7));}
+
 function addCashIncome(){
   const amt=parseFloat(document.getElementById('lc-amt').value)||0;
-  const note=document.getElementById('lc-note').value.trim()||'Cash earned';
+  const note=document.getElementById('lc-note').value.trim()||'Income';
+  const src=document.getElementById('lc-src')?.value||'cash';
+  const week=parseInt(document.getElementById('lc-week')?.value)||getWeekOfMonth(NOW);
   if(amt<=0){toast('Enter an amount');return;}
   if(!D.lauren.cashIncome)D.lauren.cashIncome=[];
-  D.lauren.cashIncome.push({id:D.nextId++,amount:amt,note,mk:MK,date:new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short'})});
-  document.getElementById('lc-amt').value='';document.getElementById('lc-note').value='';
-  save();renderPartner('lauren');toast('Cash logged ✓');
+  D.lauren.cashIncome.push({id:D.nextId++,amount:amt,note,source:src,week,mk:MK,date:new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short'})});
+  document.getElementById('lc-amt').value='';
+  document.getElementById('lc-note').value='';
+  save();renderPartner('lauren');toast('Income logged ✓');
 }
 
 
@@ -977,24 +1103,50 @@ function renderPartner(who){
     document.getElementById('j-spd-list').innerHTML=p.spending.length?p.spending.map(i=>`<div class="item"><div class="idot spd"></div><div class="iname">${i.name}</div><div class="iamt">${fmt(i.amount)}</div><button class="rm" onclick="removeItem('jake','spending',${i.id})">×</button></div>`).join(''):'<span class="empty">None added yet</span>';
 
   } else {
-    // Lauren — cash income
+    // Lauren — income (cash + bank transfer)
     const cashThisMonth=(p.cashIncome||[]).filter(c=>c.mk===MK);
     const cashTotal=cashThisMonth.reduce((s,c)=>s+c.amount,0);
+    const cashTypeTotal=cashThisMonth.filter(c=>c.source==='cash'||!c.source).reduce((s,c)=>s+c.amount,0);
+    const bankTypeTotal=cashThisMonth.filter(c=>c.source==='bank').reduce((s,c)=>s+c.amount,0);
     const sav=p.savings.reduce((s,i)=>s+i.amount,0);
     const inv=p.investments.reduce((s,i)=>s+i.amount,0);
     const spd=p.spending.reduce((s,i)=>s+i.amount,0);
     const left=cashTotal-sav-inv-spd-share;
     const leftCl=left<0?'red':left<200?'amber':'green';
-    document.getElementById('l-tag').textContent=cashTotal===0?'Log your cash earnings below':left<0?`${fmt(Math.abs(left))} over budget`:`${fmt(left)} left to spend`;
+    document.getElementById('l-tag').textContent=cashTotal===0?'Log your earnings below':left<0?`${fmt(Math.abs(left))} over budget`:`${fmt(left)} left to spend`;
     document.getElementById('l-inc-b').textContent=fmt(cashTotal);
     document.getElementById('l-sav-b').textContent=fmt(sav)+'/mo';
     document.getElementById('l-inv-b').textContent=fmt(inv)+'/mo';
     document.getElementById('l-spd-b').textContent=fmt(spd);
     document.getElementById('l-cash-total').textContent=fmt(cashTotal);
-    document.getElementById('l-cash-sub').textContent=cashThisMonth.length>0?`${cashThisMonth.length} payment${cashThisMonth.length>1?'s':''} logged this month`:'No cash logged yet this month';
-    document.getElementById(sId).innerHTML=`<div class="stat"><div class="sl">Cash this month</div><div class="sv purple">${fmt(cashTotal)}</div></div><div class="stat"><div class="sl">Savings + investments</div><div class="sv teal">${fmt(sav+inv)}</div></div><div class="stat"><div class="sl">Joint bills share</div><div class="sv">${fmt(share)}</div></div><div class="stat"><div class="sl">Left to spend</div><div class="sv ${leftCl}">${fmt(left)}</div></div>`;
-    // Cash log
-    document.getElementById('l-cash-list').innerHTML=cashThisMonth.length?cashThisMonth.map(c=>`<div class="cash-log"><div class="cash-log-info"><div class="cash-log-desc">${c.note}</div><div class="cash-log-date">${c.date}</div></div><div class="cash-log-amt">${fmt(c.amount)}</div><button class="rm" onclick="removeCash(${c.id})">×</button></div>`).join(''):'';
+    document.getElementById('l-cash-sub').textContent=cashThisMonth.length>0?`${cashThisMonth.length} payment${cashThisMonth.length>1?'s':''} logged this month`:'No income logged yet this month';
+    const srcCEl=document.getElementById('l-src-cash');const srcBEl=document.getElementById('l-src-bank');
+    if(srcCEl)srcCEl.textContent=fmt(cashTypeTotal);
+    if(srcBEl)srcBEl.textContent=fmt(bankTypeTotal);
+    document.getElementById(sId).innerHTML=`<div class="stat"><div class="sl">Income this month</div><div class="sv purple">${fmt(cashTotal)}</div></div><div class="stat"><div class="sl">Savings + investments</div><div class="sv teal">${fmt(sav+inv)}</div></div><div class="stat"><div class="sl">Joint bills share</div><div class="sv">${fmt(share)}</div></div><div class="stat"><div class="sl">Left to spend</div><div class="sv ${leftCl}">${fmt(left)}</div></div>`;
+    // Weekly breakdown
+    const WK_RANGES=['1–7','8–14','15–21','22–28','29+'];
+    const currentWk=getWeekOfMonth(NOW);
+    const weeksToShow=NOW.getDate()>=29?5:4;
+    let wkHtml='';
+    for(let w=1;w<=weeksToShow;w++){
+      const wkE=cashThisMonth.filter(c=>(c.week||getWeekOfMonth(NOW))===w);
+      const wkTot=wkE.reduce((s,c)=>s+c.amount,0);
+      const wkCash=wkE.filter(c=>c.source==='cash'||!c.source).reduce((s,c)=>s+c.amount,0);
+      const wkBank=wkE.filter(c=>c.source==='bank').reduce((s,c)=>s+c.amount,0);
+      const isEmpty=wkE.length===0,isCurrent=w===currentWk,isFuture=w>currentWk;
+      wkHtml+=`<div class="week-card${isCurrent?' current-wk':''}${isFuture&&isEmpty?' future-wk':''}"><div class="wk-top"><div class="wk-label">Week ${w}<span>· ${WK_RANGES[w-1]}</span>${isCurrent?'<span class="wk-now">now</span>':''}</div><div class="wk-total${isEmpty?' empty-wk':''}">${isEmpty?'—':fmt(wkTot)}</div></div>${!isEmpty?`<div class="wk-sources">${wkCash>0?`<span class="wk-src cash">💷 ${fmt(wkCash)}</span>`:''}${wkBank>0?`<span class="wk-src bank">🏦 ${fmt(wkBank)}</span>`:''}<span style="font-size:10px;color:var(--hint);font-family:var(--mono)">${wkE.length} payment${wkE.length!==1?'s':''}</span></div>`:''}</div>`;
+    }
+    const wkBadgeEl=document.getElementById('l-wk-badge');if(wkBadgeEl)wkBadgeEl.textContent=`Wk ${currentWk} of ${weeksToShow}`;
+    const wkBreakEl=document.getElementById('l-week-breakdown');if(wkBreakEl)wkBreakEl.innerHTML=wkHtml;
+    // Auto-set week dropdown to current week
+    const lWkEl=document.getElementById('lc-week');if(lWkEl)lWkEl.value=String(currentWk);
+    // Income entries list — newest first, with source + week label
+    document.getElementById('l-cash-list').innerHTML=cashThisMonth.length?[...cashThisMonth].reverse().map(c=>{
+      const srcLbl=c.source==='bank'?'🏦 Bank':'💷 Cash';
+      const wkLbl=c.week?`Wk ${c.week} · `:'';
+      return `<div class="cash-log"><div class="cash-log-info"><div class="cash-log-desc">${c.note}</div><div class="cash-log-date">${wkLbl}${c.date} · ${srcLbl}</div></div><div class="cash-log-amt">${fmt(c.amount)}</div><button class="rm" onclick="removeCash(${c.id})">×</button></div>`;
+    }).join(''):'<span class="empty">No income logged yet this month</span>';
     // Savings
     document.getElementById('l-sav-list').innerHTML=p.savings.length?p.savings.map(i=>{const pct=i.target?Math.min(100,Math.round((i.saved||0)/i.target*100)):0,mo=i.target&&i.amount>0?Math.ceil((i.target-(i.saved||0))/i.amount):null;return `<div class="goal-card"><div class="goal-top"><span class="goal-name">${i.name}</span><span style="display:flex;align-items:center;gap:7px"><span style="font-size:11px;font-family:var(--mono);color:var(--muted)">${fmt(i.amount)}/mo</span><button class="rm" style="padding:0 3px" onclick="removeItem('lauren','savings',${i.id})">×</button></span></div>${i.target?`<div class="goal-bar-wrap"><div class="goal-bar" style="width:${pct}%"></div></div><div class="goal-meta"><span>${fmt(i.saved||0)} of ${fmt(i.target)}</span><span>${mo?`~${mo}mo`:''}</span></div>`:''}</div>`;}).join(''):'<span class="empty">No savings goals yet</span>';
     // Investments
@@ -1094,6 +1246,138 @@ function addSaving(who){const pre=who==='jake'?'j':'l';const n=document.getEleme
 function addInvestment(who){const pre=who==='jake'?'j':'l';const n=document.getElementById(pre+'inv-n').value.trim(),a=parseFloat(document.getElementById(pre+'inv-a').value),t=document.getElementById(pre+'inv-t').value;if(!n||isNaN(a)||a<=0){toast('Fill in name and amount');return;}if(!Array.isArray(D[who].investments))D[who].investments=[];D[who].investments.push({id:D.nextId++,name:n,amount:a,itype:t});document.getElementById(pre+'inv-n').value='';document.getElementById(pre+'inv-a').value='';save();renderPartner(who);toast('Investment added ✓');}
 function addItem(who,type){const pre=who==='jake'?'j':'l',t='d';const n=document.getElementById(pre+t+'-n').value.trim(),a=parseFloat(document.getElementById(pre+t+'-a').value);if(!n||isNaN(a)||a<=0){toast('Fill in both fields');return;}if(!Array.isArray(D[who][type]))D[who][type]=[];D[who][type].push({id:D.nextId++,name:n,amount:a});document.getElementById(pre+t+'-n').value='';document.getElementById(pre+t+'-a').value='';save();renderPartner(who);toast('Saved ✓');}
 function removeItem(who,type,id){if(!Array.isArray(D[who][type]))D[who][type]=[];D[who][type]=D[who][type].filter(i=>i.id!==id);save();renderPartner(who);}
+
+// ── PDF Export ────────────────────────────────────────────
+function generatePDF(){
+  const pv=document.getElementById('print-view');
+
+  // Bills
+  const bills=D.bills;
+  const billBudget=bills.reduce((s,b)=>s+b.budget,0);
+  const billActual=bills.reduce((s,b)=>{const a=getActual(b.id);return s+(a!==null?a:b.budget);},0);
+  const credit=billBudget-billActual;
+  const share=billActual/2;
+
+  // Jake
+  const jInc=D.jake.income.reduce((s,i)=>s+i.amount,0);
+  const jSav=D.jake.savings.reduce((s,i)=>s+i.amount,0)+(D.jake.extraAlloc?.sav||0);
+  const jInv=D.jake.investments.reduce((s,i)=>s+i.amount,0)+(D.jake.extraAlloc?.inv||0);
+  const jSpd=D.jake.spending.reduce((s,i)=>s+i.amount,0)+(D.jake.extraAlloc?.spd||0);
+  const jLeft=jInc-jSav-jInv-jSpd-share;
+
+  // Lauren
+  const cashThisMonth=(D.lauren.cashIncome||[]).filter(c=>c.mk===MK);
+  const lInc=cashThisMonth.reduce((s,c)=>s+c.amount,0);
+  const lCashTotal=cashThisMonth.filter(c=>c.source==='cash'||!c.source).reduce((s,c)=>s+c.amount,0);
+  const lBankTotal=cashThisMonth.filter(c=>c.source==='bank').reduce((s,c)=>s+c.amount,0);
+  const lSav=D.lauren.savings.reduce((s,i)=>s+i.amount,0);
+  const lInv=D.lauren.investments.reduce((s,i)=>s+i.amount,0);
+  const lSpd=D.lauren.spending.reduce((s,i)=>s+i.amount,0);
+  const lLeft=lInc-lSav-lInv-lSpd-share;
+  const foodShops=(D.lauren.foodShop||[]).filter(s=>s.mk===MK);
+  const foodTotal=foodShops.reduce((s,x)=>s+x.amount,0);
+  const foodJoint=foodShops.filter(x=>x.source==='joint').reduce((s,x)=>s+x.amount,0);
+  const foodCash=foodShops.filter(x=>x.source==='cash').reduce((s,x)=>s+x.amount,0);
+  const foodMixed=foodShops.filter(x=>x.source==='mixed').reduce((s,x)=>s+x.amount,0);
+
+  // Year
+  const MONTHS_SHORT=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const thisYear=D.history.filter(h=>h.year===YEAR);
+  const yearCredit=thisYear.reduce((s,h)=>s+(h.credit||0),0);
+
+  const genDate=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+  // Bills rows HTML
+  const billRows=bills.map(b=>{
+    const a=getActual(b.id),has=a!==null,diff=has?b.budget-a:null;
+    const diffHtml=diff===null?`<td class="neutral">—</td>`:diff>0?`<td class="saved">−${fmt(diff)}</td>`:diff<0?`<td class="over">+${fmt(Math.abs(diff))}</td>`:`<td class="neutral">on budget</td>`;
+    return `<tr><td>${b.name}</td><td class="mono">${fmt(b.budget)}</td><td class="mono">${has?fmt(a):'<span style="color:#bbb">not set</span>'}</td>${diffHtml}</tr>`;
+  }).join('');
+
+  // Jake savings rows
+  const jSavRows=D.jake.savings.length?D.jake.savings.map(i=>`<tr><td>${i.name}</td><td class="mono">${fmt(i.amount)}/mo</td>${i.target?`<td class="neutral">${fmt(i.saved||0)} of ${fmt(i.target)}</td>`:`<td class="neutral">no target</td>`}</tr>`).join(''):`<tr><td colspan="3" style="color:#bbb;font-style:italic">None added</td></tr>`;
+
+  // Lauren savings rows
+  const lSavRows=D.lauren.savings.length?D.lauren.savings.map(i=>`<tr><td>${i.name}</td><td class="mono">${fmt(i.amount)}/mo</td>${i.target?`<td class="neutral">${fmt(i.saved||0)} of ${fmt(i.target)}</td>`:`<td class="neutral">no target</td>`}</tr>`).join(''):`<tr><td colspan="3" style="color:#bbb;font-style:italic">None added</td></tr>`;
+
+  // Year grid
+  const yearChips=MONTHS_SHORT.map((m,i)=>{
+    const h=thisYear.find(h=>h.mk===`${YEAR}-${i}`);
+    const isFuture=i>NOW.getMonth();
+    if(!h)return `<div class="pv-mchip${isFuture?' future':''}"><div class="pv-mname">${m}</div><div class="pv-mval">—</div></div>`;
+    const c=h.credit||0;
+    return `<div class="pv-mchip"><div class="pv-mname">${m}</div><div class="pv-mval ${c>0?'pos':c<0?'neg':''}">${c>0?'+':''}${c===0?'—':fmt(Math.abs(c))}</div></div>`;
+  }).join('');
+
+  pv.innerHTML=`<div class="pv">
+    <div class="pv-hdr">
+      <div class="pv-logo">J&amp;L</div>
+      <div>
+        <div class="pv-htitle">Jake &amp; Lauren — Finance Summary</div>
+        <div class="pv-hperiod">${MLBL}</div>
+        <div class="pv-hgen">Generated ${genDate}</div>
+      </div>
+    </div>
+
+    <div class="pv-section">
+      <div class="pv-stitle">🏠 Household Bills</div>
+      <table class="pv-table">
+        <thead><tr><th>Bill</th><th class="r">Budget</th><th class="r">Actual</th><th class="r">Difference</th></tr></thead>
+        <tbody>${billRows}</tbody>
+      </table>
+      <div class="pv-credit-box${credit<0?' over':''}">
+        <div>
+          <div class="pv-credit-lbl">${credit>0?'Credit saved this month':credit<0?'Over budget this month':'Exactly on budget'}</div>
+          <div style="font-size:11px;color:#777;margin-top:2px">Budget ${fmt(billBudget)} · Actual ${fmt(billActual)} · Each pays ${fmt(share)}</div>
+        </div>
+        <div class="pv-credit-val ${credit>0?'green':credit<0?'red':'neutral'}">${credit>=0?'':'-'}${fmt(Math.abs(credit))}</div>
+      </div>
+    </div>
+
+    <div class="pv-two-col">
+      <div>
+        <div class="pv-stitle">👤 Jake</div>
+        <div class="pv-stat-grid">
+          <div class="pv-stat"><div class="pv-stat-lbl">Income</div><div class="pv-stat-val">${fmt(jInc)}</div></div>
+          <div class="pv-stat"><div class="pv-stat-lbl">Bills share</div><div class="pv-stat-val">${fmt(share)}</div></div>
+          <div class="pv-stat"><div class="pv-stat-lbl">Savings</div><div class="pv-stat-val">${fmt(jSav)}/mo</div></div>
+          <div class="pv-stat"><div class="pv-stat-lbl">Investments</div><div class="pv-stat-val">${fmt(jInv)}/mo</div></div>
+          <div class="pv-stat"><div class="pv-stat-lbl">Spending</div><div class="pv-stat-val">${fmt(jSpd)}</div></div>
+          <div class="pv-stat"><div class="pv-stat-lbl">Left to spend</div><div class="pv-stat-val ${jLeft<0?'red':jLeft<200?'amber':'green'}">${fmt(jLeft)}</div></div>
+        </div>
+        ${D.jake.savings.length||D.jake.investments.length?`<div style="margin-top:12px"><div style="font-size:10px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Saving goals</div><table class="pv-table"><thead><tr><th>Goal</th><th class="r">Monthly</th><th class="r">Progress</th></tr></thead><tbody>${jSavRows}</tbody></table></div>`:''}
+      </div>
+      <div>
+        <div class="pv-stitle">👤 Lauren</div>
+        <div class="pv-stat-grid">
+          <div class="pv-stat"><div class="pv-stat-lbl">💷 Cash</div><div class="pv-stat-val">${fmt(lCashTotal)}</div></div>
+          <div class="pv-stat"><div class="pv-stat-lbl">🏦 Bank</div><div class="pv-stat-val">${fmt(lBankTotal)}</div></div>
+          <div class="pv-stat"><div class="pv-stat-lbl">Bills share</div><div class="pv-stat-val">${fmt(share)}</div></div>
+          <div class="pv-stat"><div class="pv-stat-lbl">Savings</div><div class="pv-stat-val">${fmt(lSav)}/mo</div></div>
+          <div class="pv-stat"><div class="pv-stat-lbl">Investments</div><div class="pv-stat-val">${fmt(lInv)}/mo</div></div>
+          <div class="pv-stat"><div class="pv-stat-lbl">Food shop</div><div class="pv-stat-val ${foodTotal>480?'red':foodTotal>384?'amber':'green'}">${fmt(foodTotal)}<span style="font-size:10px;font-weight:400;color:#888"> /£480</span></div></div>
+          <div class="pv-stat"><div class="pv-stat-lbl">Left to spend</div><div class="pv-stat-val ${lLeft<0?'red':lLeft<200?'amber':'green'}">${fmt(lLeft)}</div></div>
+        </div>
+        ${foodShops.length?`<div style="margin-top:12px"><div style="font-size:10px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Food shop breakdown</div><div style="font-size:11px;color:#555;line-height:1.8">Joint account: <strong>${fmt(foodJoint+foodMixed/2)}</strong><br>Cash from wages: <strong>${fmt(foodCash+foodMixed/2)}</strong><br>${foodShops.length} shop${foodShops.length!==1?'s':''} logged this month</div></div>`:''}
+        ${D.lauren.savings.length?`<div style="margin-top:12px"><div style="font-size:10px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Saving goals</div><table class="pv-table"><thead><tr><th>Goal</th><th class="r">Monthly</th><th class="r">Progress</th></tr></thead><tbody>${lSavRows}</tbody></table></div>`:''}
+      </div>
+    </div>
+
+    <div class="pv-section">
+      <div class="pv-stitle">📊 ${YEAR} — Year to Date</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div><div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Total credit saved</div><div style="font-size:24px;font-weight:300;font-family:'DM Mono',monospace;color:${yearCredit>=0?'#16a34a':'#dc2626'};letter-spacing:-1px">${fmt(yearCredit)}</div></div>
+        <div style="text-align:right"><div style="font-size:10px;color:#888">Months recorded</div><div style="font-size:18px;font-weight:600;color:#333">${thisYear.length}</div></div>
+      </div>
+      <div class="pv-year-grid">${yearChips}</div>
+    </div>
+
+    <div class="pv-footer">Jake &amp; Lauren Finance · ${genDate} · jaffajakee.github.io/J-L</div>
+  </div>`;
+
+  toast('📄 Opening print — use Share → Print on iPhone');
+  setTimeout(()=>window.print(),400);
+}
 
 function renderAll(){renderJoint();renderPartner('jake');renderPartner('lauren');renderFoodShop();renderYear();setTimeout(renderJChart,80);}
 
