@@ -70,6 +70,34 @@ body{padding-bottom:calc(68px + var(--sb))}
 .hh-warn{background:var(--rdim);border:1px solid rgba(255,107,107,0.3);border-radius:var(--rs);padding:10px 13px;margin-bottom:12px;font-size:12px;color:var(--red);line-height:1.5;display:none}
 .hh-warn.show{display:block}
 
+/* JOINT HEALTH CARD */
+.jh-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:14px 15px;margin-bottom:12px}
+.jh-card.warn{border-color:rgba(255,107,107,0.45);background:rgba(255,107,107,0.05)}
+.jh-card.ok{border-color:rgba(0,212,160,0.3)}
+.jh-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--hint);font-family:var(--mono);margin-bottom:11px;display:flex;align-items:center;justify-content:space-between}
+.jh-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;font-size:12px;color:var(--muted)}
+.jh-row:not(:last-child){border-bottom:1px solid rgba(255,255,255,0.04)}
+.jh-row-lbl{display:flex;align-items:center;gap:6px}
+.jh-row-val{font-family:var(--mono);font-size:13px;color:var(--text);display:flex;align-items:center;gap:6px}
+.jh-row-val.green{color:var(--green)}.jh-row-val.red{color:var(--red)}.jh-row-val.amber{color:var(--amber)}.jh-row-val.blue{color:var(--blue)}.jh-row-val.purple{color:var(--purple)}
+.jh-divider{border:none;border-top:1px solid rgba(255,255,255,0.08);margin:8px 0}
+.jh-balance{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;border-radius:var(--rs);margin-top:10px}
+.jh-balance.surplus{background:rgba(0,212,160,0.1);border:1px solid rgba(0,212,160,0.25)}
+.jh-balance.deficit{background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.3)}
+.jh-balance.tight{background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3)}
+.jh-balance-lbl{font-size:12px;font-weight:600;color:var(--text)}
+.jh-balance-val{font-size:18px;font-weight:600;font-family:var(--mono)}
+.jh-balance-val.green{color:var(--green)}.jh-balance-val.red{color:var(--red)}.jh-balance-val.amber{color:var(--amber)}
+.jh-edit-btn{background:none;border:none;cursor:pointer;color:var(--hint);font-size:12px;padding:1px 5px;border-radius:4px;font-family:var(--mono);line-height:1;transition:color .15s}
+.jh-edit-btn:active{color:var(--teal)}
+.jh-contrib-edit{display:none;margin-top:5px}
+.jh-contrib-edit.open{display:block}
+.jh-contrib-row{display:flex;gap:7px;align-items:center;margin-bottom:6px}
+.jh-contrib-row label{font-size:11px;color:var(--hint);width:85px;flex-shrink:0}
+.jh-contrib-row input{flex:1;padding:7px 9px;background:var(--s3);border:1px solid var(--border);border-radius:var(--rs);font-size:13px;color:var(--text);font-family:var(--mono)}
+.jh-contrib-row input:focus{outline:none;border-color:var(--teal)}
+.jh-contrib-save{padding:7px 14px;background:var(--teal);color:#000;border:none;border-radius:var(--rs);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)}
+
 .banner{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px}
 .banner-block .bl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-family:var(--mono);margin-bottom:4px}
 .banner-block .bv{font-size:24px;font-weight:300;letter-spacing:-1px;color:var(--text)}
@@ -155,7 +183,7 @@ body{padding-bottom:calc(68px + var(--sb))}
 .ltab.on{background:var(--s3);color:var(--text);border:1px solid var(--b2)}
 .lsec{display:none}.lsec.on{display:block;animation:fi .2s ease}
 
-/* FOOD SHOP */
+/* FOOD SHOP — redesigned */
 .food-hero{background:linear-gradient(135deg,rgba(74,222,128,0.13),rgba(74,222,128,0.04));border:1px solid rgba(74,222,128,0.28);border-radius:var(--r);padding:15px 17px;margin-bottom:12px;position:relative;overflow:hidden}
 .food-hero::after{content:'🛒';position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:32px;opacity:.18}
 .fh-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--green);font-family:var(--mono);margin-bottom:5px}
@@ -165,20 +193,37 @@ body{padding-bottom:calc(68px + var(--sb))}
 .fh-bar{height:100%;border-radius:3px;transition:width .6s ease;background:var(--green)}
 .fh-bar.warn{background:var(--amber)}.fh-bar.over{background:var(--red)}
 .fh-pct{font-size:10px;font-family:var(--mono);color:var(--hint)}
+.food-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px}
+.food-stat{background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);padding:10px 12px}
+.food-stat-lbl{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.09em;font-family:var(--mono);color:var(--muted);margin-bottom:4px}
+.food-stat-val{font-size:16px;font-weight:600;font-family:var(--mono);color:var(--text)}
+.food-stat-val.green{color:var(--green)}.food-stat-val.amber{color:var(--amber)}.food-stat-val.red{color:var(--red)}.food-stat-val.blue{color:var(--blue)}.food-stat-val.purple{color:var(--purple)}.food-stat-val.teal{color:var(--teal)}
+.food-stat-sub{font-size:10px;color:var(--hint);font-family:var(--mono);margin-top:2px}
+.food-form-toggle{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
+.ftog{padding:10px;background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;font-family:var(--font);transition:all .15s;text-align:center}
+.ftog.active-shop{background:rgba(74,222,128,0.12);border-color:rgba(74,222,128,0.4);color:var(--green)}
+.ftog.active-draw{background:var(--bdim);border-color:rgba(77,159,255,0.4);color:var(--blue)}
+.food-week-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);padding:12px 13px;margin-bottom:7px}
+.food-week-card.current-fw{border-color:rgba(74,222,128,0.45);background:linear-gradient(135deg,rgba(74,222,128,0.09),transparent)}
+.food-week-card.future-fw{opacity:.38}
+.fwk-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.fwk-label{font-size:13px;font-weight:500;color:var(--text)}
+.fwk-now{font-size:9px;background:rgba(74,222,128,0.18);color:var(--green);padding:1px 7px;border-radius:20px;font-family:var(--mono);font-weight:600;margin-left:6px}
+.fwk-net{font-size:14px;font-weight:600;font-family:var(--mono)}
+.fwk-row{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--muted);padding:2px 0}
+.fwk-row span{font-family:var(--mono);font-size:12px}
+.fwk-row span.green{color:var(--green)}.fwk-row span.blue{color:var(--blue)}.fwk-row span.purple{color:var(--purple)}
+.draw-pending{font-size:10px;background:rgba(251,191,36,0.15);color:var(--amber);border:1px solid rgba(251,191,36,0.3);border-radius:20px;padding:2px 9px;font-family:var(--mono);display:inline-block;margin-top:5px}
+.food-entry{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.food-entry:last-child{border-bottom:none}
+.food-entry-ico{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.food-entry-ico.shop{background:rgba(74,222,128,0.15)}.food-entry-ico.draw{background:var(--bdim)}
+.food-entry-info{flex:1;min-width:0}
+.food-entry-note{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.food-entry-meta{font-size:11px;color:var(--hint);font-family:var(--mono);margin-top:1px}
+.food-entry-amt{font-size:14px;font-weight:600;font-family:var(--mono);flex-shrink:0}
+.food-entry-amt.shop{color:var(--green)}.food-entry-amt.draw{color:var(--blue)}
 
-.food-source-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.food-source{background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);padding:11px 12px}
-.fs-lbl{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--hint);font-family:var(--mono);margin-bottom:5px}
-.fs-amt{font-size:17px;font-weight:500;font-family:var(--mono);color:var(--text)}
-.fs-sub{font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:3px}
-
-.shop-entry{background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);padding:10px 13px;margin-bottom:6px;display:flex;align-items:center;gap:9px}
-.shop-entry-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
-.shop-entry-icon.joint{background:var(--tdim)}.shop-entry-icon.cash{background:var(--pdim)}.shop-entry-icon.mixed{background:var(--gdim)}
-.shop-entry-info{flex:1;min-width:0}
-.shop-entry-note{font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.shop-entry-meta{font-size:10px;color:var(--hint);font-family:var(--mono);margin-top:2px}
-.shop-entry-amt{font-size:14px;font-weight:500;font-family:var(--mono);color:var(--green)}
 
 .cloud-status{display:flex;align-items:center;gap:5px;font-size:10px;font-family:var(--mono);padding:4px 9px;border-radius:20px;border:1px solid var(--border);background:var(--s2);cursor:pointer;margin-right:6px}
 .cloud-dot{width:7px;height:7px;border-radius:50%;background:var(--hint);flex-shrink:0;transition:background .3s}
@@ -590,6 +635,44 @@ body{padding-bottom:calc(68px + var(--sb))}
       <button class="nudge-close" onclick="dismissNudge()">×</button>
     </div>
     <div class="hh-warn" id="hh-warn"></div>
+
+    <!-- JOINT ACCOUNT HEALTH -->
+    <div class="jh-card" id="jh-card">
+      <div class="jh-title">
+        🏦 Joint Account Health
+        <button class="jh-edit-btn" onclick="toggleContribEdit()" id="jh-edit-btn">✏️ edit contributions</button>
+      </div>
+      <div class="jh-contrib-edit" id="jh-contrib-edit">
+        <div class="jh-contrib-row"><label>Jake's DD</label><input type="number" id="jh-jake-input" step="0.01" min="0" placeholder="1233.92"></div>
+        <div class="jh-contrib-row"><label>Lauren's DD</label><input type="number" id="jh-lauren-input" step="0.01" min="0" placeholder="993.92"></div>
+        <button class="jh-contrib-save" onclick="saveContribs()">Save contributions</button>
+        <hr class="jh-divider">
+      </div>
+      <div class="jh-row">
+        <div class="jh-row-lbl">💙 Jake pays in</div>
+        <div class="jh-row-val blue" id="jh-jake-val">£1,233.92/mo</div>
+      </div>
+      <div class="jh-row">
+        <div class="jh-row-lbl">💜 Lauren pays in</div>
+        <div class="jh-row-val purple" id="jh-lauren-val">£993.92/mo</div>
+      </div>
+      <hr class="jh-divider">
+      <div class="jh-row">
+        <div class="jh-row-lbl">📋 Auto bills out</div>
+        <div class="jh-row-val" id="jh-bills-out">−£0.00/mo</div>
+      </div>
+      <div class="jh-row">
+        <div class="jh-row-lbl">🛒 Food draws (est.)</div>
+        <div class="jh-row-val" id="jh-food-out">−£240.00/mo</div>
+      </div>
+      <div class="jh-balance surplus" id="jh-balance">
+        <div>
+          <div class="jh-balance-lbl" id="jh-balance-lbl">Monthly balance</div>
+          <div style="font-size:10px;color:var(--hint);font-family:var(--mono);margin-top:2px" id="jh-balance-sub"></div>
+        </div>
+        <div class="jh-balance-val green" id="jh-balance-val">£0.00</div>
+      </div>
+    </div>
     <div class="credit-pot">
       <div class="cp-lbl">Monthly credit pot</div>
       <div class="cp-amt" id="cp-amt">£0.00</div>
@@ -745,13 +828,7 @@ body{padding-bottom:calc(68px + var(--sb))}
             </select>
           </div>
           <div class="fld"><label>Which week?</label>
-            <select id="lc-week">
-              <option value="1">Week 1 · 1–7</option>
-              <option value="2">Week 2 · 8–14</option>
-              <option value="3">Week 3 · 15–21</option>
-              <option value="4">Week 4 · 22–28</option>
-              <option value="5">Week 5 · 29+</option>
-            </select>
+            <select id="lc-week" id="lc-week"></select>
           </div>
         </div>
         <div class="fld"><label>Note — optional</label><input type="text" id="lc-note" placeholder="e.g. client name, tips, overtime"></div>
@@ -793,43 +870,67 @@ body{padding-bottom:calc(68px + var(--sb))}
 
     <!-- FOOD SHOP SUB-TAB -->
     <div class="lsec" id="lsec-food">
+      <!-- Hero: total cash spent this month -->
       <div class="food-hero">
-        <div class="fh-lbl">Spent this month</div>
+        <div class="fh-lbl">Cash spent at till this month</div>
         <div class="fh-amt" id="food-total">£0.00</div>
-        <div class="fh-sub" id="food-sub">Monthly budget: £480 · £60/wk joint + £60/wk cash</div>
+        <div class="fh-sub">£120/wk target · £480/month budget</div>
         <div class="fh-bar-wrap"><div class="fh-bar" id="food-bar" style="width:0%"></div></div>
         <div class="fh-pct" id="food-pct">0% of £480 budget used</div>
       </div>
 
-      <div class="food-source-row">
-        <div class="food-source">
-          <div class="fs-lbl">Joint account draws</div>
-          <div class="fs-amt" id="food-joint-total">£0.00</div>
-          <div class="fs-sub">£60/wk budget</div>
+      <!-- 4 stat boxes -->
+      <div class="food-stat-grid">
+        <div class="food-stat">
+          <div class="food-stat-lbl">🛒 Lauren paid</div>
+          <div class="food-stat-val green" id="fs-lauren-paid">£0.00</div>
+          <div class="food-stat-sub">cash at till</div>
         </div>
-        <div class="food-source">
-          <div class="fs-lbl">Cash from wages</div>
-          <div class="fs-amt" id="food-cash-total">£0.00</div>
-          <div class="fs-sub">£60/wk budget</div>
+        <div class="food-stat">
+          <div class="food-stat-lbl">💳 Drawn from joint</div>
+          <div class="food-stat-val blue" id="fs-joint-drawn">£0.00</div>
+          <div class="food-stat-sub">Jake's half back</div>
+        </div>
+        <div class="food-stat">
+          <div class="food-stat-lbl">💜 Lauren's net cost</div>
+          <div class="food-stat-val purple" id="fs-lauren-net">£0.00</div>
+          <div class="food-stat-sub">after joint draws</div>
+        </div>
+        <div class="food-stat">
+          <div class="food-stat-lbl">🤝 Jake's share</div>
+          <div class="food-stat-val teal" id="fs-jake-share">£0.00</div>
+          <div class="food-stat-sub">via joint draws</div>
         </div>
       </div>
 
-      <div class="slbl">Log a food shop</div>
-      <div class="form-box open" style="margin-bottom:12px">
-        <div class="fld"><label>Amount spent (£)</label><input type="number" id="fs-amt" placeholder="0.00" min="0" step="0.01"></div>
-        <div class="fld"><label>Paid from</label>
-          <select id="fs-src">
-            <option value="joint">Joint account (£60/wk draw)</option>
-            <option value="cash">Cash from wages</option>
-            <option value="mixed">Split — joint + cash</option>
-          </select>
-        </div>
-        <div class="fld"><label>Note — optional</label><input type="text" id="fs-note" placeholder="e.g. Week 1, big shop, top-up"></div>
-        <button class="go" style="background:var(--green);color:#000" onclick="addFoodShop()">Log shop</button>
+      <!-- Form toggle -->
+      <div class="slbl">Log an entry</div>
+      <div class="food-form-toggle">
+        <button class="ftog active-shop" id="ftog-shop" onclick="switchFoodForm('shop')">🛒 Log a shop</button>
+        <button class="ftog" id="ftog-draw" onclick="switchFoodForm('draw')">💳 Log joint draw</button>
       </div>
 
-      <div class="slbl">This month's shops <span class="badge green" id="food-count-badge">0 shops</span></div>
-      <div id="food-shop-list"><span class="empty">No shops logged yet this month</span></div>
+      <!-- Shop form -->
+      <div class="form-box open" id="food-form-shop" style="margin-bottom:12px">
+        <div class="fld"><label>Amount spent at till (£)</label><input type="number" id="fs-shop-amt" placeholder="0.00" min="0" step="0.01"></div>
+        <div class="fld"><label>Note — optional</label><input type="text" id="fs-shop-note" placeholder="e.g. Tesco, big weekly shop, top-up"></div>
+        <button class="go" style="background:var(--green);color:#000" onclick="addFoodEntry('shop')">Log shop</button>
+      </div>
+
+      <!-- Joint draw form -->
+      <div class="form-box open" id="food-form-draw" style="display:none;margin-bottom:12px">
+        <div class="fld"><label>Amount drawn from joint (£)</label><input type="number" id="fs-draw-amt" placeholder="60.00" min="0" step="0.01" value="60"></div>
+        <div class="fld"><label>Note — optional</label><input type="text" id="fs-draw-note" placeholder="e.g. Week 3 draw, Jake's half"></div>
+        <button class="go" style="background:var(--blue);color:#fff" onclick="addFoodEntry('draw')">Log draw</button>
+      </div>
+
+      <!-- Weekly breakdown -->
+      <div class="slbl">Weekly breakdown <span class="badge green" id="food-wk-badge"></span></div>
+      <div id="food-week-list"></div>
+
+      <!-- Full log -->
+      <div class="slbl" style="margin-top:14px">All entries this month</div>
+      <div id="food-shop-list"><span class="empty">No entries logged yet</span></div>
     </div>
 
     <div style="height:8px"></div>
@@ -881,7 +982,6 @@ const DEFAULT_BILLS=[
   {id:'mortgage',name:'Mortgage',budget:1528.00,due:'1st of month'},
   {id:'gas',name:'Gas & Electric',budget:163.84,due:'1st of month'},
   {id:'council',name:'Council Tax',budget:120.00,due:'1st of month'},
-  {id:'food',name:'Food shopping',budget:460.00,due:'Varies'},
   {id:'sofa',name:'Sofa',budget:103.00,due:'Varies'},
   {id:'water',name:'Water',budget:61.00,due:'Varies'},
   {id:'broadband',name:'Broadband',budget:32.00,due:'Varies'},
@@ -893,6 +993,7 @@ let D={
     savings:[],investments:[],spending:[],payHistory:[],cashIncome:[]},
   lauren:{income:[],savings:[],investments:[],spending:[],cashIncome:[],cashHistory:[],foodShop:[]},
   history:[],nudgeDismissed:'',lastActiveMK:'',nextId:500,
+  contributions:{jake:1233.92,lauren:993.92,foodDrawWeekly:60},
 };
 
 let jChart=null,yrChart=null,savTimer=null;
@@ -907,6 +1008,7 @@ function sanitise(){
   const lDef={income:[],savings:[],investments:[],spending:[],cashIncome:[],cashHistory:[],foodShop:[]};
   Object.keys(jDef).forEach(k=>{if(!Array.isArray(D.jake[k])&&D.jake[k]!==null&&typeof D.jake[k]!=='object')D.jake[k]=jDef[k];if(D.jake[k]===undefined)D.jake[k]=jDef[k];});
   Object.keys(lDef).forEach(k=>{if(!Array.isArray(D.lauren[k])&&D.lauren[k]!==null&&typeof D.lauren[k]!=='object')D.lauren[k]=lDef[k];if(D.lauren[k]===undefined)D.lauren[k]=lDef[k];});
+  if(!D.contributions)D.contributions={jake:1233.92,lauren:993.92,foodDrawWeekly:60};
   if(!Array.isArray(D.jake.savings))D.jake.savings=[];
   if(!Array.isArray(D.jake.investments))D.jake.investments=[];
   if(!Array.isArray(D.jake.spending))D.jake.spending=[];
@@ -922,7 +1024,7 @@ function sanitise(){
   if(!Array.isArray(D.history))D.history=[];
 }
 
-function load(){setSS('saving');try{const r=localStorage.getItem('jl-v6');if(r){const s=JSON.parse(r);if(s.bills?.length)D.bills=s.bills;if(s.actuals)D.actuals=s.actuals;if(s.jake)D.jake={...D.jake,...s.jake};if(s.lauren)D.lauren={...D.lauren,...s.lauren};if(s.history)D.history=s.history;if(s.nudgeDismissed)D.nudgeDismissed=s.nudgeDismissed;if(s.lastActiveMK)D.lastActiveMK=s.lastActiveMK;if(s.nextId)D.nextId=s.nextId;
+function load(){setSS('saving');try{const r=localStorage.getItem('jl-v6');if(r){const s=JSON.parse(r);if(s.bills?.length)D.bills=s.bills;if(s.actuals)D.actuals=s.actuals;if(s.jake)D.jake={...D.jake,...s.jake};if(s.lauren)D.lauren={...D.lauren,...s.lauren};if(s.history)D.history=s.history;if(s.nudgeDismissed)D.nudgeDismissed=s.nudgeDismissed;if(s.lastActiveMK)D.lastActiveMK=s.lastActiveMK;if(s.nextId)D.nextId=s.nextId;if(s.contributions)D.contributions={...D.contributions,...s.contributions};
   // ── Migrations ──
   // Remove April 2026 pre-loaded pay history
   if(D.jake.payHistory)D.jake.payHistory=D.jake.payHistory.filter(h=>h.mk!=='2026-3');
@@ -934,6 +1036,10 @@ function load(){setSS('saving');try{const r=localStorage.getItem('jl-v6');if(r){
   if(D.jake.income)D.jake.income=D.jake.income.filter(i=>!(i.mk==='2026-4'&&(i.amount===2745.36||i.amount===2745)));
   // Fix Gas & Electric bill to £163.84
   const gasBill=D.bills.find(b=>b.id==='gas');if(gasBill&&gasBill.budget===163.08)gasBill.budget=163.84;
+  // Fix Food shopping bill to £480
+  const foodBill=D.bills.find(b=>b.id==='food');if(foodBill&&foodBill.budget===460.00)foodBill.budget=480.00;
+  // Remove food bill from bills tab — now tracked in Lauren's food tab
+  D.bills=D.bills.filter(b=>b.id!=='food');
   // Auto-reset actuals on new month
   if(D.lastActiveMK && D.lastActiveMK!==MK){
     // Archive previous month before clearing
@@ -1029,7 +1135,83 @@ function renderPayHistory(){
 }
 
 // ── Render: Joint ─────────────────────────────────────────
+// ── Joint Account Health ──────────────────────────────────
+function toggleContribEdit(){
+  const el=document.getElementById('jh-contrib-edit');
+  const isOpen=el.classList.contains('open');
+  if(!isOpen){
+    document.getElementById('jh-jake-input').value=D.contributions.jake.toFixed(2);
+    document.getElementById('jh-lauren-input').value=D.contributions.lauren.toFixed(2);
+  }
+  el.classList.toggle('open');
+  document.getElementById('jh-edit-btn').textContent=isOpen?'✏️ edit contributions':'✕ cancel';
+}
+
+function saveContribs(){
+  const j=parseFloat(document.getElementById('jh-jake-input').value)||0;
+  const l=parseFloat(document.getElementById('jh-lauren-input').value)||0;
+  if(j<=0||l<=0){toast('Enter valid amounts for both');return;}
+  D.contributions.jake=j;
+  D.contributions.lauren=l;
+  document.getElementById('jh-contrib-edit').classList.remove('open');
+  document.getElementById('jh-edit-btn').textContent='✏️ edit contributions';
+  save();renderJoint();toast('Contributions updated ✓');
+}
+
+function renderJointHealth(){
+  const c=D.contributions;
+  const billsOut=D.bills.reduce((s,b)=>s+b.budget,0);
+  // Estimated weekly draws * 4 (use actual this month if available, else estimate)
+  const foodDrawsThisMonth=(D.lauren.foodShop||[]).filter(x=>x.mk===MK&&x.type==='draw').reduce((s,x)=>s+x.amount,0);
+  const weeksGone=getWeekOfMonth(NOW);
+  const foodOutEstimate=foodDrawsThisMonth>0?foodDrawsThisMonth:c.foodDrawWeekly*4;
+  const totalIn=c.jake+c.lauren;
+  const totalOut=billsOut+foodOutEstimate;
+  const balance=totalIn-totalOut;
+  const pct=Math.round(totalIn>0?totalOut/totalIn*100:0);
+
+  document.getElementById('jh-jake-val').textContent=fmt(c.jake)+'/mo';
+  document.getElementById('jh-lauren-val').textContent=fmt(c.lauren)+'/mo';
+  document.getElementById('jh-bills-out').textContent='−'+fmt(billsOut)+'/mo';
+  document.getElementById('jh-food-out').textContent=foodDrawsThisMonth>0
+    ?'−'+fmt(foodDrawsThisMonth)+' so far this month'
+    :'−'+fmt(foodOutEstimate)+'/mo (est. 4 wks)';
+
+  const balEl=document.getElementById('jh-balance');
+  const valEl=document.getElementById('jh-balance-val');
+  const lblEl=document.getElementById('jh-balance-lbl');
+  const subEl=document.getElementById('jh-balance-sub');
+  const card=document.getElementById('jh-card');
+
+  if(balance<0){
+    balEl.className='jh-balance deficit';
+    valEl.className='jh-balance-val red';
+    valEl.textContent='−'+fmt(Math.abs(balance));
+    lblEl.textContent='⚠️ Shortfall every month';
+    subEl.textContent='Contributions don\'t cover outgoings — increase DDs';
+    card.className='jh-card warn';
+  } else if(balance<50){
+    balEl.className='jh-balance tight';
+    valEl.className='jh-balance-val amber';
+    valEl.textContent=fmt(balance);
+    lblEl.textContent='⚠️ Very tight — almost nothing left';
+    subEl.textContent='Only '+fmt(balance)+' buffer after all outgoings';
+    card.className='jh-card warn';
+  } else {
+    balEl.className='jh-balance surplus';
+    valEl.className='jh-balance-val green';
+    valEl.textContent='+'+fmt(balance);
+    lblEl.textContent='Monthly surplus';
+    subEl.textContent=fmt(balance)+' buffer after bills + food draws ('+pct+'% of income used)';
+    card.className='jh-card ok';
+  }
+
+  // Also update the old hh-warn (hide it — health card replaces it)
+  document.getElementById('hh-warn').classList.remove('show');
+}
+
 function renderJoint(){
+  renderJointHealth();
   const bills=D.bills,budget=bills.reduce((s,b)=>s+b.budget,0);
   const actual=bills.reduce((s,b)=>{const a=getActual(b.id);return s+(a!==null?a:b.budget);},0);
   const credit=budget-actual,hasEdits=bills.some(b=>getActual(b.id)!==null);
@@ -1139,8 +1321,12 @@ function renderPartner(who){
     }
     const wkBadgeEl=document.getElementById('l-wk-badge');if(wkBadgeEl)wkBadgeEl.textContent=`Wk ${currentWk} of ${weeksToShow}`;
     const wkBreakEl=document.getElementById('l-week-breakdown');if(wkBreakEl)wkBreakEl.innerHTML=wkHtml;
-    // Auto-set week dropdown to current week
-    const lWkEl=document.getElementById('lc-week');if(lWkEl)lWkEl.value=String(currentWk);
+    // Build week dropdown — only show weeks up to current
+    const WK_LABELS=['1–7','8–14','15–21','22–28','29+'];
+    const lWkEl=document.getElementById('lc-week');
+    if(lWkEl){
+      lWkEl.innerHTML=WK_LABELS.slice(0,currentWk).map((r,i)=>`<option value="${i+1}"${i+1===currentWk?' selected':''}>Week ${i+1} · ${r}</option>`).join('');
+    }
     // Income entries list — newest first, with source + week label
     document.getElementById('l-cash-list').innerHTML=cashThisMonth.length?[...cashThisMonth].reverse().map(c=>{
       const srcLbl=c.source==='bank'?'🏦 Bank':'💷 Cash';
@@ -1209,38 +1395,88 @@ function showLTab(id){
 }
 
 // ── Food shop (Lauren) ────────────────────────────────────
-function addFoodShop(){
-  const amt=parseFloat(document.getElementById('fs-amt').value)||0;
-  const src=document.getElementById('fs-src').value;
-  const note=document.getElementById('fs-note').value.trim()||'Food shop';
+function switchFoodForm(mode){
+  document.getElementById('food-form-shop').style.display=mode==='shop'?'':'none';
+  document.getElementById('food-form-draw').style.display=mode==='draw'?'':'none';
+  document.getElementById('ftog-shop').className='ftog'+(mode==='shop'?' active-shop':'');
+  document.getElementById('ftog-draw').className='ftog'+(mode==='draw'?' active-draw':'');
+}
+function addFoodEntry(type){
+  const amtId=type==='shop'?'fs-shop-amt':'fs-draw-amt';
+  const noteId=type==='shop'?'fs-shop-note':'fs-draw-note';
+  const amt=parseFloat(document.getElementById(amtId).value)||0;
+  const note=document.getElementById(noteId).value.trim()||(type==='shop'?'Food shop':'Joint draw');
   if(amt<=0){toast('Enter an amount');return;}
+  const week=getWeekOfMonth(NOW);
   if(!D.lauren.foodShop)D.lauren.foodShop=[];
-  D.lauren.foodShop.push({id:D.nextId++,amount:amt,source:src,note,mk:MK,date:new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short'})});
-  document.getElementById('fs-amt').value='';document.getElementById('fs-note').value='';
-  save();renderFoodShop();toast('Shop logged ✓');
+  D.lauren.foodShop.push({id:D.nextId++,type,amount:amt,note,week,mk:MK,date:new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short'})});
+  document.getElementById(amtId).value=type==='draw'?'60':'';
+  document.getElementById(noteId).value='';
+  save();renderFoodShop();toast(type==='shop'?'Shop logged ✓':'Joint draw logged ✓');
 }
 function removeFoodShop(id){D.lauren.foodShop=D.lauren.foodShop.filter(s=>s.id!==id);save();renderFoodShop();}
 function renderFoodShop(){
   if(!D.lauren.foodShop)D.lauren.foodShop=[];
-  const shops=D.lauren.foodShop.filter(s=>s.mk===MK);
-  const total=shops.reduce((s,x)=>s+x.amount,0);
-  const jointTotal=shops.filter(x=>x.source==='joint').reduce((s,x)=>s+x.amount,0);
-  const cashTotal=shops.filter(x=>x.source==='cash').reduce((s,x)=>s+x.amount,0);
-  const mixedTotal=shops.filter(x=>x.source==='mixed').reduce((s,x)=>s+x.amount,0);
-  // 4 weeks per month budget = £480 (£240 joint + £240 cash)
-  const budget=480,pct=Math.min(150,Math.round(total/budget*100));
+  const all=D.lauren.foodShop.filter(s=>s.mk===MK);
+  // Separate shops (cash at till) from joint draws
+  // Legacy entries (no type) treated as shop
+  const shops=all.filter(x=>!x.type||x.type==='shop');
+  const draws=all.filter(x=>x.type==='draw');
+  const totalSpent=shops.reduce((s,x)=>s+x.amount,0);
+  const totalDrawn=draws.reduce((s,x)=>s+x.amount,0);
+  const laurenNet=totalSpent-totalDrawn;
+  const budget=480,pct=Math.min(150,Math.round(totalSpent/budget*100));
   const barCls=pct>=100?'over':pct>=80?'warn':'';
-  document.getElementById('food-total').textContent=fmt(total);
+  const netCl=laurenNet<0?'red':laurenNet<120?'amber':'purple';
+  // Hero
+  document.getElementById('food-total').textContent=fmt(totalSpent);
   document.getElementById('food-total').style.color=pct>=100?'var(--red)':pct>=80?'var(--amber)':'var(--green)';
   document.getElementById('food-bar').style.width=Math.min(100,pct)+'%';
   document.getElementById('food-bar').className='fh-bar'+(barCls?' '+barCls:'');
-  document.getElementById('food-pct').textContent=pct+'% of £480 monthly budget · £'+(budget-total>0?(budget-total).toFixed(2)+' remaining':'0.00 — over by £'+Math.abs(budget-total).toFixed(2));
-  document.getElementById('food-joint-total').textContent=fmt(jointTotal+mixedTotal/2);
-  document.getElementById('food-cash-total').textContent=fmt(cashTotal+mixedTotal/2);
-  document.getElementById('food-count-badge').textContent=shops.length+' shop'+(shops.length!==1?'s':'');
-  const srcIco={joint:'🏦',cash:'💷',mixed:'🔀'};
-  const srcLbl={joint:'Joint account',cash:'Cash from wages',mixed:'Split payment'};
-  document.getElementById('food-shop-list').innerHTML=shops.length?[...shops].reverse().map(x=>`<div class="shop-entry"><div class="shop-entry-icon ${x.source}">${srcIco[x.source]}</div><div class="shop-entry-info"><div class="shop-entry-note">${x.note}</div><div class="shop-entry-meta">${srcLbl[x.source]} · ${x.date}</div></div><div class="shop-entry-amt">${fmt(x.amount)}</div><button class="rm" onclick="removeFoodShop(${x.id})">×</button></div>`).join(''):'<span class="empty">No shops logged yet this month</span>';
+  document.getElementById('food-pct').textContent=pct+'% of £480 monthly budget · £'+(budget-totalSpent>0?(budget-totalSpent).toFixed(2)+' remaining':'0.00 — over by £'+Math.abs(budget-totalSpent).toFixed(2));
+  // Stats
+  document.getElementById('fs-lauren-paid').textContent=fmt(totalSpent);
+  document.getElementById('fs-joint-drawn').textContent=fmt(totalDrawn);
+  const netEl=document.getElementById('fs-lauren-net');
+  netEl.textContent=fmt(laurenNet<0?0:laurenNet);
+  netEl.className='food-stat-val '+netCl;
+  document.getElementById('fs-jake-share').textContent=fmt(totalDrawn);
+  // Week badge
+  const currentWk=getWeekOfMonth(NOW);
+  const weeksToShow=NOW.getDate()>=29?5:4;
+  const wkBadge=document.getElementById('food-wk-badge');
+  if(wkBadge)wkBadge.textContent=`Wk ${currentWk} of ${weeksToShow}`;
+  // Weekly cards
+  const WK_RANGES=['1–7','8–14','15–21','22–28','29+'];
+  let wkHtml='';
+  for(let w=1;w<=weeksToShow;w++){
+    const wShops=shops.filter(x=>(x.week||currentWk)===w);
+    const wDraws=draws.filter(x=>(x.week||currentWk)===w);
+    const wSpent=wShops.reduce((s,x)=>s+x.amount,0);
+    const wDrawn=wDraws.reduce((s,x)=>s+x.amount,0);
+    const wNet=wSpent-wDrawn;
+    const isCurrent=w===currentWk,isFuture=w>currentWk,isEmpty=wShops.length===0&&wDraws.length===0;
+    const drawPending=wShops.length>0&&wDraws.length===0&&!isFuture;
+    wkHtml+=`<div class="food-week-card${isCurrent?' current-fw':''}${isFuture&&isEmpty?' future-fw':''}">
+      <div class="fwk-top">
+        <div class="fwk-label">Week ${w} <span style="font-size:10px;color:var(--hint);font-family:var(--mono)">· ${WK_RANGES[w-1]}</span>${isCurrent?'<span class="fwk-now">now</span>':''}</div>
+        <div class="fwk-net" style="color:${isEmpty?'var(--hint)':wNet>0?'var(--purple)':'var(--text)'}">${isEmpty?'—':fmt(wNet)+' net'}</div>
+      </div>
+      ${!isEmpty?`<div class="fwk-row">🛒 Cash at till<span class="green">${fmt(wSpent)}</span></div>
+      <div class="fwk-row">💳 Drawn from joint<span class="blue">${wDrawn>0?fmt(wDrawn):'—'}</span></div>
+      <div class="fwk-row" style="border-top:1px solid var(--border);margin-top:4px;padding-top:4px">Lauren's net<span class="purple">${fmt(wNet<0?0:wNet)}</span></div>
+      ${drawPending?'<div class="draw-pending">⚠️ joint draw pending</div>':''}`:
+      isFuture?'<div style="font-size:11px;color:var(--hint)">Not yet</div>':'<div style="font-size:11px;color:var(--hint)">Nothing logged</div>'}
+    </div>`;
+  }
+  const wkList=document.getElementById('food-week-list');
+  if(wkList)wkList.innerHTML=wkHtml;
+  // Full log — newest first, shops and draws together
+  const allSorted=[...all].sort((a,b)=>b.id-a.id);
+  document.getElementById('food-shop-list').innerHTML=allSorted.length?allSorted.map(x=>{
+    const isShop=!x.type||x.type==='shop';
+    return `<div class="food-entry"><div class="food-entry-ico ${isShop?'shop':'draw'}">${isShop?'🛒':'💳'}</div><div class="food-entry-info"><div class="food-entry-note">${x.note}</div><div class="food-entry-meta">Wk ${x.week||'?'} · ${x.date} · ${isShop?'Cash at till':'Joint draw'}</div></div><div class="food-entry-amt ${isShop?'shop':'draw'}">${isShop?'+':'−'}${fmt(x.amount)}</div><button class="rm" onclick="removeFoodShop(${x.id})">×</button></div>`;
+  }).join(''):'<span class="empty">No entries logged yet this month</span>';
 }
 function addSaving(who){const pre=who==='jake'?'j':'l';const n=document.getElementById(pre+'s-n').value.trim(),a=parseFloat(document.getElementById(pre+'s-a').value),t=parseFloat(document.getElementById(pre+'s-t').value)||0;if(!n||isNaN(a)||a<=0){toast('Fill in name and amount');return;}if(!Array.isArray(D[who].savings))D[who].savings=[];D[who].savings.push({id:D.nextId++,name:n,amount:a,target:t||null,saved:0});document.getElementById(pre+'s-n').value='';document.getElementById(pre+'s-a').value='';document.getElementById(pre+'s-t').value='';save();renderPartner(who);toast('Saving goal added ✓');}
 function addInvestment(who){const pre=who==='jake'?'j':'l';const n=document.getElementById(pre+'inv-n').value.trim(),a=parseFloat(document.getElementById(pre+'inv-a').value),t=document.getElementById(pre+'inv-t').value;if(!n||isNaN(a)||a<=0){toast('Fill in name and amount');return;}if(!Array.isArray(D[who].investments))D[who].investments=[];D[who].investments.push({id:D.nextId++,name:n,amount:a,itype:t});document.getElementById(pre+'inv-n').value='';document.getElementById(pre+'inv-a').value='';save();renderPartner(who);toast('Investment added ✓');}
@@ -1275,10 +1511,9 @@ function generatePDF(){
   const lSpd=D.lauren.spending.reduce((s,i)=>s+i.amount,0);
   const lLeft=lInc-lSav-lInv-lSpd-share;
   const foodShops=(D.lauren.foodShop||[]).filter(s=>s.mk===MK);
-  const foodTotal=foodShops.reduce((s,x)=>s+x.amount,0);
-  const foodJoint=foodShops.filter(x=>x.source==='joint').reduce((s,x)=>s+x.amount,0);
-  const foodCash=foodShops.filter(x=>x.source==='cash').reduce((s,x)=>s+x.amount,0);
-  const foodMixed=foodShops.filter(x=>x.source==='mixed').reduce((s,x)=>s+x.amount,0);
+  const foodSpent=foodShops.filter(x=>!x.type||x.type==='shop').reduce((s,x)=>s+x.amount,0);
+  const foodDrawn=foodShops.filter(x=>x.type==='draw').reduce((s,x)=>s+x.amount,0);
+  const foodNet=Math.max(0,foodSpent-foodDrawn);
 
   // Year
   const MONTHS_SHORT=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -1355,10 +1590,10 @@ function generatePDF(){
           <div class="pv-stat"><div class="pv-stat-lbl">Bills share</div><div class="pv-stat-val">${fmt(share)}</div></div>
           <div class="pv-stat"><div class="pv-stat-lbl">Savings</div><div class="pv-stat-val">${fmt(lSav)}/mo</div></div>
           <div class="pv-stat"><div class="pv-stat-lbl">Investments</div><div class="pv-stat-val">${fmt(lInv)}/mo</div></div>
-          <div class="pv-stat"><div class="pv-stat-lbl">Food shop</div><div class="pv-stat-val ${foodTotal>480?'red':foodTotal>384?'amber':'green'}">${fmt(foodTotal)}<span style="font-size:10px;font-weight:400;color:#888"> /£480</span></div></div>
+          <div class="pv-stat"><div class="pv-stat-lbl">Food spent</div><div class="pv-stat-val ${foodSpent>480?'red':foodSpent>384?'amber':'green'}">${fmt(foodSpent)}<span style="font-size:10px;font-weight:400;color:#888"> /£480</span></div></div>
           <div class="pv-stat"><div class="pv-stat-lbl">Left to spend</div><div class="pv-stat-val ${lLeft<0?'red':lLeft<200?'amber':'green'}">${fmt(lLeft)}</div></div>
         </div>
-        ${foodShops.length?`<div style="margin-top:12px"><div style="font-size:10px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Food shop breakdown</div><div style="font-size:11px;color:#555;line-height:1.8">Joint account: <strong>${fmt(foodJoint+foodMixed/2)}</strong><br>Cash from wages: <strong>${fmt(foodCash+foodMixed/2)}</strong><br>${foodShops.length} shop${foodShops.length!==1?'s':''} logged this month</div></div>`:''}
+        ${foodShops.length?`<div style="margin-top:12px"><div style="font-size:10px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Food shop breakdown</div><div style="font-size:11px;color:#555;line-height:1.8">Lauren paid at till: <strong>${fmt(foodSpent)}</strong><br>Drawn from joint: <strong>${fmt(foodDrawn)}</strong><br>Lauren's net cost: <strong>${fmt(foodNet)}</strong><br>Jake's share (via joint): <strong>${fmt(foodDrawn)}</strong></div></div>`:''}
         ${D.lauren.savings.length?`<div style="margin-top:12px"><div style="font-size:10px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Saving goals</div><table class="pv-table"><thead><tr><th>Goal</th><th class="r">Monthly</th><th class="r">Progress</th></tr></thead><tbody>${lSavRows}</tbody></table></div>`:''}
       </div>
     </div>
@@ -1430,6 +1665,8 @@ async function cloudPoll(){
     if(D.jake.income)D.jake.income=D.jake.income.filter(i=>i.mk!=='2026-3');
     if(D.jake.income)D.jake.income=D.jake.income.filter(i=>!(i.mk==='2026-4'&&(i.amount===2745.36||i.amount===2745)));
     const gasBill=D.bills.find(b=>b.id==='gas');if(gasBill&&gasBill.budget===163.08)gasBill.budget=163.84;
+    const foodBill=D.bills.find(b=>b.id==='food');if(foodBill&&foodBill.budget===460.00)foodBill.budget=480.00;
+    D.bills=D.bills.filter(b=>b.id!=='food');
     sanitise();
     localStorage.setItem('jl-v6',JSON.stringify(D));
     renderAll();
