@@ -312,6 +312,10 @@ body{padding-bottom:calc(68px + var(--sb))}
 .hist-bar{height:100%;border-radius:2px;transition:width .5s}
 .hist-bar.pos{background:var(--green)}.hist-bar.neg{background:var(--red)}
 .hist-meta{display:flex;justify-content:space-between;font-size:10px;font-family:var(--mono);color:var(--hint)}
+.hist-income-row{display:flex;gap:8px;margin-top:7px;flex-wrap:wrap}
+.hist-inc{font-size:11px;font-family:var(--mono);padding:2px 8px;border-radius:20px}
+.hist-inc.jake{background:rgba(99,179,237,0.12);color:#63b3ed}
+.hist-inc.lauren{background:rgba(183,148,244,0.12);color:#b794f4}
 
 .hero{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:12px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden}
 .hero::before{content:'';position:absolute;top:-35px;right:-35px;width:120px;height:120px;border-radius:50%}
@@ -1059,7 +1063,18 @@ function load(){setSS('saving');try{const r=localStorage.getItem('jl-v6');if(r){
 function getActual(id){const a=D.actuals[id];return a?.mk===MK?a.amount:null;}
 function setActual(id,v){D.actuals[id]={mk:MK,amount:v};}
 function clearActual(id){delete D.actuals[id];}
-function recordHistory(){if(!D.history)D.history=[];const budget=D.bills.reduce((s,b)=>s+b.budget,0);const actual=D.bills.reduce((s,b)=>{const a=getActual(b.id);return s+(a!==null?a:b.budget);},0);const credit=budget-actual;if(!D.history.find(h=>h.mk===MK)){D.history.unshift({mk:MK,label:MLBL,year:YEAR,budget,actual,credit,bills:D.bills.length});if(D.history.length>24)D.history=D.history.slice(0,24);}}
+function recordHistory(){
+  if(!D.history)D.history=[];
+  const budget=D.bills.reduce((s,b)=>s+b.budget,0);
+  const actual=D.bills.reduce((s,b)=>{const a=getActual(b.id);return s+(a!==null?a:b.budget);},0);
+  const credit=budget-actual;
+  const jakeInc=D.jake.income.reduce((s,i)=>s+i.amount,0)+(D.jake.cashIncome||[]).filter(c=>c.mk===MK).reduce((s,c)=>s+c.amount,0);
+  const laurenInc=(D.lauren.cashIncome||[]).filter(c=>c.mk===MK).reduce((s,c)=>s+c.amount,0);
+  if(!D.history.find(h=>h.mk===MK)){
+    D.history.unshift({mk:MK,label:MLBL,year:YEAR,budget,actual,credit,bills:D.bills.length,jakeInc,laurenInc});
+    if(D.history.length>24)D.history=D.history.slice(0,24);
+  }
+}
 
 function setSS(s){const d=document.getElementById('sdot'),l=document.getElementById('slbl');d.className='sdot'+(s==='saving'?' amber':'');l.textContent=s==='saving'?'saving…':NOW.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2100);}
@@ -1377,12 +1392,30 @@ function renderYear(){
   const totalCredit=thisYear.reduce((s,h)=>s+(h.credit||0),0);
   const totalBudget=thisYear.reduce((s,h)=>s+(h.budget||0),0);
   const totalActual=thisYear.reduce((s,h)=>s+(h.actual||h.budget),0);
+  const totalJakeInc=thisYear.reduce((s,h)=>s+(h.jakeInc||0),0);
+  const totalLaurenInc=thisYear.reduce((s,h)=>s+(h.laurenInc||0),0);
   const best=thisYear.length?thisYear.reduce((b,h)=>(h.credit||0)>(b.credit||0)?h:b,thisYear[0]):null;
   document.getElementById('yr-total').textContent=fmtK(Math.abs(totalCredit));
   document.getElementById('yr-sub').textContent=`${fmt(totalCredit)} saved vs budget · ${thisYear.length} months recorded in ${YEAR}`;
-  document.getElementById('yr-stats').innerHTML=`<div class="stat"><div class="sl">Year budget</div><div class="sv">${fmtK(totalBudget)}</div></div><div class="stat"><div class="sl">Year actual</div><div class="sv">${fmtK(totalActual)}</div></div><div class="stat"><div class="sl">Total credit</div><div class="sv ${totalCredit>=0?'green':'red'}">${fmt(totalCredit)}</div></div><div class="stat"><div class="sl">Best month</div><div class="sv teal">${best?best.label.split(' ')[0]:'—'}</div><div class="ss">${best?fmt(best.credit||0)+' saved':''}</div></div>`;
+  document.getElementById('yr-stats').innerHTML=`
+    <div class="stat"><div class="sl">Year budget</div><div class="sv">${fmtK(totalBudget)}</div></div>
+    <div class="stat"><div class="sl">Year actual</div><div class="sv">${fmtK(totalActual)}</div></div>
+    <div class="stat"><div class="sl">Total credit</div><div class="sv ${totalCredit>=0?'green':'red'}">${fmt(totalCredit)}</div></div>
+    <div class="stat"><div class="sl">Best month</div><div class="sv teal">${best?best.label.split(' ')[0]:'—'}</div><div class="ss">${best?fmt(best.credit||0)+' saved':''}</div></div>
+    ${totalJakeInc>0?`<div class="stat"><div class="sl">Jake's income</div><div class="sv">${fmtK(totalJakeInc)}</div><div class="ss">year to date</div></div>`:''}
+    ${totalLaurenInc>0?`<div class="stat"><div class="sl">Lauren's income</div><div class="sv">${fmtK(totalLaurenInc)}</div><div class="ss">year to date</div></div>`:''}
+  `;
   const maxC=Math.max(...thisYear.map(h=>Math.abs(h.credit||0)),1);
-  document.getElementById('yr-hist-list').innerHTML=thisYear.length?thisYear.map(h=>{const c=h.credit||0,pct=Math.min(100,Math.round(Math.abs(c)/maxC*100));return `<div class="hist-card"><div class="hist-top"><span class="hist-month">${h.label}</span><span class="hist-credit ${c>0?'pos':c<0?'neg':'zero'}">${c>0?'+':c<0?'−':''}${fmt(Math.abs(c))}</span></div><div class="hist-bar-wrap"><div class="hist-bar ${c>=0?'pos':'neg'}" style="width:${pct}%"></div></div><div class="hist-meta"><span>budget ${fmt(h.budget)}</span><span>actual ${fmt(h.actual||h.budget)}</span></div></div>`;}).join(''):'<span class="empty">History builds automatically each month</span>';
+  document.getElementById('yr-hist-list').innerHTML=thisYear.length?thisYear.map(h=>{
+    const c=h.credit||0,pct=Math.min(100,Math.round(Math.abs(c)/maxC*100));
+    const jInc=h.jakeInc||0,lInc=h.laurenInc||0;
+    return `<div class="hist-card">
+      <div class="hist-top"><span class="hist-month">${h.label}</span><span class="hist-credit ${c>0?'pos':c<0?'neg':'zero'}">${c>0?'+':c<0?'−':''}${fmt(Math.abs(c))}</span></div>
+      <div class="hist-bar-wrap"><div class="hist-bar ${c>=0?'pos':'neg'}" style="width:${pct}%"></div></div>
+      <div class="hist-meta"><span>budget ${fmt(h.budget)}</span><span>actual ${fmt(h.actual||h.budget)}</span></div>
+      ${jInc>0||lInc>0?`<div class="hist-income-row">${jInc>0?`<span class="hist-inc jake">👤 Jake ${fmt(jInc)}</span>`:''}${lInc>0?`<span class="hist-inc lauren">👤 Lauren ${fmt(lInc)}</span>`:''}</div>`:''}
+    </div>`;
+  }).join(''):'<span class="empty">History builds automatically each month</span>';
 }
 function renderYearChart(){
   const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
