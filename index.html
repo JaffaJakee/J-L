@@ -643,7 +643,7 @@ body{padding-bottom:calc(68px + var(--sb))}
         <button class="jh-edit-btn" onclick="toggleContribEdit()" id="jh-edit-btn">✏️ edit contributions</button>
       </div>
       <div class="jh-contrib-edit" id="jh-contrib-edit">
-        <div class="jh-contrib-row"><label>Jake's DD</label><input type="number" id="jh-jake-input" step="0.01" min="0" placeholder="1233.92"></div>
+        <div class="jh-contrib-row"><label>Jake's DD</label><input type="number" id="jh-jake-input" step="0.01" min="0" placeholder="1253.92"></div>
         <div class="jh-contrib-row"><label>Lauren's DD</label><input type="number" id="jh-lauren-input" step="0.01" min="0" placeholder="993.92"></div>
         <button class="jh-contrib-save" onclick="saveContribs()">Save contributions</button>
         <hr class="jh-divider">
@@ -993,7 +993,7 @@ let D={
     savings:[],investments:[],spending:[],payHistory:[],cashIncome:[]},
   lauren:{income:[],savings:[],investments:[],spending:[],cashIncome:[],cashHistory:[],foodShop:[]},
   history:[],nudgeDismissed:'',lastActiveMK:'',nextId:500,
-  contributions:{jake:1233.92,lauren:993.92,foodDrawWeekly:60},
+  contributions:{jake:1253.92,lauren:993.92,foodDrawWeekly:60},
 };
 
 let jChart=null,yrChart=null,savTimer=null;
@@ -1008,7 +1008,8 @@ function sanitise(){
   const lDef={income:[],savings:[],investments:[],spending:[],cashIncome:[],cashHistory:[],foodShop:[]};
   Object.keys(jDef).forEach(k=>{if(!Array.isArray(D.jake[k])&&D.jake[k]!==null&&typeof D.jake[k]!=='object')D.jake[k]=jDef[k];if(D.jake[k]===undefined)D.jake[k]=jDef[k];});
   Object.keys(lDef).forEach(k=>{if(!Array.isArray(D.lauren[k])&&D.lauren[k]!==null&&typeof D.lauren[k]!=='object')D.lauren[k]=lDef[k];if(D.lauren[k]===undefined)D.lauren[k]=lDef[k];});
-  if(!D.contributions)D.contributions={jake:1233.92,lauren:993.92,foodDrawWeekly:60};
+  if(!D.contributions)D.contributions={jake:1253.92,lauren:993.92,foodDrawWeekly:60};
+  if(D.contributions.jake===1233.92)D.contributions.jake=1253.92;
   if(!Array.isArray(D.jake.savings))D.jake.savings=[];
   if(!Array.isArray(D.jake.investments))D.jake.investments=[];
   if(!Array.isArray(D.jake.spending))D.jake.spending=[];
@@ -1040,6 +1041,8 @@ function load(){setSS('saving');try{const r=localStorage.getItem('jl-v6');if(r){
   const foodBill=D.bills.find(b=>b.id==='food');if(foodBill&&foodBill.budget===460.00)foodBill.budget=480.00;
   // Remove food bill from bills tab — now tracked in Lauren's food tab
   D.bills=D.bills.filter(b=>b.id!=='food');
+  // Clear all food shop data — not tracking until June 2026
+  D.lauren.foodShop=[];
   // Auto-reset actuals on new month
   if(D.lastActiveMK && D.lastActiveMK!==MK){
     // Archive previous month before clearing
@@ -1099,7 +1102,33 @@ function quickPaySave(){
 }
 
 // ── Cash income (Lauren) ──────────────────────────────────
-function getWeekOfMonth(d){return Math.min(5,Math.ceil(d.getDate()/7));}
+function getLaurenWeeks(year,month){
+  // Returns [{start,end}] for each Tue–Sat working block in the month.
+  // If the month opens on a working day before the first Tuesday (e.g. Wed–Sat),
+  // those days form the start of Week 1.
+  const dim=new Date(year,month+1,0).getDate();
+  const wks=[];let ws=null;
+  for(let d=1;d<=dim;d++){
+    const dow=new Date(year,month,d).getDay(); // 0=Sun,1=Mon,...,6=Sat
+    if(ws===null&&(dow===2||(d===1&&dow>=3&&dow<=6)))ws=d;
+    if(dow===6&&ws!==null){wks.push({start:ws,end:d});ws=null;}
+  }
+  if(ws!==null)wks.push({start:ws,end:dim}); // partial final week if needed
+  return wks;
+}
+function weekLabel(wk,year,month){
+  const D=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const d1=new Date(year,month,wk.start),d2=new Date(year,month,wk.end);
+  return `${D[d1.getDay()]} ${wk.start}–${D[d2.getDay()]} ${wk.end}`;
+}
+function isOffDay(d){const w=d.getDay();return w===0||w===1;}
+function getWeekOfMonth(d){
+  const wks=getLaurenWeeks(d.getFullYear(),d.getMonth()),day=d.getDate(),dow=d.getDay();
+  // Sun/Mon are off days — default to most recently completed week
+  if(dow===0||dow===1){for(let i=wks.length-1;i>=0;i--)if(wks[i].end<day)return i+1;return 1;}
+  for(let i=0;i<wks.length;i++)if(day>=wks[i].start&&day<=wks[i].end)return i+1;
+  return Math.max(1,wks.length);
+}
 
 function addCashIncome(){
   const amt=parseFloat(document.getElementById('lc-amt').value)||0;
@@ -1306,26 +1335,26 @@ function renderPartner(who){
     if(srcCEl)srcCEl.textContent=fmt(cashTypeTotal);
     if(srcBEl)srcBEl.textContent=fmt(bankTypeTotal);
     document.getElementById(sId).innerHTML=`<div class="stat"><div class="sl">Income this month</div><div class="sv purple">${fmt(cashTotal)}</div></div><div class="stat"><div class="sl">Savings + investments</div><div class="sv teal">${fmt(sav+inv)}</div></div><div class="stat"><div class="sl">Joint bills share</div><div class="sv">${fmt(share)}</div></div><div class="stat"><div class="sl">Left to spend</div><div class="sv ${leftCl}">${fmt(left)}</div></div>`;
-    // Weekly breakdown
-    const WK_RANGES=['1–7','8–14','15–21','22–28','29+'];
+    // Weekly breakdown — Tue–Sat working weeks
+    const LWKS=getLaurenWeeks(NOW.getFullYear(),NOW.getMonth());
     const currentWk=getWeekOfMonth(NOW);
-    const weeksToShow=NOW.getDate()>=29?5:4;
+    const weeksToShow=LWKS.filter(wk=>wk.start<=NOW.getDate()).length;
     let wkHtml='';
     for(let w=1;w<=weeksToShow;w++){
       const wkE=cashThisMonth.filter(c=>(c.week||getWeekOfMonth(NOW))===w);
       const wkTot=wkE.reduce((s,c)=>s+c.amount,0);
       const wkCash=wkE.filter(c=>c.source==='cash'||!c.source).reduce((s,c)=>s+c.amount,0);
       const wkBank=wkE.filter(c=>c.source==='bank').reduce((s,c)=>s+c.amount,0);
-      const isEmpty=wkE.length===0,isCurrent=w===currentWk,isFuture=w>currentWk;
-      wkHtml+=`<div class="week-card${isCurrent?' current-wk':''}${isFuture&&isEmpty?' future-wk':''}"><div class="wk-top"><div class="wk-label">Week ${w}<span>· ${WK_RANGES[w-1]}</span>${isCurrent?'<span class="wk-now">now</span>':''}</div><div class="wk-total${isEmpty?' empty-wk':''}">${isEmpty?'—':fmt(wkTot)}</div></div>${!isEmpty?`<div class="wk-sources">${wkCash>0?`<span class="wk-src cash">💷 ${fmt(wkCash)}</span>`:''}${wkBank>0?`<span class="wk-src bank">🏦 ${fmt(wkBank)}</span>`:''}<span style="font-size:10px;color:var(--hint);font-family:var(--mono)">${wkE.length} payment${wkE.length!==1?'s':''}</span></div>`:''}</div>`;
+      const isEmpty=wkE.length===0,isCurrent=w===currentWk&&!isOffDay(NOW),isFuture=w>currentWk;
+      const lbl=weekLabel(LWKS[w-1],NOW.getFullYear(),NOW.getMonth());
+      wkHtml+=`<div class="week-card${isCurrent?' current-wk':''}${isFuture&&isEmpty?' future-wk':''}"><div class="wk-top"><div class="wk-label">Week ${w}<span>· ${lbl}</span>${isCurrent?'<span class="wk-now">now</span>':''}</div><div class="wk-total${isEmpty?' empty-wk':''}">${isEmpty?'—':fmt(wkTot)}</div></div>${!isEmpty?`<div class="wk-sources">${wkCash>0?`<span class="wk-src cash">💷 ${fmt(wkCash)}</span>`:''}${wkBank>0?`<span class="wk-src bank">🏦 ${fmt(wkBank)}</span>`:''}<span style="font-size:10px;color:var(--hint);font-family:var(--mono)">${wkE.length} payment${wkE.length!==1?'s':''}</span></div>`:''}</div>`;
     }
-    const wkBadgeEl=document.getElementById('l-wk-badge');if(wkBadgeEl)wkBadgeEl.textContent=`Wk ${currentWk} of ${weeksToShow}`;
+    const wkBadgeEl=document.getElementById('l-wk-badge');if(wkBadgeEl)wkBadgeEl.textContent=`Wk ${currentWk} of ${LWKS.length}`;
     const wkBreakEl=document.getElementById('l-week-breakdown');if(wkBreakEl)wkBreakEl.innerHTML=wkHtml;
-    // Build week dropdown — only show weeks up to current
-    const WK_LABELS=['1–7','8–14','15–21','22–28','29+'];
+    // Build week dropdown — only show weeks that have started
     const lWkEl=document.getElementById('lc-week');
     if(lWkEl){
-      lWkEl.innerHTML=WK_LABELS.slice(0,currentWk).map((r,i)=>`<option value="${i+1}"${i+1===currentWk?' selected':''}>Week ${i+1} · ${r}</option>`).join('');
+      lWkEl.innerHTML=LWKS.slice(0,weeksToShow).map((wk,i)=>`<option value="${i+1}"${i+1===currentWk?' selected':''}>Week ${i+1} · ${weekLabel(wk,NOW.getFullYear(),NOW.getMonth())}</option>`).join('');
     }
     // Income entries list — newest first, with source + week label
     document.getElementById('l-cash-list').innerHTML=cashThisMonth.length?[...cashThisMonth].reverse().map(c=>{
@@ -1441,13 +1470,14 @@ function renderFoodShop(){
   netEl.textContent=fmt(laurenNet<0?0:laurenNet);
   netEl.className='food-stat-val '+netCl;
   document.getElementById('fs-jake-share').textContent=fmt(totalDrawn);
-  // Week badge
+  // Week badge — Tue–Sat working weeks
+  const LWKS=getLaurenWeeks(NOW.getFullYear(),NOW.getMonth());
   const currentWk=getWeekOfMonth(NOW);
-  const weeksToShow=NOW.getDate()>=29?5:4;
+  const weeksToShow=LWKS.filter(wk=>wk.start<=NOW.getDate()).length;
   const wkBadge=document.getElementById('food-wk-badge');
-  if(wkBadge)wkBadge.textContent=`Wk ${currentWk} of ${weeksToShow}`;
+  if(wkBadge)wkBadge.textContent=`Wk ${currentWk} of ${LWKS.length}`;
   // Weekly cards
-  const WK_RANGES=['1–7','8–14','15–21','22–28','29+'];
+
   let wkHtml='';
   for(let w=1;w<=weeksToShow;w++){
     const wShops=shops.filter(x=>(x.week||currentWk)===w);
@@ -1455,11 +1485,12 @@ function renderFoodShop(){
     const wSpent=wShops.reduce((s,x)=>s+x.amount,0);
     const wDrawn=wDraws.reduce((s,x)=>s+x.amount,0);
     const wNet=wSpent-wDrawn;
-    const isCurrent=w===currentWk,isFuture=w>currentWk,isEmpty=wShops.length===0&&wDraws.length===0;
+    const isCurrent=w===currentWk&&!isOffDay(NOW),isFuture=w>currentWk,isEmpty=wShops.length===0&&wDraws.length===0;
     const drawPending=wShops.length>0&&wDraws.length===0&&!isFuture;
+    const lbl=weekLabel(LWKS[w-1],NOW.getFullYear(),NOW.getMonth());
     wkHtml+=`<div class="food-week-card${isCurrent?' current-fw':''}${isFuture&&isEmpty?' future-fw':''}">
       <div class="fwk-top">
-        <div class="fwk-label">Week ${w} <span style="font-size:10px;color:var(--hint);font-family:var(--mono)">· ${WK_RANGES[w-1]}</span>${isCurrent?'<span class="fwk-now">now</span>':''}</div>
+        <div class="fwk-label">Week ${w} <span style="font-size:10px;color:var(--hint);font-family:var(--mono)">· ${lbl}</span>${isCurrent?'<span class="fwk-now">now</span>':''}</div>
         <div class="fwk-net" style="color:${isEmpty?'var(--hint)':wNet>0?'var(--purple)':'var(--text)'}">${isEmpty?'—':fmt(wNet)+' net'}</div>
       </div>
       ${!isEmpty?`<div class="fwk-row">🛒 Cash at till<span class="green">${fmt(wSpent)}</span></div>
@@ -1667,6 +1698,8 @@ async function cloudPoll(){
     const gasBill=D.bills.find(b=>b.id==='gas');if(gasBill&&gasBill.budget===163.08)gasBill.budget=163.84;
     const foodBill=D.bills.find(b=>b.id==='food');if(foodBill&&foodBill.budget===460.00)foodBill.budget=480.00;
     D.bills=D.bills.filter(b=>b.id!=='food');
+    // Clear all food shop data — not tracking until June 2026
+    D.lauren.foodShop=[];
     sanitise();
     localStorage.setItem('jl-v6',JSON.stringify(D));
     renderAll();
