@@ -24,7 +24,22 @@
   --r:14px;--rs:9px;--sb:env(safe-area-inset-bottom,0px);
   --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
 }
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body.light{
+  --bg:#f4f4f7;--surface:#ffffff;--s2:#eeeef3;--s3:#e4e4eb;--s4:#d8d8e2;
+  --border:rgba(0,0,0,0.08);--b2:rgba(0,0,0,0.13);--b3:rgba(0,0,0,0.2);
+  --text:#111118;--muted:#55556a;--hint:#aaaabc;
+  --teal:#009970;--tdim:rgba(0,153,112,0.1);--tdim2:rgba(0,153,112,0.18);
+  --blue:#2b7fff;--bdim:rgba(43,127,255,0.1);
+  --purple:#7c5ce8;--pdim:rgba(124,92,232,0.1);
+  --amber:#c97d00;--adim:rgba(201,125,0,0.11);
+  --red:#d93025;--rdim:rgba(217,48,37,0.09);
+  --green:#1a9e4a;--gdim:rgba(26,158,74,0.1);
+  --gold:#b8860b;--goldim:rgba(184,134,11,0.11);
+}
+body.light .pnb{background:#e8e8f0;border-color:#d0d0dc;color:#111}
+body.light .pd{background:#d0d0dc;border-color:#bbbbc8}
+body.light #pin-overlay{background:#f4f4f7}
+body.light .cloud-modal .cloud-box{background:#fff;border-color:#ddd}
 html,body{background:var(--bg);color:var(--text);font-family:var(--font)}
 body{padding-bottom:calc(68px + var(--sb))}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
@@ -525,6 +540,48 @@ body{padding-bottom:calc(68px + var(--sb))}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
 </style>
 
+<style>
+/* PERSONAL OUTGOINGS */
+.out-hero{background:linear-gradient(135deg,rgba(255,107,107,0.13),rgba(255,107,107,0.04));border:1px solid rgba(255,107,107,0.28);border-radius:var(--r);padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.out-hero-left .oh-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--red);font-family:var(--mono);margin-bottom:4px}
+.out-hero-left .oh-amt{font-size:32px;font-weight:300;letter-spacing:-1.5px;color:var(--red);line-height:1;font-family:var(--mono)}
+.out-hero-left .oh-sub{font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:5px}
+.out-renewal-warn{background:rgba(245,166,35,0.15);border:1px solid rgba(245,166,35,0.4);border-radius:var(--rs);padding:10px 13px;margin-bottom:10px;font-size:12px;color:var(--amber);line-height:1.5;display:none}
+.out-renewal-warn.show{display:flex;align-items:flex-start;gap:8px}
+.sub-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);padding:11px 13px;margin-bottom:7px;transition:border-color .15s}
+.sub-card:hover{border-color:var(--b2)}
+.sub-card.renewing{border-color:rgba(245,166,35,0.45);background:rgba(245,166,35,0.05)}
+.sub-top{display:flex;align-items:center;gap:10px}
+.sub-ico{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;background:var(--rdim)}
+.sub-info{flex:1;min-width:0}
+.sub-name{font-size:13px;font-weight:500;color:var(--text)}
+.sub-meta{font-size:10px;color:var(--hint);font-family:var(--mono);margin-top:2px}
+.sub-amt{font-size:15px;font-weight:500;font-family:var(--mono);color:var(--red);flex-shrink:0}
+.sub-renew{display:flex;align-items:center;gap:7px;margin-top:8px;flex-wrap:wrap}
+.sub-renew-chip{font-size:10px;padding:3px 9px;border-radius:20px;font-family:var(--mono);font-weight:500;background:var(--adim);color:var(--amber)}
+.sub-renew-chip.urgent{background:var(--rdim);color:var(--red)}
+.sub-renew-chip.ok{background:var(--s3);color:var(--hint)}
+/* MORTGAGE COUNTDOWN CARD */
+.mort-card{background:linear-gradient(135deg,rgba(245,166,35,0.13),rgba(245,166,35,0.04));border:1px solid rgba(245,166,35,0.32);border-radius:var(--r);padding:15px 16px;margin-bottom:12px;position:relative;overflow:hidden}
+.mort-card.warn{background:linear-gradient(135deg,rgba(255,107,107,0.15),rgba(255,107,107,0.05));border-color:rgba(255,107,107,0.4)}
+.mort-card::after{content:'🏠';position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:40px;opacity:.1;pointer-events:none}
+.mort-alert{background:rgba(255,107,107,0.18);border:1px solid rgba(255,107,107,0.45);border-radius:var(--rs);padding:8px 12px;margin-bottom:12px;font-size:12px;color:var(--red);font-weight:600;display:none}
+.mort-alert.show{display:block}
+.mort-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);font-family:var(--mono);margin-bottom:6px}
+.mort-countdown{display:flex;gap:10px;align-items:baseline;margin-bottom:10px;flex-wrap:wrap}
+.mort-unit{text-align:center}
+.mort-num{font-size:30px;font-weight:300;letter-spacing:-1.5px;color:var(--amber);line-height:1;font-family:var(--mono)}
+.mort-unit-lbl{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--hint);font-family:var(--mono);margin-top:2px}
+.mort-sep{font-size:20px;font-weight:300;color:var(--hint);align-self:flex-end;padding-bottom:4px}
+.mort-bar-wrap{height:5px;background:var(--s3);border-radius:3px;overflow:hidden;margin:8px 0 5px}
+.mort-bar{height:100%;border-radius:3px;background:var(--amber);transition:width .6s ease}
+.mort-meta{display:flex;justify-content:space-between;font-size:10px;font-family:var(--mono);color:var(--hint);margin-bottom:10px}
+.mort-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+.mort-stat{background:rgba(255,255,255,0.04);border-radius:8px;padding:8px 10px}
+.mort-stat-lbl{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--hint);font-family:var(--mono);margin-bottom:3px}
+.mort-stat-val{font-size:14px;font-weight:500;font-family:var(--mono);color:var(--amber)}
+</style>
+
 <script>
 (function(){
   const DEFAULT_PIN='1234';
@@ -619,6 +676,7 @@ body{padding-bottom:calc(68px + var(--sb))}
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:4px">
+    <button id="theme-toggle" onclick="toggleTheme()" style="background:var(--s2);border:1px solid var(--border);border-radius:20px;padding:6px 9px;cursor:pointer;font-size:14px;line-height:1;color:var(--muted)" title="Toggle light/dark mode">🌙</button>
     <div class="cloud-status" id="cloud-status-pill" onclick="openCloudModal()" title="Live sync">
       <div class="cloud-dot" id="cloud-dot"></div>
       <span id="cloud-lbl" style="color:var(--hint)">live</span>
@@ -639,6 +697,20 @@ body{padding-bottom:calc(68px + var(--sb))}
       <button class="nudge-close" onclick="dismissNudge()">×</button>
     </div>
     <div class="hh-warn" id="hh-warn"></div>
+
+    <!-- MORTGAGE COUNTDOWN -->
+    <div class="mort-card" id="mort-card">
+      <div class="mort-alert" id="mort-alert"></div>
+      <div class="mort-lbl">🔒 Fixed rate expires</div>
+      <div class="mort-countdown" id="mort-countdown"></div>
+      <div class="mort-bar-wrap"><div class="mort-bar" id="mort-bar" style="width:0%"></div></div>
+      <div class="mort-meta"><span id="mort-meta-start"></span><span id="mort-meta-end">29 Feb 2028</span></div>
+      <div class="mort-stats">
+        <div class="mort-stat"><div class="mort-stat-lbl">Rate</div><div class="mort-stat-val">4.23%</div></div>
+        <div class="mort-stat"><div class="mort-stat-lbl">Monthly</div><div class="mort-stat-val">£1,528</div></div>
+        <div class="mort-stat"><div class="mort-stat-lbl">Progress</div><div class="mort-stat-val" id="mort-stat-pct">—</div></div>
+      </div>
+    </div>
 
     <!-- JOINT ACCOUNT HEALTH -->
     <div class="jh-card" id="jh-card">
@@ -755,6 +827,32 @@ body{padding-bottom:calc(68px + var(--sb))}
     <div id="j-pay-history"></div>
 
     <div class="stats" style="margin-top:16px" id="jk-stats2"></div>
+
+    <!-- PERSONAL OUTGOINGS -->
+    <div class="slbl">Monthly outgoings <span class="badge red" id="j-out-badge">£0/mo</span></div>
+    <div class="out-renewal-warn" id="j-out-warn"><span>⚠️</span><span id="j-out-warn-text"></span></div>
+    <div class="out-hero">
+      <div class="out-hero-left">
+        <div class="oh-lbl">Total leaving your account</div>
+        <div class="oh-amt" id="j-out-total">£0.00</div>
+        <div class="oh-sub" id="j-out-sub">per month</div>
+      </div>
+    </div>
+    <div id="j-sub-list"></div>
+    <button class="add-toggle" onclick="toggleAddSub()">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="6" y1="0" x2="6" y2="12"/><line x1="0" y1="6" x2="12" y2="6"/></svg>
+      Add outgoing
+    </button>
+    <div class="form-box" id="add-sub-form">
+      <div class="fld"><label>Name</label><input type="text" id="sub-n" placeholder="e.g. Netflix, Gym, RAC"></div>
+      <div class="fld"><label>Monthly cost (£)</label><input type="number" id="sub-a" placeholder="0.00" min="0" step="0.01"></div>
+      <div class="fld"><label>Emoji icon — optional</label><input type="text" id="sub-e" placeholder="e.g. 🎵 🚗 🏋️" maxlength="4"></div>
+      <div class="fld"><label>Renewal date — optional</label><input type="date" id="sub-d"></div>
+      <div class="fld" id="sub-warn-wrap" style="display:none"><label>Warn me how many days before?</label>
+        <select id="sub-w"><option value="7">7 days</option><option value="14">14 days</option><option value="30" selected>30 days</option><option value="60">60 days</option></select>
+      </div>
+      <button class="go" style="background:var(--red);color:#fff" onclick="addPersonalSub()">Add outgoing</button>
+    </div>
 
     <div class="slbl">Savings goals <span class="badge teal" id="j-sav-b">£0/mo</span></div>
     <div id="j-sav-list"></div>
@@ -1014,6 +1112,15 @@ function sanitise(){
   Object.keys(lDef).forEach(k=>{if(!Array.isArray(D.lauren[k])&&D.lauren[k]!==null&&typeof D.lauren[k]!=='object')D.lauren[k]=lDef[k];if(D.lauren[k]===undefined)D.lauren[k]=lDef[k];});
   if(!D.contributions)D.contributions={jake:1253.92,lauren:993.92,foodDrawWeekly:60};
   if(D.contributions.jake===1233.92)D.contributions.jake=1253.92;
+  if(!Array.isArray(D.jake.personalSubs)){
+    D.jake.personalSubs=[
+      {id:D.nextId++,name:'Life Insurance',amount:34.00,emoji:'🛡️'},
+      {id:D.nextId++,name:'Road Tax',amount:31.50,emoji:'🚗'},
+      {id:D.nextId++,name:'Mobile Phone',amount:8.50,emoji:'📱'},
+      {id:D.nextId++,name:'Spotify',amount:13.00,emoji:'🎵'},
+      {id:D.nextId++,name:'Car Insurance',amount:54.00,emoji:'🚘',renewalDate:'2027-05-25',warnDays:30},
+    ];
+  }
   if(!Array.isArray(D.jake.savings))D.jake.savings=[];
   if(!Array.isArray(D.jake.investments))D.jake.investments=[];
   if(!Array.isArray(D.jake.spending))D.jake.spending=[];
@@ -1678,7 +1785,143 @@ function generatePDF(){
   setTimeout(()=>window.print(),400);
 }
 
-function renderAll(){renderJoint();renderPartner('jake');renderPartner('lauren');renderFoodShop();renderYear();setTimeout(renderJChart,80);}
+// ── Personal outgoings (Jake) ─────────────────────────────
+function toggleAddSub(){
+  const f=document.getElementById('add-sub-form');
+  f.classList.toggle('open');
+  const dInp=document.getElementById('sub-d');
+  dInp.onchange=function(){document.getElementById('sub-warn-wrap').style.display=this.value?'block':'none';};
+}
+function addPersonalSub(){
+  const n=document.getElementById('sub-n').value.trim();
+  const a=parseFloat(document.getElementById('sub-a').value)||0;
+  const e=document.getElementById('sub-e').value.trim()||'💳';
+  const d=document.getElementById('sub-d').value;
+  const w=parseInt(document.getElementById('sub-w').value)||30;
+  if(!n||a<=0){toast('Enter name and amount');return;}
+  if(!Array.isArray(D.jake.personalSubs))D.jake.personalSubs=[];
+  D.jake.personalSubs.push({id:D.nextId++,name:n,amount:a,emoji:e,renewalDate:d||null,warnDays:d?w:null});
+  ['sub-n','sub-a','sub-e','sub-d'].forEach(id=>{document.getElementById(id).value='';});
+  document.getElementById('sub-warn-wrap').style.display='none';
+  document.getElementById('add-sub-form').classList.remove('open');
+  save();renderPersonalSubs();toast('Outgoing added ✓');
+}
+function removePersonalSub(id){
+  D.jake.personalSubs=D.jake.personalSubs.filter(s=>s.id!==id);
+  save();renderPersonalSubs();
+}
+function renderPersonalSubs(){
+  if(!Array.isArray(D.jake.personalSubs))D.jake.personalSubs=[];
+  const subs=D.jake.personalSubs;
+  const total=subs.reduce((s,x)=>s+x.amount,0);
+  const count=subs.length;
+  document.getElementById('j-out-badge').textContent=fmt(total)+'/mo';
+  document.getElementById('j-out-total').textContent=fmt(total);
+  document.getElementById('j-out-sub').textContent=`${count} outgoing${count!==1?'s':''} · per month`;
+  // Build renewal warnings (for all subs with renewalDate)
+  const today=new Date();today.setHours(0,0,0,0);
+  const warnings=[];
+  subs.forEach(s=>{
+    if(!s.renewalDate)return;
+    const rd=new Date(s.renewalDate);rd.setHours(0,0,0,0);
+    const daysLeft=Math.round((rd-today)/(1000*60*60*24));
+    if(daysLeft<=s.warnDays&&daysLeft>=0)warnings.push({name:s.name,daysLeft,urgent:daysLeft<=7});
+  });
+  const warnEl=document.getElementById('j-out-warn');
+  const warnTxt=document.getElementById('j-out-warn-text');
+  if(warnings.length){
+    const w=warnings[0];
+    warnTxt.textContent=`${w.name} renews in ${w.daysLeft} day${w.daysLeft!==1?'s':''}${w.daysLeft<=30?' — start comparing now':''}`;
+    warnEl.classList.add('show');
+  } else {
+    warnEl.classList.remove('show');
+  }
+  // Render sub cards
+  document.getElementById('j-sub-list').innerHTML=subs.length?subs.map(s=>{
+    let renewHtml='';
+    if(s.renewalDate){
+      const rd=new Date(s.renewalDate);rd.setHours(0,0,0,0);
+      const daysLeft=Math.round((rd-today)/(1000*60*60*24));
+      const rdFmt=rd.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+      const chipCls=daysLeft<=7?'urgent':daysLeft<=(s.warnDays||30)?'':' ok';
+      const chipTxt=daysLeft<0?`Expired ${Math.abs(daysLeft)}d ago`:daysLeft===0?'Renews today':`${daysLeft}d to go`;
+      renewHtml=`<div class="sub-renew"><span class="sub-renew-chip${chipCls}">🔄 ${rdFmt}</span><span class="sub-renew-chip${chipCls}">${chipTxt}</span></div>`;
+    }
+    return `<div class="sub-card${s.renewalDate&&new Date(s.renewalDate)-today<=(s.warnDays||30)*86400000&&new Date(s.renewalDate)>=today?' renewing':''}">
+      <div class="sub-top">
+        <div class="sub-ico">${s.emoji||'💳'}</div>
+        <div class="sub-info"><div class="sub-name">${s.name}</div><div class="sub-meta">monthly · direct debit</div></div>
+        <div class="sub-amt">${fmt(s.amount)}</div>
+        <button class="rm" onclick="removePersonalSub(${s.id})">×</button>
+      </div>${renewHtml}
+    </div>`;
+  }).join(''):'<span class="empty">No outgoings added yet</span>';
+}
+
+function renderAll(){renderJoint();renderPartner('jake');renderPartner('lauren');renderFoodShop();renderYear();renderMortgage();renderPersonalSubs();setTimeout(renderJChart,80);}
+
+// ── Mortgage countdown ────────────────────────────────────
+function renderMortgage(){
+  // Fixed rate: 4.23%, started 1 March 2026, expires 29 Feb 2028
+  const fixStart=new Date(2026,2,1); // 1 Mar 2026
+  const fixEnd=new Date(2028,1,29);  // 29 Feb 2028
+  const now=new Date();
+
+  const msLeft=fixEnd-now;
+  const msTotal=fixEnd-fixStart;
+  const msElapsed=now-fixStart;
+
+  // Already expired
+  if(msLeft<=0){
+    document.getElementById('mort-card').innerHTML='<div class="mort-lbl" style="color:var(--green)">✅ Fixed rate has ended — remortgage now</div>';
+    return;
+  }
+
+  const daysLeft=Math.floor(msLeft/(1000*60*60*24));
+  const weeksLeft=Math.floor(daysLeft/7);
+  const monthsLeft=Math.floor(daysLeft/30.44);
+  const remainingAfterMonths=daysLeft-Math.round(monthsLeft*30.44);
+  const weeksAfterMonths=Math.floor(Math.abs(remainingAfterMonths)/7);
+  const daysAfterWeeks=daysLeft-(monthsLeft*30|0)-(weeksAfterMonths*7);
+
+  const pct=Math.min(100,Math.round(msElapsed/msTotal*100));
+
+  // Build countdown display
+  const units=[];
+  if(monthsLeft>0)units.push({n:monthsLeft,l:'months'});
+  if(weeksAfterMonths>0||monthsLeft===0)units.push({n:weeksAfterMonths,l:'weeks'});
+  if(daysLeft<60)units.push({n:daysLeft%7,l:'days'});
+
+  document.getElementById('mort-countdown').innerHTML=units.map((u,i)=>
+    `${i>0?'<div class="mort-sep">·</div>':''}<div class="mort-unit"><div class="mort-num">${u.n}</div><div class="mort-unit-lbl">${u.l}</div></div>`
+  ).join('');
+
+  // Progress bar
+  document.getElementById('mort-bar').style.width=pct+'%';
+  document.getElementById('mort-stat-pct').textContent=pct+'% done';
+
+  // Meta labels
+  const startFmt=fixStart.toLocaleDateString('en-GB',{month:'short',year:'numeric'});
+  const endFmt=fixEnd.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  document.getElementById('mort-meta-start').textContent=startFmt;
+  document.getElementById('mort-meta-end').textContent=endFmt;
+
+  // Warning states
+  const alertEl=document.getElementById('mort-alert');
+  const card=document.getElementById('mort-card');
+  if(daysLeft<=30){
+    alertEl.textContent='⚠️ Under 30 days left — start comparing remortgage deals now!';
+    alertEl.classList.add('show');
+    card.classList.add('warn');
+  } else if(daysLeft<=90){
+    alertEl.textContent='📋 3 months out — good time to start comparing remortgage deals.';
+    alertEl.classList.add('show');
+    card.classList.remove('warn');
+  } else {
+    alertEl.classList.remove('show');
+    card.classList.remove('warn');
+  }
+}
 
 // ── Sync ──────────────────────────────────────────────────
 function toggleSync(){const p=document.getElementById('sync-panel'),open=p.style.display==='block';if(open){p.style.display='none';return;}document.getElementById('sync-code-box').textContent=btoa(unescape(encodeURIComponent(JSON.stringify(D))));p.style.display='block';p.scrollIntoView({behavior:'smooth',block:'nearest'});}
@@ -1849,6 +2092,22 @@ function copyCloudDetails(){
   if(navigator.clipboard)navigator.clipboard.writeText(txt).then(()=>toast('Details copied ✓'));
   else prompt('Copy:',txt);
 }
+
+// ── Light/dark mode ───────────────────────────────────────
+function toggleTheme(){
+  const isLight=document.body.classList.toggle('light');
+  localStorage.setItem('jl-theme',isLight?'light':'dark');
+  document.getElementById('theme-toggle').textContent=isLight?'☀️':'🌙';
+  document.querySelector('meta[name="theme-color"]').content=isLight?'#f4f4f7':'#0a0a0f';
+}
+(function applyTheme(){
+  const saved=localStorage.getItem('jl-theme');
+  if(saved==='light'){
+    document.body.classList.add('light');
+    document.getElementById('theme-toggle').textContent='☀️';
+    document.querySelector('meta[name="theme-color"]').content='#f4f4f7';
+  }
+})();
 
 load();
 cloudLoad();
