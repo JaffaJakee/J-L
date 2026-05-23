@@ -7,6 +7,13 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="J&L Finance">
 <meta name="theme-color" content="#0a0a0f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="J&L Finance">
+<meta name="description" content="Jake & Lauren home finance tracker">
+<!-- PWA Apple touch icons -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230a0a0f'/><rect x='12' y='12' width='76' height='76' rx='16' fill='%2300d4a0'/><text x='50' y='67' font-family='system-ui' font-weight='700' font-size='38' fill='%23000' text-anchor='middle'>J&amp;L</text></svg>">
+<!-- PWA Manifest (inline) -->
+<link rel="manifest" href="data:application/manifest+json,{&quot;name&quot;:&quot;Jake & Lauren Finance&quot;,&quot;short_name&quot;:&quot;J&L Finance&quot;,&quot;description&quot;:&quot;Home finance tracker&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;%230a0a0f&quot;,&quot;theme_color&quot;:&quot;%230a0a0f&quot;,&quot;orientation&quot;:&quot;portrait&quot;,&quot;icons&quot;:[{&quot;src&quot;:&quot;data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='42' fill='%230a0a0f'/><rect x='24' y='24' width='144' height='144' rx='30' fill='%2300d4a0'/><text x='96' y='128' font-family='system-ui' font-weight='700' font-size='72' fill='%23000' text-anchor='middle'>J&L</text></svg>&quot;,&quot;sizes&quot;:&quot;192x192&quot;,&quot;type&quot;:&quot;image/svg+xml&quot;}]}">
 <title>Jake &amp; Lauren · Finance</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -379,7 +386,61 @@ body{padding-bottom:calc(68px + var(--sb))}
 .src-split-lbl{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.09em;font-family:var(--mono);margin-bottom:4px}
 .src-split-val{font-size:17px;font-weight:500;font-family:var(--mono);color:var(--text)}
 
-/* ── EXPORT BUTTON ─────────────────────────────────────── */
+/* ── QUICK LOG FAB ─────────────────────────────────────── */
+.fab{position:fixed;bottom:calc(80px + var(--sb));right:16px;z-index:50;width:52px;height:52px;border-radius:50%;background:var(--teal);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,212,160,0.4);transition:transform .2s,box-shadow .2s;-webkit-tap-highlight-color:transparent}
+.fab:active{transform:scale(.92)}
+.fab.open{transform:rotate(45deg);background:var(--red);box-shadow:0 4px 20px rgba(255,107,107,0.4)}
+.fab-ico{font-size:26px;font-weight:300;color:#000;line-height:1;transition:color .2s}
+.fab.open .fab-ico{color:#fff}
+.ql-sheet{position:fixed;bottom:0;left:0;right:0;z-index:49;background:var(--surface);border-top:1px solid var(--b2);border-radius:20px 20px 0 0;padding:12px 16px calc(80px + var(--sb));transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);max-height:85vh;overflow-y:auto}
+.ql-sheet.open{transform:translateY(0)}
+.ql-handle{width:36px;height:4px;background:var(--b2);border-radius:2px;margin:0 auto 16px}
+.ql-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--hint);font-family:var(--mono);margin-bottom:12px}
+.ql-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:16px}
+.ql-tab{border:1px solid var(--border);background:var(--s2);border-radius:var(--rs);padding:9px 4px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;font-family:var(--font);text-align:center;transition:all .15s;line-height:1.3}
+.ql-tab.on{border-color:var(--teal);background:var(--tdim);color:var(--teal)}
+.ql-form{display:none;animation:fi .15s ease}.ql-form.on{display:block}
+.ql-num{width:100%;padding:18px 16px;font-size:32px;font-weight:300;font-family:var(--mono);background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);color:var(--text);text-align:center;letter-spacing:-1px;margin-bottom:10px}
+.ql-num:focus{outline:none;border-color:var(--teal)}
+.ql-sub{font-size:11px;color:var(--hint);font-family:var(--mono);text-align:center;margin-bottom:12px}
+.ql-note{width:100%;padding:11px 13px;font-size:13px;background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:var(--font);margin-bottom:10px}
+.ql-note:focus{outline:none;border-color:var(--teal)}
+.ql-go{width:100%;padding:15px;border:none;border-radius:var(--r);font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);transition:opacity .15s}
+.ql-go:active{opacity:.8}
+.ql-bill-list{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.ql-bill-btn{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);cursor:pointer;transition:border-color .15s}
+.ql-bill-btn.sel{border-color:var(--teal);background:var(--tdim)}
+.ql-bill-btn-name{font-size:13px;font-weight:500;color:var(--text)}
+.ql-bill-btn-bud{font-size:11px;font-family:var(--mono);color:var(--hint)}
+.ql-overlay{position:fixed;inset:0;z-index:48;background:rgba(0,0,0,0.5);display:none}
+.ql-overlay.open{display:block}
+/* ── INSTALL BANNER ────────────────────────────────────── */
+.install-banner{background:linear-gradient(135deg,rgba(0,212,160,0.15),rgba(77,159,255,0.08));border:1px solid rgba(0,212,160,0.3);border-radius:var(--r);padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.install-banner-ico{font-size:22px;flex-shrink:0}
+.install-banner-text .ib-title{font-size:13px;font-weight:600;color:var(--teal);margin-bottom:2px}
+.install-banner-text .ib-sub{font-size:11px;color:var(--muted);line-height:1.4}
+.install-banner-btn{margin-left:auto;padding:8px 14px;background:var(--teal);color:#000;border:none;border-radius:var(--rs);font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;font-family:var(--font)}
+.install-banner-close{background:none;border:none;color:var(--hint);cursor:pointer;font-size:18px;padding:2px;flex-shrink:0;line-height:1}
+/* ── DASHBOARD HEALTH CARD ─────────────────────────────── */
+.dash-health{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:14px 15px;margin-bottom:12px}
+.dh-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--hint);font-family:var(--mono);margin-bottom:12px}
+.dh-score-row{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.dh-score{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:3px solid var(--teal)}
+.dh-score.warn{border-color:var(--amber)}.dh-score.bad{border-color:var(--red)}
+.dh-score-num{font-size:18px;font-weight:700;font-family:var(--mono);color:var(--teal)}
+.dh-score.warn .dh-score-num{color:var(--amber)}.dh-score.bad .dh-score-num{color:var(--red)}
+.dh-score-info .dh-score-lbl{font-size:14px;font-weight:600;color:var(--text)}
+.dh-score-info .dh-score-sub{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.4}
+.dh-metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+.dh-metric{background:rgba(255,255,255,0.03);border-radius:9px;padding:9px 10px}
+.dh-metric-lbl{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono);color:var(--hint);margin-bottom:4px}
+.dh-metric-val{font-size:15px;font-weight:600;font-family:var(--mono);color:var(--text)}
+.dh-metric-val.green{color:var(--green)}.dh-metric-val.amber{color:var(--amber)}.dh-metric-val.red{color:var(--red)}.dh-metric-val.teal{color:var(--teal)}
+.dh-metric-sub{font-size:9px;color:var(--hint);font-family:var(--mono);margin-top:2px}
+.dh-vs{display:flex;align-items:center;gap:6px;margin-top:10px;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:var(--rs)}
+.dh-vs-lbl{font-size:11px;color:var(--muted);flex:1}
+.dh-vs-val{font-size:12px;font-family:var(--mono);font-weight:600}
+.dh-vs-val.up{color:var(--green)}.dh-vs-val.down{color:var(--red)}.dh-vs-val.flat{color:var(--hint)}
 .export-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:linear-gradient(135deg,rgba(0,212,160,0.18),rgba(77,159,255,0.1));border:1px solid rgba(0,212,160,0.35);border-radius:var(--r);color:var(--teal);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);margin-bottom:12px;transition:all .15s}
 .export-btn:active{opacity:.75}
 .export-btn-ico{font-size:17px;line-height:1}
@@ -691,6 +752,34 @@ body{padding-bottom:calc(68px + var(--sb))}
 <!-- JOINT BILLS -->
 <section id="sec-joint" class="sec on">
   <div class="pad">
+    <!-- INSTALL BANNER -->
+    <div class="install-banner" id="install-banner" style="display:none">
+      <div class="install-banner-ico">📲</div>
+      <div class="install-banner-text">
+        <div class="ib-title">Install as an app</div>
+        <div class="ib-sub">Tap Share → Add to Home Screen for the full app experience</div>
+      </div>
+      <button class="install-banner-close" onclick="dismissInstall()">×</button>
+    </div>
+
+    <!-- DASHBOARD HEALTH CARD -->
+    <div class="dash-health" id="dash-health">
+      <div class="dh-title">📊 Financial health — <span id="dh-month"></span></div>
+      <div class="dh-score-row">
+        <div class="dh-score" id="dh-score-ring"><div class="dh-score-num" id="dh-score-num">—</div></div>
+        <div class="dh-score-info"><div class="dh-score-lbl" id="dh-score-lbl">Calculating…</div><div class="dh-score-sub" id="dh-score-sub"></div></div>
+      </div>
+      <div class="dh-metrics">
+        <div class="dh-metric"><div class="dh-metric-lbl">Savings rate</div><div class="dh-metric-val" id="dh-savrate">—</div><div class="dh-metric-sub">of income</div></div>
+        <div class="dh-metric"><div class="dh-metric-lbl">Bills used</div><div class="dh-metric-val" id="dh-billpct">—</div><div class="dh-metric-sub">of budget</div></div>
+        <div class="dh-metric"><div class="dh-metric-lbl">Surplus</div><div class="dh-metric-val" id="dh-surplus">—</div><div class="dh-metric-sub">joint account</div></div>
+      </div>
+      <div class="dh-vs" id="dh-vs" style="display:none">
+        <span class="dh-vs-lbl" id="dh-vs-lbl">vs last month</span>
+        <span class="dh-vs-val" id="dh-vs-val"></span>
+      </div>
+    </div>
+
     <div class="nudge" id="nudge" style="display:none">
       <div class="nudge-ico">📅</div>
       <div><div class="nudge-title">Month-end review</div><div class="nudge-desc">Nearly end of month — tap ✏️ on any bill to log what you actually spent and close off <span id="nudge-month"></span>.</div></div>
@@ -1063,6 +1152,58 @@ body{padding-bottom:calc(68px + var(--sb))}
 </section>
 
 <div id="print-view"></div>
+
+<!-- QUICK LOG FAB -->
+<div class="ql-overlay" id="ql-overlay" onclick="closeQL()"></div>
+<button class="fab" id="fab" onclick="toggleQL()"><div class="fab-ico">+</div></button>
+<div class="ql-sheet" id="ql-sheet">
+  <div class="ql-handle"></div>
+  <div class="ql-title">⚡ Quick log</div>
+  <div class="ql-tabs">
+    <div class="ql-tab on" id="qlt-jake" onclick="switchQLTab('jake')">💙<br>Jake<br>Pay</div>
+    <div class="ql-tab" id="qlt-bill" onclick="switchQLTab('bill')">🏠<br>Bill<br>Actual</div>
+    <div class="ql-tab" id="qlt-lauren" onclick="switchQLTab('lauren')">💜<br>Lauren<br>Income</div>
+    <div class="ql-tab" id="qlt-food" onclick="switchQLTab('food')">🛒<br>Food<br>Shop</div>
+  </div>
+
+  <!-- Jake pay -->
+  <div class="ql-form on" id="qlf-jake">
+    <input class="ql-num" type="number" id="ql-jake-amt" placeholder="0.00" inputmode="decimal" step="0.01">
+    <div class="ql-sub">Jake's net pay this month (£)</div>
+    <button class="ql-go" style="background:var(--blue);color:#fff" onclick="qlSaveJake()">Save pay ✓</button>
+  </div>
+
+  <!-- Bill actual -->
+  <div class="ql-form" id="qlf-bill">
+    <div class="ql-sub" style="text-align:left;margin-bottom:8px">Which bill?</div>
+    <div class="ql-bill-list" id="ql-bill-list"></div>
+    <input class="ql-num" type="number" id="ql-bill-amt" placeholder="0.00" inputmode="decimal" step="0.01" style="display:none">
+    <div class="ql-sub" id="ql-bill-sub" style="display:none"></div>
+    <button class="ql-go" style="background:var(--teal);color:#000;display:none" id="ql-bill-go" onclick="qlSaveBill()">Save actual ✓</button>
+  </div>
+
+  <!-- Lauren income -->
+  <div class="ql-form" id="qlf-lauren">
+    <input class="ql-num" type="number" id="ql-lauren-amt" placeholder="0.00" inputmode="decimal" step="0.01">
+    <div class="ql-sub">Lauren's income this week (£)</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+      <select style="padding:10px 12px;background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);font-size:13px;color:var(--text);font-family:var(--font)" id="ql-lauren-src">
+        <option value="cash">💷 Cash</option>
+        <option value="bank">🏦 Bank</option>
+      </select>
+      <select style="padding:10px 12px;background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);font-size:13px;color:var(--text);font-family:var(--font)" id="ql-lauren-week"></select>
+    </div>
+    <button class="ql-go" style="background:var(--purple);color:#fff" onclick="qlSaveLauren()">Save income ✓</button>
+  </div>
+
+  <!-- Food shop -->
+  <div class="ql-form" id="qlf-food">
+    <input class="ql-num" type="number" id="ql-food-amt" placeholder="0.00" inputmode="decimal" step="0.01">
+    <div class="ql-sub">Amount spent at till (£)</div>
+    <input class="ql-note" type="text" id="ql-food-note" placeholder="Note — e.g. Tesco, big weekly shop">
+    <button class="ql-go" style="background:var(--green);color:#000" onclick="qlSaveFood()">Save shop ✓</button>
+  </div>
+</div>
 
 <nav class="nav">
   <button class="nb on" id="nb-joint" onclick="showSec('joint')"><div class="nb-ico">🏠</div><div class="nb-lbl">Bills</div></button>
@@ -1858,7 +1999,7 @@ function renderPersonalSubs(){
   }).join(''):'<span class="empty">No outgoings added yet</span>';
 }
 
-function renderAll(){renderJoint();renderPartner('jake');renderPartner('lauren');renderFoodShop();renderYear();renderMortgage();renderPersonalSubs();setTimeout(renderJChart,80);}
+function renderAll(){renderJoint();renderPartner('jake');renderPartner('lauren');renderFoodShop();renderYear();renderMortgage();renderPersonalSubs();renderDashboard();setTimeout(renderJChart,80);}
 
 // ── Mortgage countdown ────────────────────────────────────
 function renderMortgage(){
@@ -2093,6 +2234,179 @@ function copyCloudDetails(){
   else prompt('Copy:',txt);
 }
 
+// ── Dashboard health card ─────────────────────────────────
+function renderDashboard(){
+  document.getElementById('dh-month').textContent=MLBL;
+  const bills=D.bills;
+  const billBudget=bills.reduce((s,b)=>s+b.budget,0);
+  const billActual=bills.reduce((s,b)=>{const a=getActual(b.id);return s+(a!==null?a:b.budget);},0);
+  const credit=billBudget-billActual;
+  const jInc=D.jake.income.reduce((s,i)=>s+i.amount,0);
+  const lInc=(D.lauren.cashIncome||[]).filter(c=>c.mk===MK).reduce((s,c)=>s+c.amount,0);
+  const totalInc=jInc+lInc;
+  const jSav=(D.jake.savings||[]).reduce((s,i)=>s+i.amount,0)+(D.jake.extraAlloc?.sav||0);
+  const jInv=(D.jake.investments||[]).reduce((s,i)=>s+i.amount,0)+(D.jake.extraAlloc?.inv||0);
+  const lSav=(D.lauren.savings||[]).reduce((s,i)=>s+i.amount,0);
+  const lInv=(D.lauren.investments||[]).reduce((s,i)=>s+i.amount,0);
+  const totalSav=jSav+jInv+lSav+lInv;
+  const savRate=totalInc>0?Math.round(totalSav/totalInc*100):0;
+  const billPct=Math.round(billActual/billBudget*100);
+  const c=D.contributions;
+  const surplus=(c.jake+c.lauren)-billBudget-(c.foodDrawWeekly*4);
+
+  // Score 0-100
+  let score=50;
+  if(totalInc>0)score+=10;
+  if(savRate>=20)score+=20;else if(savRate>=10)score+=10;
+  if(credit>=0)score+=10;else score-=15;
+  if(surplus>0)score+=10;else score-=20;
+  score=Math.max(0,Math.min(100,score));
+
+  const ring=document.getElementById('dh-score-ring');
+  const scoreNum=document.getElementById('dh-score-num');
+  const scoreLbl=document.getElementById('dh-score-lbl');
+  const scoreSub=document.getElementById('dh-score-sub');
+  scoreNum.textContent=score;
+  ring.className='dh-score'+(score>=70?'':score>=45?' warn':' bad');
+  scoreLbl.textContent=score>=70?'Looking healthy':score>=45?'Doing OK':'Needs attention';
+  scoreSub.textContent=score>=70?'Savings, bills and surplus all on track':score>=45?'Some areas need attention — check below':'Income or surplus is tight this month';
+
+  // Metrics
+  const savRateEl=document.getElementById('dh-savrate');
+  savRateEl.textContent=totalInc>0?savRate+'%':'—';
+  savRateEl.className='dh-metric-val'+(savRate>=20?'green':savRate>=10?' amber':' red');
+  const billPctEl=document.getElementById('dh-billpct');
+  billPctEl.textContent=billPct+'%';
+  billPctEl.className='dh-metric-val'+(billPct<=100?'green':' red');
+  const surplusEl=document.getElementById('dh-surplus');
+  surplusEl.textContent=surplus>0?fmt(surplus):'—';
+  surplusEl.className='dh-metric-val'+(surplus>100?'teal':surplus>0?' amber':' red');
+
+  // vs last month
+  const lastMonth=D.history.find(h=>h.mk!==MK&&h.year===YEAR);
+  if(lastMonth&&lastMonth.credit!==undefined){
+    const diff=credit-(lastMonth.credit||0);
+    const vsEl=document.getElementById('dh-vs');
+    const vsLbl=document.getElementById('dh-vs-lbl');
+    const vsVal=document.getElementById('dh-vs-val');
+    vsEl.style.display='flex';
+    vsLbl.textContent=`vs ${lastMonth.label}`;
+    vsVal.textContent=(diff>=0?'↑ +':'↓ ')+fmt(Math.abs(diff))+' credit';
+    vsVal.className='dh-vs-val'+(diff>=0?' up':' down');
+  }
+}
+
+// ── Quick Log FAB ─────────────────────────────────────────
+let _qlBillSel=null;
+function toggleQL(){
+  const fab=document.getElementById('fab');
+  const sheet=document.getElementById('ql-sheet');
+  const overlay=document.getElementById('ql-overlay');
+  const isOpen=sheet.classList.contains('open');
+  if(isOpen){closeQL();}else{
+    fab.classList.add('open');
+    sheet.classList.add('open');
+    overlay.classList.add('open');
+    _qlBillSel=null;
+    // Populate bill list
+    document.getElementById('ql-bill-list').innerHTML=D.bills.map(b=>{
+      const a=getActual(b.id);
+      return `<div class="ql-bill-btn" id="qlbb-${b.id}" onclick="qlSelectBill('${b.id}')">
+        <span class="ql-bill-btn-name">${b.name}</span>
+        <span class="ql-bill-btn-bud">${a!==null?fmt(a)+' logged':'budget '+fmt(b.budget)}</span>
+      </div>`;
+    }).join('');
+    document.getElementById('ql-bill-amt').style.display='none';
+    document.getElementById('ql-bill-sub').style.display='none';
+    document.getElementById('ql-bill-go').style.display='none';
+    // Populate Lauren week dropdown
+    const LWKS=getLaurenWeeks(NOW.getFullYear(),NOW.getMonth());
+    const currentWk=getWeekOfMonth(NOW);
+    const weeksToShow=LWKS.filter(wk=>wk.start<=NOW.getDate()).length;
+    const lWkEl=document.getElementById('ql-lauren-week');
+    if(lWkEl)lWkEl.innerHTML=LWKS.slice(0,weeksToShow).map((wk,i)=>`<option value="${i+1}"${i+1===currentWk?' selected':''}>Week ${i+1}</option>`).join('');
+    // Focus first input
+    setTimeout(()=>document.getElementById('ql-jake-amt')?.focus(),300);
+  }
+}
+function closeQL(){
+  document.getElementById('fab').classList.remove('open');
+  document.getElementById('ql-sheet').classList.remove('open');
+  document.getElementById('ql-overlay').classList.remove('open');
+}
+function switchQLTab(id){
+  ['jake','bill','lauren','food'].forEach(t=>{
+    document.getElementById('qlt-'+t).classList.toggle('on',t===id);
+    document.getElementById('qlf-'+t).classList.toggle('on',t===id);
+  });
+  setTimeout(()=>{
+    const inp={'jake':'ql-jake-amt','lauren':'ql-lauren-amt','food':'ql-food-amt'}[id];
+    if(inp)document.getElementById(inp)?.focus();
+  },80);
+}
+function qlSelectBill(id){
+  _qlBillSel=id;
+  document.querySelectorAll('.ql-bill-btn').forEach(b=>b.classList.remove('sel'));
+  document.getElementById('qlbb-'+id)?.classList.add('sel');
+  const b=D.bills.find(x=>x.id===id);
+  const amtEl=document.getElementById('ql-bill-amt');
+  const subEl=document.getElementById('ql-bill-sub');
+  const goEl=document.getElementById('ql-bill-go');
+  amtEl.style.display='';amtEl.value=b?b.budget.toFixed(2):'';
+  subEl.style.display='';subEl.textContent=`${b?.name} — budget is ${fmt(b?.budget||0)}`;
+  goEl.style.display='';
+  setTimeout(()=>amtEl.focus(),80);
+}
+function qlSaveJake(){
+  const v=parseFloat(document.getElementById('ql-jake-amt').value)||0;
+  if(v<=0){toast('Enter an amount');return;}
+  D.jake.income=[{id:D.nextId++,name:'Net Pay — '+MLBL,amount:v,type:'base',mk:MK}];
+  if(!D.jake.payHistory)D.jake.payHistory=[];
+  if(!D.jake.payHistory.find(h=>h.mk===MK)){D.jake.payHistory.unshift({mk:MK,period:MLBL,net:v,extra:0,sav:0,inv:0});if(D.jake.payHistory.length>24)D.jake.payHistory=D.jake.payHistory.slice(0,24);}
+  document.getElementById('ql-jake-amt').value='';
+  save();renderAll();closeQL();toast('💙 Jake pay saved ✓');
+}
+function qlSaveBill(){
+  if(!_qlBillSel){toast('Select a bill first');return;}
+  const v=parseFloat(document.getElementById('ql-bill-amt').value);
+  if(isNaN(v)||v<0){toast('Enter a valid amount');return;}
+  setActual(_qlBillSel,v);
+  save();renderAll();closeQL();toast('🏠 Bill actual saved ✓');
+}
+function qlSaveLauren(){
+  const v=parseFloat(document.getElementById('ql-lauren-amt').value)||0;
+  if(v<=0){toast('Enter an amount');return;}
+  const src=document.getElementById('ql-lauren-src').value;
+  const week=parseInt(document.getElementById('ql-lauren-week').value)||getWeekOfMonth(NOW);
+  if(!D.lauren.cashIncome)D.lauren.cashIncome=[];
+  D.lauren.cashIncome.push({id:D.nextId++,amount:v,note:'Quick log',source:src,week,mk:MK,date:new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short'})});
+  document.getElementById('ql-lauren-amt').value='';
+  save();renderAll();closeQL();toast('💜 Lauren income saved ✓');
+}
+function qlSaveFood(){
+  const v=parseFloat(document.getElementById('ql-food-amt').value)||0;
+  const note=document.getElementById('ql-food-note').value.trim()||'Food shop';
+  if(v<=0){toast('Enter an amount');return;}
+  if(!D.lauren.foodShop)D.lauren.foodShop=[];
+  D.lauren.foodShop.push({id:D.nextId++,type:'shop',amount:v,note,week:getWeekOfMonth(NOW),mk:MK,date:new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short'})});
+  document.getElementById('ql-food-amt').value='';
+  document.getElementById('ql-food-note').value='';
+  save();renderAll();closeQL();toast('🛒 Food shop saved ✓');
+}
+
+// ── Install banner ────────────────────────────────────────
+function checkInstallBanner(){
+  const dismissed=localStorage.getItem('jl-install-dismissed');
+  if(dismissed)return;
+  // Show if running in browser (not standalone)
+  const isStandalone=window.navigator.standalone||window.matchMedia('(display-mode: standalone)').matches;
+  if(!isStandalone)document.getElementById('install-banner').style.display='flex';
+}
+function dismissInstall(){
+  document.getElementById('install-banner').style.display='none';
+  localStorage.setItem('jl-install-dismissed','1');
+}
+
 // ── Light/dark mode ───────────────────────────────────────
 function toggleTheme(){
   const isLight=document.body.classList.toggle('light');
@@ -2110,6 +2424,7 @@ function toggleTheme(){
 })();
 
 load();
+checkInstallBanner();
 cloudLoad();
 </script>
 </body>
