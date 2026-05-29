@@ -112,6 +112,18 @@ body{padding-bottom:calc(68px + var(--sb))}
 .jh-row-val.green{color:var(--green)}.jh-row-val.red{color:var(--red)}.jh-row-val.amber{color:var(--amber)}.jh-row-val.blue{color:var(--blue)}.jh-row-val.purple{color:var(--purple)}
 .jh-divider{border:none;border-top:1px solid rgba(255,255,255,0.08);margin:8px 0}
 .jh-balance{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;border-radius:var(--rs);margin-top:10px}
+.jh-actual-bal{display:flex;align-items:center;justify-content:space-between;padding:10px 11px;border-radius:var(--rs);margin-top:10px;background:rgba(77,159,255,0.1);border:1px solid rgba(77,159,255,0.25)}
+.jh-actual-bal-left .jh-actual-lbl{font-size:11px;font-weight:600;color:var(--blue)}
+.jh-actual-bal-left .jh-actual-ts{font-size:10px;color:var(--hint);font-family:var(--mono);margin-top:2px}
+.jh-actual-bal-right{display:flex;align-items:center;gap:8px}
+.jh-actual-val{font-size:22px;font-weight:600;font-family:var(--mono);color:var(--blue)}
+.jh-actual-edit{background:none;border:none;cursor:pointer;color:var(--hint);font-size:12px;padding:4px 6px;border-radius:5px;font-family:var(--mono);transition:color .15s;flex-shrink:0}
+.jh-actual-edit:active{color:var(--blue)}
+.jh-actual-form{display:none;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+.jh-actual-form.open{display:flex;gap:7px;align-items:center}
+.jh-actual-form input{flex:1;min-width:0;padding:8px 10px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--rs);font-size:15px;color:var(--text);font-family:var(--mono);box-sizing:border-box}
+.jh-actual-form input:focus{outline:none;border-color:var(--blue)}
+.jh-actual-form button{padding:8px 14px;background:var(--blue);color:#000;border:none;border-radius:var(--rs);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0}
 .jh-balance.surplus{background:rgba(0,212,160,0.1);border:1px solid rgba(0,212,160,0.25)}
 .jh-balance.deficit{background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.3)}
 .jh-balance.tight{background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3)}
@@ -176,21 +188,21 @@ body{padding-bottom:calc(68px + var(--sb))}
 .edit-panel{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:none;animation:fi .15s ease}
 .edit-panel.open{display:block}
 .edit-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--hint);font-family:var(--mono);margin-bottom:7px}
-.edit-row{display:flex;gap:7px;align-items:flex-end}
-.ef{flex:1}.ef label{display:block;font-size:10px;color:var(--hint);font-family:var(--mono);margin-bottom:4px}
-.ef input{width:100%;padding:9px 11px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--rs);font-size:14px;color:var(--text);font-family:var(--mono)}
+.edit-row{display:flex;gap:7px;align-items:flex-end;width:100%}
+.ef{flex:1;min-width:0}.ef label{display:block;font-size:10px;color:var(--hint);font-family:var(--mono);margin-bottom:4px}
+.ef input{width:100%;padding:9px 11px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--rs);font-size:14px;color:var(--text);font-family:var(--mono);box-sizing:border-box}
 .ef input:focus{outline:none;border-color:var(--teal)}
-.save-e{padding:9px 14px;background:var(--teal);color:#000;border:none;border-radius:var(--rs);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
-.reset-e{padding:9px 11px;background:none;color:var(--muted);border:1px solid var(--border);border-radius:var(--rs);font-size:12px;cursor:pointer}
+.save-e{padding:9px 14px;background:var(--teal);color:#000;border:none;border-radius:var(--rs);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.reset-e{padding:9px 11px;background:none;color:var(--muted);border:1px solid var(--border);border-radius:var(--rs);font-size:12px;cursor:pointer;flex-shrink:0}
 
 /* QUICK PAY */
 .quick-pay{background:linear-gradient(135deg,rgba(77,159,255,0.15),rgba(77,159,255,0.05));border:1px solid rgba(77,159,255,0.3);border-radius:var(--r);padding:14px 16px;margin-bottom:12px}
 .qp-title{font-size:12px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono);margin-bottom:10px}
-.qp-row{display:flex;gap:8px;align-items:flex-end}
-.qp-field{flex:1}.qp-field label{display:block;font-size:10px;color:var(--hint);font-family:var(--mono);margin-bottom:5px}
-.qp-field input{width:100%;padding:11px 13px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--rs);font-size:16px;color:var(--text);font-family:var(--mono)}
+.qp-row{display:flex;gap:8px;align-items:flex-end;width:100%}
+.qp-field{flex:1;min-width:0}.qp-field label{display:block;font-size:10px;color:var(--hint);font-family:var(--mono);margin-bottom:5px}
+.qp-field input{width:100%;padding:11px 13px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--rs);font-size:16px;color:var(--text);font-family:var(--mono);box-sizing:border-box}
 .qp-field input:focus{outline:none;border-color:var(--blue)}
-.qp-btn{padding:11px 16px;background:var(--blue);color:#000;border:none;border-radius:var(--rs);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:var(--font)}
+.qp-btn{padding:11px 16px;background:var(--blue);color:#000;border:none;border-radius:var(--rs);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:var(--font);flex-shrink:0}
 .qp-btn:active{opacity:.8}
 .qp-hint{font-size:11px;color:var(--hint);font-family:var(--mono);margin-top:8px}
 
@@ -283,8 +295,8 @@ body{padding-bottom:calc(68px + var(--sb))}
 .alloc-panel.open{display:block;animation:fi .15s ease}
 .alloc-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--gold);font-family:var(--mono);margin-bottom:9px}
 .alloc-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.alloc-row label{font-size:12px;color:var(--muted);width:100px;flex-shrink:0}
-.alloc-row input{flex:1;padding:8px 10px;background:var(--s4);border:1px solid var(--border);border-radius:var(--rs);font-size:13px;color:var(--text);font-family:var(--mono)}
+.alloc-row label{font-size:11px;color:var(--muted);width:90px;min-width:90px;flex-shrink:0}
+.alloc-row input{flex:1;min-width:0;padding:8px 10px;background:var(--s4);border:1px solid var(--border);border-radius:var(--rs);font-size:13px;color:var(--text);font-family:var(--mono);box-sizing:border-box;width:100%}
 .alloc-row input:focus{outline:none;border-color:var(--gold)}
 .alloc-rem{font-size:11px;font-family:var(--mono);padding:7px 10px;background:var(--s4);border-radius:var(--rs);margin-bottom:9px}
 .alloc-rem.ok{color:var(--green)}.alloc-rem.warn{color:var(--amber)}.alloc-rem.over{color:var(--red)}
@@ -292,11 +304,11 @@ body{padding-bottom:calc(68px + var(--sb))}
 /* FORMS */
 .add-toggle{width:100%;border:1px dashed var(--b2);background:none;border-radius:var(--r);padding:11px;color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;margin-bottom:12px;font-family:var(--font);transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px}
 .add-toggle:hover{background:var(--s2);color:var(--text)}
-.form-box{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);padding:13px;margin-bottom:12px;display:none}
+.form-box{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);padding:13px;margin-bottom:12px;display:none;overflow:hidden}
 .form-box.open{display:block;animation:fi .15s ease}
 .fld{margin-bottom:10px}
 .fld label{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--hint);margin-bottom:5px;font-family:var(--mono)}
-.fld input,.fld select{width:100%;padding:10px 12px;background:var(--s3);border:1px solid var(--border);border-radius:var(--rs);font-size:14px;color:var(--text);font-family:var(--font);-webkit-appearance:none;appearance:none}
+.fld input,.fld select{width:100%;max-width:100%;padding:10px 12px;background:var(--s3);border:1px solid var(--border);border-radius:var(--rs);font-size:14px;color:var(--text);font-family:var(--font);-webkit-appearance:none;appearance:none;box-sizing:border-box}
 .fld input:focus,.fld select:focus{outline:none;border-color:var(--teal)}
 .fld input::placeholder{color:var(--hint)}
 .go{width:100%;padding:12px;border:none;border-radius:var(--rs);font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font);margin-top:2px}
@@ -355,10 +367,10 @@ body{padding-bottom:calc(68px + var(--sb))}
 
 /* Savings balance panel */
 .sav-bal-row{display:flex;align-items:center;gap:7px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
-.sav-bal-inp{flex:1;padding:7px 10px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--rs);font-size:13px;color:var(--text);font-family:var(--mono)}
+.sav-bal-inp{flex:1;min-width:0;padding:7px 10px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--rs);font-size:13px;color:var(--text);font-family:var(--mono);box-sizing:border-box}
 .sav-bal-inp:focus{outline:none;border-color:var(--teal)}
-.sav-bal-btn{padding:7px 12px;background:var(--teal);color:#000;border:none;border-radius:var(--rs);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}
-.sav-bal-lbl{font-size:10px;color:var(--hint);font-family:var(--mono)}
+.sav-bal-btn{padding:7px 12px;background:var(--teal);color:#000;border:none;border-radius:var(--rs);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.sav-bal-lbl{font-size:10px;color:var(--hint);font-family:var(--mono);white-space:nowrap;flex-shrink:0}
 .sav-bal-edit{background:none;border:none;color:var(--hint);font-size:11px;cursor:pointer;padding:2px 5px;font-family:var(--mono);border-radius:4px}
 .sav-bal-edit:active{color:var(--teal)}
 
@@ -888,6 +900,21 @@ body{padding-bottom:calc(68px + var(--sb))}
         </div>
         <div class="jh-balance-val green" id="jh-balance-val">£0.00</div>
       </div>
+      <!-- Actual bank balance -->
+      <div class="jh-actual-bal">
+        <div class="jh-actual-bal-left">
+          <div class="jh-actual-lbl">🏦 Actual balance</div>
+          <div class="jh-actual-ts" id="jh-actual-ts">tap ✏️ to set</div>
+        </div>
+        <div class="jh-actual-bal-right">
+          <div class="jh-actual-val" id="jh-actual-val">—</div>
+          <button class="jh-actual-edit" onclick="toggleActualBal()">✏️</button>
+        </div>
+      </div>
+      <div class="jh-actual-form" id="jh-actual-form">
+        <input type="number" id="jh-actual-input" placeholder="1216.00" min="0" step="0.01" inputmode="decimal">
+        <button onclick="saveActualBal()">Save</button>
+      </div>
     </div>
     <div class="credit-pot">
       <div class="cp-lbl">Bills credit pot</div>
@@ -1068,16 +1095,14 @@ body{padding-bottom:calc(68px + var(--sb))}
       <div class="slbl">Log a payment</div>
       <div class="form-box open" style="margin-bottom:12px">
         <div class="fld"><label>Amount (£)</label><input type="number" id="lc-amt" placeholder="0.00" min="0" step="0.01"></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div class="fld"><label>How paid?</label>
-            <select id="lc-src">
-              <option value="cash">💷 Cash</option>
-              <option value="bank">🏦 Bank transfer</option>
-            </select>
-          </div>
-          <div class="fld"><label>Which week?</label>
-            <select id="lc-week" id="lc-week"></select>
-          </div>
+        <div class="fld"><label>How paid?</label>
+          <select id="lc-src">
+            <option value="cash">💷 Cash in hand</option>
+            <option value="bank">🏦 Bank transfer</option>
+          </select>
+        </div>
+        <div class="fld"><label>Which week?</label>
+          <select id="lc-week"></select>
         </div>
         <div class="fld"><label>Note — optional</label><input type="text" id="lc-note" placeholder="e.g. client name, tips, overtime"></div>
         <button class="go purple" onclick="addCashIncome()">Log income</button>
@@ -1305,13 +1330,11 @@ body{padding-bottom:calc(68px + var(--sb))}
   <div class="ql-form" id="qlf-lauren">
     <input class="ql-num" type="number" id="ql-lauren-amt" placeholder="0.00" inputmode="decimal" step="0.01">
     <div class="ql-sub">Lauren's income this week (£)</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-      <select style="padding:10px 12px;background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);font-size:13px;color:var(--text);font-family:var(--font)" id="ql-lauren-src">
-        <option value="cash">💷 Cash</option>
-        <option value="bank">🏦 Bank</option>
-      </select>
-      <select style="padding:10px 12px;background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);font-size:13px;color:var(--text);font-family:var(--font)" id="ql-lauren-week"></select>
-    </div>
+    <select style="width:100%;padding:10px 12px;background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);font-size:13px;color:var(--text);font-family:var(--font);margin-bottom:8px;box-sizing:border-box" id="ql-lauren-src">
+      <option value="cash">💷 Cash in hand</option>
+      <option value="bank">🏦 Bank transfer</option>
+    </select>
+    <select style="width:100%;padding:10px 12px;background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);font-size:13px;color:var(--text);font-family:var(--font);margin-bottom:10px;box-sizing:border-box" id="ql-lauren-week"></select>
     <button class="ql-go" style="background:var(--purple);color:#fff" onclick="qlSaveLauren()">Save income ✓</button>
   </div>
 
@@ -1587,6 +1610,37 @@ function saveContribs(){
   save();renderJoint();toast('Contributions updated ✓');
 }
 
+function toggleActualBal(){
+  const form=document.getElementById('jh-actual-form');
+  const isOpen=form.classList.contains('open');
+  form.classList.toggle('open',!isOpen);
+  if(!isOpen){
+    const cur=D.contributions.actualBalance;
+    document.getElementById('jh-actual-input').value=cur!=null?cur.toFixed(2):'';
+    setTimeout(()=>document.getElementById('jh-actual-input').focus(),80);
+  }
+}
+function saveActualBal(){
+  const v=parseFloat(document.getElementById('jh-actual-input').value);
+  if(isNaN(v)||v<0){toast('Enter a valid balance');return;}
+  D.contributions.actualBalance=v;
+  D.contributions.actualBalanceTs=new Date().toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+  document.getElementById('jh-actual-form').classList.remove('open');
+  save();renderJointActualBal();toast('Balance updated ✓');
+}
+function renderJointActualBal(){
+  const c=D.contributions;
+  const valEl=document.getElementById('jh-actual-val');
+  const tsEl=document.getElementById('jh-actual-ts');
+  if(c.actualBalance!=null){
+    valEl.textContent=fmt(c.actualBalance);
+    tsEl.textContent='Updated '+c.actualBalanceTs;
+  } else {
+    valEl.textContent='—';
+    tsEl.textContent='tap ✏️ to set';
+  }
+}
+
 function renderJointHealth(){
   const c=D.contributions;
   const billsOut=D.bills.reduce((s,b)=>s+b.budget,0);
@@ -1637,6 +1691,7 @@ function renderJointHealth(){
 
   // Also update the old hh-warn (hide it — health card replaces it)
   document.getElementById('hh-warn').classList.remove('show');
+  renderJointActualBal();
 }
 
 function renderJoint(){
@@ -1798,7 +1853,7 @@ function renderPartner(who){
     // Build week dropdown — only show weeks that have started
     const lWkEl=document.getElementById('lc-week');
     if(lWkEl){
-      lWkEl.innerHTML=LWKS.slice(0,weeksToShow).map((wk,i)=>`<option value="${i+1}"${i+1===currentWk?' selected':''}>Week ${i+1} · ${weekLabel(wk,NOW.getFullYear(),NOW.getMonth())}</option>`).join('');
+      lWkEl.innerHTML=LWKS.slice(0,weeksToShow).map((wk,i)=>`<option value="${i+1}"${i+1===currentWk?' selected':''}>Wk ${i+1} (${weekLabel(wk,NOW.getFullYear(),NOW.getMonth())})</option>`).join('');
     }
     // Income entries list — newest first, with source + week label
     document.getElementById('l-cash-list').innerHTML=cashThisMonth.length?[...cashThisMonth].reverse().map(c=>{
@@ -2605,8 +2660,12 @@ function renderDashboard(){
   billPctEl.textContent=billPct+'%';
   billPctEl.className='dh-metric-val'+(billPct<=100?'green':' red');
   const surplusEl=document.getElementById('dh-surplus');
-  surplusEl.textContent=surplus>0?fmt(surplus):'—';
-  surplusEl.className='dh-metric-val'+(surplus>100?'teal':surplus>0?' amber':' red');
+  const actualBal=c.actualBalance;
+  surplusEl.textContent=actualBal!=null?fmt(actualBal):(surplus>0?fmt(surplus):'—');
+  surplusEl.className='dh-metric-val'+(actualBal!=null?(actualBal>500?'teal':actualBal>100?' amber':' red'):(surplus>100?'teal':surplus>0?' amber':' red'));
+  document.querySelector('#dash-health .dh-metric:last-child .dh-metric-sub')?.remove&&null;
+  const subEl=document.querySelector('#dh-surplus')?.closest('.dh-metric')?.querySelector('.dh-metric-sub');
+  if(subEl)subEl.textContent=actualBal!=null?'actual balance':'estimated';
 
   // vs last month
   const lastMonth=D.history.find(h=>h.mk!==MK&&h.year===YEAR);
