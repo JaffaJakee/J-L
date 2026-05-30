@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230a0a0f'/><rect x='12' y='12' width='76' height='76' rx='16' fill='%2300d4a0'/><text x='50' y='67' font-family='system-ui' font-weight='700' font-size='38' fill='%23000' text-anchor='middle'>J&amp;L</text></svg>">
 <!-- PWA Manifest (inline) -->
 <link rel="manifest" href="data:application/manifest+json,{&quot;name&quot;:&quot;Jake & Lauren Finance&quot;,&quot;short_name&quot;:&quot;J&L Finance&quot;,&quot;description&quot;:&quot;Home finance tracker&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;%230a0a0f&quot;,&quot;theme_color&quot;:&quot;%230a0a0f&quot;,&quot;orientation&quot;:&quot;portrait&quot;,&quot;icons&quot;:[{&quot;src&quot;:&quot;data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='42' fill='%230a0a0f'/><rect x='24' y='24' width='144' height='144' rx='30' fill='%2300d4a0'/><text x='96' y='128' font-family='system-ui' font-weight='700' font-size='72' fill='%23000' text-anchor='middle'>J&L</text></svg>&quot;,&quot;sizes&quot;:&quot;192x192&quot;,&quot;type&quot;:&quot;image/svg+xml&quot;}]}">
-<title>Jake &amp; Lauren · Finance</title>
+<title>Jake &amp; Lauren · Finance v20</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -1526,17 +1526,16 @@ function quickPaySave(){
 
 // ── Cash income (Lauren) ──────────────────────────────────
 function getLaurenWeeks(year,month){
-  // Returns [{start,end}] for each Tue–Sat working block in the month.
-  // If the month opens on a working day before the first Tuesday (e.g. Wed–Sat),
-  // those days form the start of Week 1.
+  // Returns [{start,end}] for each Mon–Sun working block in the month.
+  // If the month opens mid-week (Tue–Sat), those days form the start of Week 1.
   const dim=new Date(year,month+1,0).getDate();
   const wks=[];let ws=null;
   for(let d=1;d<=dim;d++){
     const dow=new Date(year,month,d).getDay(); // 0=Sun,1=Mon,...,6=Sat
-    if(ws===null&&(dow===2||(d===1&&dow>=3&&dow<=6)))ws=d;
-    if(dow===6&&ws!==null){wks.push({start:ws,end:d});ws=null;}
+    if(ws===null&&(dow===1||(d===1&&dow>=2&&dow<=6)))ws=d;
+    if(dow===0&&ws!==null){wks.push({start:ws,end:d});ws=null;}
   }
-  if(ws!==null)wks.push({start:ws,end:dim}); // partial final week if needed
+  if(ws!==null)wks.push({start:ws,end:dim}); // partial final week
   return wks;
 }
 function weekLabel(wk,year,month){
@@ -1544,11 +1543,11 @@ function weekLabel(wk,year,month){
   const d1=new Date(year,month,wk.start),d2=new Date(year,month,wk.end);
   return `${D[d1.getDay()]} ${wk.start}–${D[d2.getDay()]} ${wk.end}`;
 }
-function isOffDay(d){const w=d.getDay();return w===0||w===1;}
+function isOffDay(d){const w=d.getDay();return w===0;} // Sunday only
 function getWeekOfMonth(d){
   const wks=getLaurenWeeks(d.getFullYear(),d.getMonth()),day=d.getDate(),dow=d.getDay();
-  // Sun/Mon are off days — default to most recently completed week
-  if(dow===0||dow===1){for(let i=wks.length-1;i>=0;i--)if(wks[i].end<day)return i+1;return 1;}
+  // Sunday is end of week — default to that week
+  if(dow===0){for(let i=wks.length-1;i>=0;i--)if(wks[i].end>=day)return i+1;return wks.length;}
   for(let i=0;i<wks.length;i++)if(day>=wks[i].start&&day<=wks[i].end)return i+1;
   return Math.max(1,wks.length);
 }
@@ -1788,14 +1787,15 @@ function renderPartner(who){
     const sav=p.savings.reduce((s,i)=>s+i.amount,0)+(p.extraAlloc?.sav||0);
     const inv=p.investments.reduce((s,i)=>s+i.amount,0)+(p.extraAlloc?.inv||0);
     const spd=p.spending.reduce((s,i)=>s+i.amount,0)+(p.extraAlloc?.spd||0);
-    const left=inc-sav-inv-spd-share;
+    const personalOut=(D.jake.personalSubs||[]).reduce((s,x)=>s+x.amount,0);
+    const left=inc-sav-inv-spd-share-personalOut;
     const leftCl=left<0?'red':left<200?'amber':'green';
     document.getElementById('j-tag').textContent=inc===0?'National Highways':left<0?`${fmt(Math.abs(left))} over budget`:left===0?'Balanced this month':`${fmt(left)} left to spend`;
     document.getElementById('j-inc-b').textContent=fmt(inc);
     document.getElementById('j-sav-b').textContent=fmt(sav)+'/mo';
     document.getElementById('j-inv-b').textContent=fmt(inv)+'/mo';
     document.getElementById('j-spd-b').textContent=fmt(spd);
-    document.getElementById(sId).innerHTML=`<div class="stat"><div class="sl">Monthly income</div><div class="sv blue">${fmt(inc)}</div></div><div class="stat"><div class="sl">Savings + investments</div><div class="sv teal">${fmt(sav+inv)}</div></div><div class="stat"><div class="sl">Joint bills share</div><div class="sv">${fmt(share)}</div><div class="ss">actual this month</div></div><div class="stat"><div class="sl">Left to spend</div><div class="sv ${leftCl}">${fmt(left)}</div>${credit>0?`<div class="ss">+${fmt(credit)} credit share</div>`:''}</div>`;
+    document.getElementById(sId).innerHTML=`<div class="stat"><div class="sl">Monthly income</div><div class="sv blue">${fmt(inc)}</div></div><div class="stat"><div class="sl">Savings + investments</div><div class="sv teal">${fmt(sav+inv)}</div></div><div class="stat"><div class="sl">Joint bills share</div><div class="sv">${fmt(share)}</div><div class="ss">actual this month</div></div><div class="stat"><div class="sl">Personal outgoings</div><div class="sv red">${fmt(personalOut)}</div><div class="ss">subs + DDs</div></div><div class="stat"><div class="sl">Left to spend</div><div class="sv ${leftCl}">${fmt(left)}</div>${credit>0?`<div class="ss">+${fmt(credit)} credit share</div>`:''}</div>`;
     // Income list
     document.getElementById('j-inc-list').innerHTML=p.income.length?p.income.map(i=>`<div class="item"><div class="idot ${i.type==='extra'?'gold':'inc'}"></div><div class="iname">${i.name}</div><div class="iamt">${fmt(i.amount)}</div><button class="rm" onclick="removeJakeIncome(${i.id})">×</button></div>`).join(''):'<span class="empty">No income logged yet</span>';
     renderPayHistory();
