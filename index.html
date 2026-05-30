@@ -1174,6 +1174,20 @@ body{padding-bottom:calc(68px + var(--sb))}
         <button class="go" style="background:var(--red);color:#fff" onclick="addLaurenSub()">Add outgoing</button>
       </div>
 
+      <!-- LAUREN EMERGENCY FUND -->
+      <div class="ef-card" id="lef-card">
+        <div class="ef-lbl">🛡️ Emergency Fund</div>
+        <div class="ef-amt" id="lef-amt">£0.00</div>
+        <div class="ef-sub" id="lef-sub">Target £12,000 · 12 months of essential outgoings · £350/mo</div>
+        <div class="ef-bar-wrap"><div class="ef-bar" id="lef-bar" style="width:0%"></div></div>
+        <div class="ef-pct" id="lef-pct">0% funded · £12,000 to go</div>
+        <div class="ef-bal-row">
+          <input class="ef-bal-inp" type="number" id="lef-bal-inp" placeholder="Current balance e.g. 350.00" min="0" step="0.01" inputmode="decimal">
+          <button class="ef-bal-btn" id="lef-bal-btn" onclick="saveLEFBalance()">Update</button>
+        </div>
+        <div class="ef-bal-ts" id="lef-bal-ts"></div>
+      </div>
+
       <div class="slbl">Savings goals <span class="badge teal" id="l-sav-b">£0/mo</span></div>
       <div id="l-sav-list"></div>
       <div class="form-box open" style="margin-bottom:12px">
@@ -1902,7 +1916,7 @@ function renderPartner(who){
     const srcCEl=document.getElementById('l-src-cash');const srcBEl=document.getElementById('l-src-bank');
     if(srcCEl)srcCEl.textContent=fmt(cashTypeTotal);
     if(srcBEl)srcBEl.textContent=fmt(bankTypeTotal);
-    document.getElementById(sId).innerHTML=`<div class="stat"><div class="sl">Income this month</div><div class="sv purple">${fmt(cashTotal)}</div></div><div class="stat"><div class="sl">Savings + investments</div><div class="sv teal">${fmt(sav+inv)}</div></div><div class="stat"><div class="sl">Joint bills share</div><div class="sv">${fmt(share)}</div></div><div class="stat"><div class="sl">Personal outgoings</div><div class="sv red">${fmt(lPersonalOut)}</div><div class="ss">salon + other</div></div><div class="stat"><div class="sl">Left to spend</div><div class="sv ${leftCl}">${fmt(left)}</div></div>`;
+    document.getElementById(sId).innerHTML=`<div class="stat"><div class="sl">Income this month</div><div class="sv purple">${fmt(cashTotal)}</div></div><div class="stat"><div class="sl">Savings + investments</div><div class="sv teal">${fmt(sav+inv)}</div></div><div class="stat"><div class="sl">Joint bills share</div><div class="sv">${fmt(share)}</div></div><div class="stat"><div class="sl">Personal outgoings</div><div class="sv red">${fmt(lPersonalOut)}</div><div class="ss">salon + other</div></div><div class="stat"><div class="sl">Left to spend</div><div class="sv ${leftCl}">${fmt(left)}</div></div><div class="stat"><div class="sl">Emergency fund</div><div class="sv ${(D.lauren.emergencyFund?.saved||0)>=LEF_TARGET?'green':(D.lauren.emergencyFund?.saved||0)>0?'amber':'red'}">${fmt(D.lauren.emergencyFund?.saved||0)}</div><div class="ss">${Math.min(100,Math.round((D.lauren.emergencyFund?.saved||0)/LEF_TARGET*100))}% of ${fmt(LEF_TARGET)}</div></div>`;
     // Weekly breakdown — Tue–Sat working weeks
     const LWKS=getLaurenWeeks(NOW.getFullYear(),NOW.getMonth());
     const currentWk=getWeekOfMonth(NOW);
@@ -2387,6 +2401,8 @@ function removePersonalSub(id){
 }
 // ── Emergency Fund ────────────────────────────────────────
 const EF_TARGET=8400,EF_MONTHLY=350;
+const LEF_TARGET=12000,LEF_MONTHLY=350;
+
 function saveEFBalance(){
   const v=parseFloat(document.getElementById('ef-bal-inp').value);
   if(isNaN(v)||v<0){toast('Enter a valid balance');return;}
@@ -2396,6 +2412,17 @@ function saveEFBalance(){
   document.getElementById('ef-bal-inp').value='';
   save();renderEF();toast('Emergency fund updated ✓');
 }
+
+function saveLEFBalance(){
+  const v=parseFloat(document.getElementById('lef-bal-inp').value);
+  if(isNaN(v)||v<0){toast('Enter a valid balance');return;}
+  if(!D.lauren.emergencyFund)D.lauren.emergencyFund={};
+  D.lauren.emergencyFund.saved=v;
+  D.lauren.emergencyFund.ts=new Date().toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+  document.getElementById('lef-bal-inp').value='';
+  save();renderLEF();toast('Emergency fund updated ✓');
+}
+
 function renderEF(){
   if(!D.jake.emergencyFund)D.jake.emergencyFund={};
   const saved=D.jake.emergencyFund.saved||0;
@@ -2418,6 +2445,30 @@ function renderEF(){
     :`${pct}% funded · ${fmt(remaining)} to go · ~${moLeft} month${moLeft!==1?'s':''} at ${fmt(EF_MONTHLY)}/mo`;
   const ts=D.jake.emergencyFund.ts;
   document.getElementById('ef-bal-ts').textContent=ts?'Updated '+ts:'Enter your current balance above';
+}
+
+function renderLEF(){
+  if(!D.lauren.emergencyFund)D.lauren.emergencyFund={};
+  const saved=D.lauren.emergencyFund.saved||0;
+  const pct=Math.min(100,Math.round(saved/LEF_TARGET*100));
+  const remaining=Math.max(0,LEF_TARGET-saved);
+  const moLeft=remaining>0?Math.ceil(remaining/LEF_MONTHLY):0;
+  const funded=saved>=LEF_TARGET;
+  const card=document.getElementById('lef-card');
+  if(!card)return;
+  card.className='ef-card'+(funded?' funded':'');
+  document.getElementById('lef-amt').textContent=fmt(saved);
+  document.getElementById('lef-sub').textContent=funded
+    ?`✅ Fully funded — 12 months of essential outgoings covered`
+    :`Target ${fmt(LEF_TARGET)} · 12 months essential outgoings · ${fmt(LEF_MONTHLY)}/mo`;
+  const bar=document.getElementById('lef-bar');
+  bar.style.width=pct+'%';
+  bar.className='ef-bar'+(pct>=100?' ok':pct>=50?' warn':'');
+  document.getElementById('lef-pct').textContent=funded
+    ?`100% funded 🎉`
+    :`${pct}% funded · ${fmt(remaining)} to go · ~${moLeft} month${moLeft!==1?'s':''} at ${fmt(LEF_MONTHLY)}/mo`;
+  const ts=D.lauren.emergencyFund.ts;
+  document.getElementById('lef-bal-ts').textContent=ts?'Updated '+ts:'Enter your current balance above';
 }
 
 function renderPersonalSubs(){
@@ -2540,7 +2591,7 @@ function renderLaurenSubs(){
   }).join(''):'<span class="empty">No outgoings added yet</span>';
 }
 
-function renderAll(){renderJoint();renderPartner('jake');renderPartner('lauren');renderFoodShop();renderYear();renderMortgage();renderPersonalSubs();renderLaurenSubs();renderEF();renderDashboard();recordHistory();setTimeout(renderJChart,80);}
+function renderAll(){renderJoint();renderPartner('jake');renderPartner('lauren');renderFoodShop();renderYear();renderMortgage();renderPersonalSubs();renderLaurenSubs();renderEF();renderLEF();renderDashboard();recordHistory();setTimeout(renderJChart,80);}
 
 // ── Savings balance tracking ──────────────────────────────
 function toggleBalPanel(who,id){
