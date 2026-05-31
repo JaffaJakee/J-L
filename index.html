@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230a0a0f'/><rect x='12' y='12' width='76' height='76' rx='16' fill='%2300d4a0'/><text x='50' y='67' font-family='system-ui' font-weight='700' font-size='38' fill='%23000' text-anchor='middle'>J&amp;L</text></svg>">
 <!-- PWA Manifest (inline) -->
 <link rel="manifest" href="data:application/manifest+json,{&quot;name&quot;:&quot;Jake & Lauren Finance&quot;,&quot;short_name&quot;:&quot;J&L Finance&quot;,&quot;description&quot;:&quot;Home finance tracker&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;%230a0a0f&quot;,&quot;theme_color&quot;:&quot;%230a0a0f&quot;,&quot;orientation&quot;:&quot;portrait&quot;,&quot;icons&quot;:[{&quot;src&quot;:&quot;data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='42' fill='%230a0a0f'/><rect x='24' y='24' width='144' height='144' rx='30' fill='%2300d4a0'/><text x='96' y='128' font-family='system-ui' font-weight='700' font-size='72' fill='%23000' text-anchor='middle'>J&L</text></svg>&quot;,&quot;sizes&quot;:&quot;192x192&quot;,&quot;type&quot;:&quot;image/svg+xml&quot;}]}">
-<title>Jake &amp; Lauren · Finance v20</title>
+<title>Jake &amp; Lauren · Finance v21</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -705,6 +705,15 @@ body{padding-bottom:calc(68px + var(--sb))}
 .sub-renew-chip{font-size:10px;padding:3px 9px;border-radius:20px;font-family:var(--mono);font-weight:500;background:var(--adim);color:var(--amber)}
 .sub-renew-chip.urgent{background:var(--rdim);color:var(--red)}
 .sub-renew-chip.ok{background:var(--s3);color:var(--hint)}
+/* SUB CARD INLINE EDIT */
+.sub-edit-panel{display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);animation:fi .15s ease}
+.sub-edit-panel.open{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.sub-edit-panel label{font-size:10px;color:var(--hint);font-family:var(--mono);width:100%;margin-bottom:2px}
+.sub-edit-panel input{flex:1;min-width:80px;padding:8px 10px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--rs);font-size:14px;color:var(--text);font-family:var(--mono);box-sizing:border-box}
+.sub-edit-panel input:focus{outline:none;border-color:var(--teal)}
+.sub-edit-save{padding:8px 13px;background:var(--teal);color:#000;border:none;border-radius:var(--rs);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.sub-edit-cancel{padding:8px 10px;background:none;color:var(--muted);border:1px solid var(--border);border-radius:var(--rs);font-size:12px;cursor:pointer;flex-shrink:0}
+.sub-card.sub-card-unset{border-color:rgba(255,255,255,0.04);opacity:.8}
 /* MORTGAGE COUNTDOWN CARD */
 .mort-card{background:linear-gradient(135deg,rgba(245,166,35,0.13),rgba(245,166,35,0.04));border:1px solid rgba(245,166,35,0.32);border-radius:var(--r);padding:15px 16px;margin-bottom:12px;position:relative;overflow:hidden}
 .mort-card.warn{background:linear-gradient(135deg,rgba(255,107,107,0.15),rgba(255,107,107,0.05));border-color:rgba(255,107,107,0.4)}
@@ -1490,10 +1499,25 @@ function sanitise(){
   if(!Array.isArray(D.lauren.cashIncome))D.lauren.cashIncome=[];
   if(!Array.isArray(D.lauren.foodShop))D.lauren.foodShop=[];
   if(!Array.isArray(D.lauren.personalSubs)){
-    // £100/wk salon room rent = £100 × 52 / 12 = £433.33/mo
     D.lauren.personalSubs=[
       {id:D.nextId++,name:'Salon Room Rent',amount:400,emoji:'💅',weeklyRate:100,renewalDate:null,warnDays:null},
+      {id:D.nextId++,name:'Life Insurance',amount:0,emoji:'🛡️',renewalDate:null,warnDays:null},
+      {id:D.nextId++,name:'Road Tax',amount:0,emoji:'🚗',renewalDate:null,warnDays:null},
+      {id:D.nextId++,name:'Mobile Phone',amount:0,emoji:'📱',renewalDate:null,warnDays:null},
+      {id:D.nextId++,name:'Car Insurance',amount:0,emoji:'🚘',renewalDate:null,warnDays:null},
     ];
+  } else {
+    // Migration: add missing subs for existing users who only have salon rent
+    const lSubNames=D.lauren.personalSubs.map(s=>s.name);
+    const toAdd=[
+      {name:'Life Insurance',emoji:'🛡️'},{name:'Road Tax',emoji:'🚗'},
+      {name:'Mobile Phone',emoji:'📱'},{name:'Car Insurance',emoji:'🚘'},
+    ];
+    toAdd.forEach(t=>{
+      if(!lSubNames.includes(t.name)){
+        D.lauren.personalSubs.push({id:D.nextId++,name:t.name,amount:0,emoji:t.emoji,renewalDate:null,warnDays:null});
+      }
+    });
   }
   if(!Array.isArray(D.bills))D.bills=JSON.parse(JSON.stringify(DEFAULT_BILLS));
   if(!Array.isArray(D.history))D.history=[];
@@ -2508,13 +2532,20 @@ function renderPersonalSubs(){
       const chipTxt=daysLeft<0?`Expired ${Math.abs(daysLeft)}d ago`:daysLeft===0?'Renews today':`${daysLeft}d to go`;
       renewHtml=`<div class="sub-renew"><span class="sub-renew-chip${chipCls}">🔄 ${rdFmt}</span><span class="sub-renew-chip${chipCls}">${chipTxt}</span></div>`;
     }
-    return `<div class="sub-card${s.renewalDate&&new Date(s.renewalDate)-today<=(s.warnDays||30)*86400000&&new Date(s.renewalDate)>=today?' renewing':''}">
+    return `<div class="sub-card${s.renewalDate&&new Date(s.renewalDate)-today<=(s.warnDays||30)*86400000&&new Date(s.renewalDate)>=today?' renewing':''}" id="jsub-card-${s.id}">
       <div class="sub-top">
         <div class="sub-ico">${s.emoji||'💳'}</div>
         <div class="sub-info"><div class="sub-name">${s.name}</div><div class="sub-meta">monthly · direct debit</div></div>
-        <div class="sub-amt">${fmt(s.amount)}</div>
+        <div class="sub-amt" id="jsub-amt-${s.id}">${fmt(s.amount)}</div>
+        <button class="ib" onclick="toggleSubEdit('jake',${s.id})" title="Edit amount" style="font-size:13px;padding:4px 6px">✏️</button>
         <button class="rm" onclick="removePersonalSub(${s.id})">×</button>
       </div>${renewHtml}
+      <div class="sub-edit-panel" id="jsub-edit-${s.id}">
+        <label>Monthly amount (£)</label>
+        <input type="number" id="jsub-inp-${s.id}" value="${s.amount.toFixed(2)}" min="0" step="0.01" inputmode="decimal">
+        <button class="sub-edit-save" onclick="saveSubEdit('jake',${s.id})">Save</button>
+        <button class="sub-edit-cancel" onclick="toggleSubEdit('jake',${s.id})">Cancel</button>
+      </div>
     </div>`;
   }).join(''):'<span class="empty">No outgoings added yet</span>';
 }
@@ -2543,6 +2574,29 @@ function addLaurenSub(){
 function removeLaurenSub(id){
   D.lauren.personalSubs=D.lauren.personalSubs.filter(s=>s.id!==id);
   save();renderAll();
+}
+function toggleSubEdit(who,id){
+  const prefix=who==='jake'?'jsub':'lsub';
+  const panel=document.getElementById(`${prefix}-edit-${id}`);
+  if(!panel)return;
+  const isOpen=panel.classList.contains('open');
+  // Close all open sub edit panels for this person first
+  document.querySelectorAll(`[id^="${prefix}-edit-"]`).forEach(p=>p.classList.remove('open'));
+  if(!isOpen){
+    panel.classList.add('open');
+    setTimeout(()=>document.getElementById(`${prefix}-inp-${id}`)?.focus(),80);
+  }
+}
+function saveSubEdit(who,id){
+  const prefix=who==='jake'?'jsub':'lsub';
+  const v=parseFloat(document.getElementById(`${prefix}-inp-${id}`)?.value);
+  if(isNaN(v)||v<0){toast('Enter a valid amount');return;}
+  const subs=who==='jake'?D.jake.personalSubs:D.lauren.personalSubs;
+  const sub=subs.find(s=>s.id===id);
+  if(!sub){toast('Not found');return;}
+  sub.amount=v;
+  document.getElementById(`${prefix}-edit-${id}`)?.classList.remove('open');
+  save();renderAll();toast(`${sub.name} updated to ${fmt(v)} ✓`);
 }
 function renderLaurenSubs(){
   if(!Array.isArray(D.lauren.personalSubs))D.lauren.personalSubs=[];
@@ -2580,13 +2634,21 @@ function renderLaurenSubs(){
       renewHtml=`<div class="sub-renew"><span class="sub-renew-chip${chipCls}">🔄 ${rdFmt}</span><span class="sub-renew-chip${chipCls}">${chipTxt}</span></div>`;
     }
     const isRent=s.weeklyRate;
-    return `<div class="sub-card${s.renewalDate&&new Date(s.renewalDate)-today<=(s.warnDays||30)*86400000&&new Date(s.renewalDate)>=today?' renewing':''}">
+    const isZero=s.amount===0;
+    return `<div class="sub-card${s.renewalDate&&new Date(s.renewalDate)-today<=(s.warnDays||30)*86400000&&new Date(s.renewalDate)>=today?' renewing':''}${isZero?' sub-card-unset':''}" id="lsub-card-${s.id}">
       <div class="sub-top">
         <div class="sub-ico">${s.emoji||'💳'}</div>
-        <div class="sub-info"><div class="sub-name">${s.name}</div><div class="sub-meta">${isRent?`£${s.weeklyRate}/wk cash · £${s.amount}/mo`:'monthly outgoing'}</div></div>
-        <div class="sub-amt" style="color:var(--red)">${fmt(s.amount)}</div>
+        <div class="sub-info"><div class="sub-name">${s.name}</div><div class="sub-meta">${isRent?`£${s.weeklyRate}/wk cash · £${s.amount}/mo`:isZero?'tap ✏️ to set your amount':'monthly outgoing'}</div></div>
+        <div class="sub-amt" id="lsub-amt-${s.id}" style="color:${isZero?'var(--hint)':'var(--red)'}">${isZero?'£0.00 —':fmt(s.amount)}</div>
+        <button class="ib" onclick="toggleSubEdit('lauren',${s.id})" title="Edit amount" style="font-size:13px;padding:4px 6px">✏️</button>
         <button class="rm" onclick="removeLaurenSub(${s.id})">×</button>
       </div>${renewHtml}
+      <div class="sub-edit-panel" id="lsub-edit-${s.id}">
+        <label>Monthly amount (£)</label>
+        <input type="number" id="lsub-inp-${s.id}" value="${s.amount>0?s.amount.toFixed(2):''}" placeholder="0.00" min="0" step="0.01" inputmode="decimal">
+        <button class="sub-edit-save" onclick="saveSubEdit('lauren',${s.id})">Save</button>
+        <button class="sub-edit-cancel" onclick="toggleSubEdit('lauren',${s.id})">Cancel</button>
+      </div>
     </div>`;
   }).join(''):'<span class="empty">No outgoings added yet</span>';
 }
