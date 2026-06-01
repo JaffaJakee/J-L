@@ -147,23 +147,23 @@ body{padding-bottom:calc(68px + var(--sb))}
 
 .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:12px}
 /* EMERGENCY FUND CARD */
-.ef-card{background:linear-gradient(135deg,rgba(255,107,107,0.13),rgba(245,166,35,0.06));border:1px solid rgba(255,107,107,0.3);border-radius:var(--r);padding:15px 17px;margin-bottom:12px;position:relative;overflow:hidden}
+.ef-card{background:linear-gradient(135deg,rgba(77,159,255,0.13),rgba(77,159,255,0.04));border:1px solid rgba(77,159,255,0.3);border-radius:var(--r);padding:15px 17px;margin-bottom:12px;position:relative;overflow:hidden}
 .ef-card.funded{background:linear-gradient(135deg,rgba(74,222,128,0.13),rgba(0,212,160,0.05));border-color:rgba(74,222,128,0.35)}
 .ef-card::after{content:'🛡️';position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:38px;opacity:.12;pointer-events:none}
-.ef-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--red);font-family:var(--mono);margin-bottom:5px}
+.ef-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);font-family:var(--mono);margin-bottom:5px}
 .ef-card.funded .ef-lbl{color:var(--green)}
-.ef-amt{font-size:34px;font-weight:300;letter-spacing:-1.5px;color:var(--red);line-height:1}
+.ef-amt{font-size:34px;font-weight:300;letter-spacing:-1.5px;color:var(--blue);line-height:1}
 .ef-card.funded .ef-amt{color:var(--green)}
 .ef-sub{font-size:11px;color:var(--muted);margin-top:6px;font-family:var(--mono);line-height:1.6}
 .ef-bar-wrap{height:5px;background:var(--s3);border-radius:3px;overflow:hidden;margin:10px 0 4px}
-.ef-bar{height:100%;border-radius:3px;background:var(--red);transition:width .6s ease}
-.ef-bar.warn{background:var(--amber)}.ef-bar.ok{background:var(--green)}
+.ef-bar{height:100%;border-radius:3px;background:var(--blue);transition:width .6s ease}
+.ef-bar.warn{background:var(--teal)}.ef-bar.ok{background:var(--green)}
 .ef-pct{font-size:10px;font-family:var(--mono);color:var(--hint);margin-bottom:10px}
 .ef-bal-row{display:flex;align-items:center;gap:7px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06)}
 .ef-bal-inp{flex:1;min-width:0;padding:8px 10px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--rs);font-size:14px;color:var(--text);font-family:var(--mono);box-sizing:border-box}
-.ef-bal-inp:focus{outline:none;border-color:var(--red)}
+.ef-bal-inp:focus{outline:none;border-color:var(--blue)}
 .ef-card.funded .ef-bal-inp:focus{border-color:var(--green)}
-.ef-bal-btn{padding:8px 13px;background:var(--red);color:#fff;border:none;border-radius:var(--rs);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.ef-bal-btn{padding:8px 13px;background:var(--blue);color:#fff;border:none;border-radius:var(--rs);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0}
 .ef-card.funded .ef-bal-btn{background:var(--green);color:#000}
 .ef-bal-ts{font-size:10px;color:var(--hint);font-family:var(--mono);margin-top:5px}
 .stat{background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);padding:11px 12px}
@@ -1525,27 +1525,22 @@ function sanitise(){
 
 function load(){setSS('saving');try{const r=localStorage.getItem('jl-v6');if(r){const s=JSON.parse(r);if(s.bills?.length)D.bills=s.bills;if(s.actuals)D.actuals=s.actuals;if(s.jake)D.jake={...D.jake,...s.jake};if(s.lauren)D.lauren={...D.lauren,...s.lauren};if(s.history)D.history=s.history;if(s.nudgeDismissed)D.nudgeDismissed=s.nudgeDismissed;if(s.lastActiveMK)D.lastActiveMK=s.lastActiveMK;if(s.nextId)D.nextId=s.nextId;if(s.contributions)D.contributions={...D.contributions,...s.contributions};
   // ── Migrations ──
-  // Remove April 2026 pre-loaded pay history
   if(D.jake.payHistory)D.jake.payHistory=D.jake.payHistory.filter(h=>h.mk!=='2026-3');
-  // Remove May 2026 phantom £2745 pay history entry (pre-loaded data that leaked in via Firebase sync)
   if(D.jake.payHistory)D.jake.payHistory=D.jake.payHistory.filter(h=>!(h.mk==='2026-4'&&(h.net===2745.36||h.net===2745||h.net===2745.00)));
-  // Remove April 2026 pre-loaded income entry
   if(D.jake.income)D.jake.income=D.jake.income.filter(i=>i.mk!=='2026-3');
-  // Remove May 2026 phantom income entry
   if(D.jake.income)D.jake.income=D.jake.income.filter(i=>!(i.mk==='2026-4'&&(i.amount===2745.36||i.amount===2745)));
-  // Fix Gas & Electric bill to £163.84
   const gasBill=D.bills.find(b=>b.id==='gas');if(gasBill&&gasBill.budget===163.08)gasBill.budget=163.84;
-  // Fix Food shopping bill to £480
   const foodBill=D.bills.find(b=>b.id==='food');if(foodBill&&foodBill.budget===460.00)foodBill.budget=480.00;
-  // Remove food bill from bills tab — now tracked in Lauren's food tab
   D.bills=D.bills.filter(b=>b.id!=='food');
-  // Fix Lauren salon rent from £433.33 to £400
   if(Array.isArray(D.lauren.personalSubs)){const salonSub=D.lauren.personalSubs.find(s=>s.name==='Salon Room Rent');if(salonSub&&salonSub.amount===433.33)salonSub.amount=400;}
+  // Hard migration: strip phantom June 2026 history entry if no June income is actually logged
+  const juneIncome=(D.jake.income||[]).filter(i=>i.mk==='2026-5').reduce((s,i)=>s+i.amount,0)
+    +(D.jake.cashIncome||[]).filter(c=>c.mk==='2026-5').reduce((s,c)=>s+c.amount,0)
+    +(D.lauren.cashIncome||[]).filter(c=>c.mk==='2026-5').reduce((s,c)=>s+c.amount,0);
+  if(juneIncome===0){D.history=(D.history||[]).filter(h=>h.mk!=='2026-5');}
   // Auto-reset actuals on new month
   if(D.lastActiveMK && D.lastActiveMK!==MK){
-    // Archive previous month before clearing
     recordHistory();
-    // Wipe all actuals
     D.actuals={};
     D.lastActiveMK=MK;
     save();
@@ -1553,7 +1548,17 @@ function load(){setSS('saving');try{const r=localStorage.getItem('jl-v6');if(r){
   } else if(!D.lastActiveMK){
     D.lastActiveMK=MK;
   }
-  }recordHistory();}catch(e){console.error('load error',e);}sanitise();setSS('saved');checkNudge();renderAll();}
+  }}catch(e){console.error('load error',e);}
+  sanitise();
+  // Strip any phantom current-month history entry if nothing has actually been logged yet
+  const hasCurrentActuals=D.bills&&D.bills.some(b=>D.actuals&&D.actuals[b.id]&&D.actuals[b.id].mk===MK);
+  const hasCurrentJakeInc=(D.jake.income||[]).some(i=>i.mk===MK)+(D.jake.cashIncome||[]).some(c=>c.mk===MK);
+  const hasCurrentLaurenInc=(D.lauren.cashIncome||[]).some(c=>c.mk===MK);
+  if(!hasCurrentActuals&&!hasCurrentJakeInc&&!hasCurrentLaurenInc){
+    D.history=(D.history||[]).filter(h=>h.mk!==MK);
+  }
+  setSS('saved');checkNudge();renderAll();
+}
 function getActual(id){const a=D.actuals[id];return a?.mk===MK?a.amount:null;}
 function setActual(id,v){D.actuals[id]={mk:MK,amount:v};}
 function clearActual(id){delete D.actuals[id];}
@@ -1573,13 +1578,21 @@ function recordHistory(){
   const totalInc=jakeInc+laurenInc;
   const totalSav=jSav+lSav+jInv+lInv;
   const savingsRate=totalInc>0?Math.round(totalSav/totalInc*100):0;
+  const hasActuals=D.bills.some(b=>getActual(b.id)!==null);
+  const hasIncome=jakeInc>0||laurenInc>0;
   const snap={mk:MK,label:MLBL,year:YEAR,budget,actual,credit,bills:D.bills.length,jakeInc,laurenInc,jSav,lSav,jInv,lInv,jSpd,lSpd,savingsRate,totalSav};
   const existing=D.history.find(h=>h.mk===MK);
+  // Only create or keep a snapshot for the current month if real data exists
   if(!existing){
-    D.history.unshift(snap);
-    if(D.history.length>24)D.history=D.history.slice(0,24);
-  } else {
+    if(hasIncome||hasActuals){
+      D.history.unshift(snap);
+      if(D.history.length>24)D.history=D.history.slice(0,24);
+    }
+  } else if(hasIncome||hasActuals){
     Object.assign(existing,snap);
+  } else {
+    // Data was cleared — remove the phantom entry
+    D.history=D.history.filter(h=>h.mk!==MK);
   }
 }
 
@@ -1901,7 +1914,7 @@ function renderPartner(who){
     document.getElementById('j-sav-b').textContent=fmt(sav)+'/mo';
     document.getElementById('j-inv-b').textContent=fmt(inv)+'/mo';
     document.getElementById('j-spd-b').textContent=fmt(spd);
-    document.getElementById(sId).innerHTML=`<div class="stat"><div class="sl">Monthly income</div><div class="sv blue">${fmt(inc)}</div></div><div class="stat"><div class="sl">Savings + investments</div><div class="sv teal">${fmt(sav+inv)}</div></div><div class="stat"><div class="sl">Joint bills share</div><div class="sv">${fmt(share)}</div><div class="ss">actual this month</div></div><div class="stat"><div class="sl">Personal outgoings</div><div class="sv red">${fmt(personalOut)}</div><div class="ss">subs + DDs</div></div><div class="stat"><div class="sl">Left to spend</div><div class="sv ${leftCl}">${fmt(left)}</div>${credit>0?`<div class="ss">+${fmt(credit)} credit share</div>`:''}</div><div class="stat"><div class="sl">Emergency fund</div><div class="sv ${(D.jake.emergencyFund?.saved||0)>=EF_TARGET?'green':(D.jake.emergencyFund?.saved||0)>0?'amber':'red'}">${fmt(D.jake.emergencyFund?.saved||0)}</div><div class="ss">${Math.min(100,Math.round((D.jake.emergencyFund?.saved||0)/EF_TARGET*100))}% of ${fmt(EF_TARGET)}</div></div>`;
+    document.getElementById(sId).innerHTML=`<div class="stat"><div class="sl">Monthly income</div><div class="sv blue">${fmt(inc)}</div></div><div class="stat"><div class="sl">Savings + investments</div><div class="sv teal">${fmt(sav+inv)}</div></div><div class="stat"><div class="sl">Joint bills share</div><div class="sv">${fmt(share)}</div><div class="ss">actual this month</div></div><div class="stat"><div class="sl">Personal outgoings</div><div class="sv red">${fmt(personalOut)}</div><div class="ss">subs + DDs</div></div><div class="stat"><div class="sl">Left to spend</div><div class="sv ${leftCl}">${fmt(left)}</div>${credit>0?`<div class="ss">+${fmt(credit)} credit share</div>`:''}</div><div class="stat"><div class="sl">Emergency fund</div><div class="sv ${(D.jake.emergencyFund?.saved||0)>=EF_TARGET?'green':(D.jake.emergencyFund?.saved||0)>0?'teal':'blue'}">${fmt(D.jake.emergencyFund?.saved||0)}</div><div class="ss">${Math.min(100,Math.round((D.jake.emergencyFund?.saved||0)/EF_TARGET*100))}% of ${fmt(EF_TARGET)}</div></div>`;
     // Income list
     document.getElementById('j-inc-list').innerHTML=p.income.length?p.income.map(i=>`<div class="item"><div class="idot ${i.type==='extra'?'gold':'inc'}"></div><div class="iname">${i.name}</div><div class="iamt">${fmt(i.amount)}</div><button class="rm" onclick="removeJakeIncome(${i.id})">×</button></div>`).join(''):'<span class="empty">No income logged yet</span>';
     renderPayHistory();
@@ -1940,7 +1953,7 @@ function renderPartner(who){
     const srcCEl=document.getElementById('l-src-cash');const srcBEl=document.getElementById('l-src-bank');
     if(srcCEl)srcCEl.textContent=fmt(cashTypeTotal);
     if(srcBEl)srcBEl.textContent=fmt(bankTypeTotal);
-    document.getElementById(sId).innerHTML=`<div class="stat"><div class="sl">Income this month</div><div class="sv purple">${fmt(cashTotal)}</div></div><div class="stat"><div class="sl">Savings + investments</div><div class="sv teal">${fmt(sav+inv)}</div></div><div class="stat"><div class="sl">Joint bills share</div><div class="sv">${fmt(share)}</div></div><div class="stat"><div class="sl">Personal outgoings</div><div class="sv red">${fmt(lPersonalOut)}</div><div class="ss">salon + other</div></div><div class="stat"><div class="sl">Left to spend</div><div class="sv ${leftCl}">${fmt(left)}</div></div><div class="stat"><div class="sl">Emergency fund</div><div class="sv ${(D.lauren.emergencyFund?.saved||0)>=LEF_TARGET?'green':(D.lauren.emergencyFund?.saved||0)>0?'amber':'red'}">${fmt(D.lauren.emergencyFund?.saved||0)}</div><div class="ss">${Math.min(100,Math.round((D.lauren.emergencyFund?.saved||0)/LEF_TARGET*100))}% of ${fmt(LEF_TARGET)}</div></div>`;
+    document.getElementById(sId).innerHTML=`<div class="stat"><div class="sl">Income this month</div><div class="sv purple">${fmt(cashTotal)}</div></div><div class="stat"><div class="sl">Savings + investments</div><div class="sv teal">${fmt(sav+inv)}</div></div><div class="stat"><div class="sl">Joint bills share</div><div class="sv">${fmt(share)}</div></div><div class="stat"><div class="sl">Personal outgoings</div><div class="sv red">${fmt(lPersonalOut)}</div><div class="ss">salon + other</div></div><div class="stat"><div class="sl">Left to spend</div><div class="sv ${leftCl}">${fmt(left)}</div></div><div class="stat"><div class="sl">Emergency fund</div><div class="sv ${(D.lauren.emergencyFund?.saved||0)>=LEF_TARGET?'green':(D.lauren.emergencyFund?.saved||0)>0?'teal':'blue'}">${fmt(D.lauren.emergencyFund?.saved||0)}</div><div class="ss">${Math.min(100,Math.round((D.lauren.emergencyFund?.saved||0)/LEF_TARGET*100))}% of ${fmt(LEF_TARGET)}</div></div>`;
     // Weekly breakdown — Tue–Sat working weeks
     const LWKS=getLaurenWeeks(NOW.getFullYear(),NOW.getMonth());
     const currentWk=getWeekOfMonth(NOW);
@@ -2033,13 +2046,26 @@ function renderYearOverview(){
   document.getElementById('yr-hist-list').innerHTML=thisYear.length?thisYear.map(h=>{
     const c=h.credit||0,pct=Math.min(100,Math.round(Math.abs(c)/maxC*100));
     const jInc=h.jakeInc||0,lInc=h.laurenInc||0;
+    const isCurrent=h.mk===MK;
     return `<div class="hist-card">
-      <div class="hist-top"><span class="hist-month">${h.label}</span><span class="hist-credit ${c>0?'pos':c<0?'neg':'zero'}">${c>0?'+':c<0?'−':''}${fmt(Math.abs(c))}</span></div>
+      <div class="hist-top">
+        <span class="hist-month">${h.label}${isCurrent?'<span style="font-size:9px;background:var(--tdim);color:var(--teal);padding:1px 7px;border-radius:20px;margin-left:7px;font-family:var(--mono)">current</span>':''}</span>
+        <span style="display:flex;align-items:center;gap:8px">
+          <span class="hist-credit ${c>0?'pos':c<0?'neg':'zero'}">${c>0?'+':c<0?'−':''}${fmt(Math.abs(c))}</span>
+          <button onclick="deleteHistoryMonth('${h.mk}')" style="background:none;border:none;cursor:pointer;color:var(--hint);font-size:14px;padding:2px 4px;border-radius:4px;line-height:1;transition:color .15s" title="Delete this month" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--hint)'">🗑</button>
+        </span>
+      </div>
       <div class="hist-bar-wrap"><div class="hist-bar ${c>=0?'pos':'neg'}" style="width:${pct}%"></div></div>
       <div class="hist-meta"><span>budget ${fmt(h.budget)}</span><span>actual ${fmt(h.actual||h.budget)}</span></div>
       ${jInc>0||lInc>0?`<div class="hist-income-row">${jInc>0?`<span class="hist-inc jake">👤 Jake ${fmt(jInc)}</span>`:''}${lInc>0?`<span class="hist-inc lauren">👤 Lauren ${fmt(lInc)}</span>`:''}</div>`:''}
     </div>`;
   }).join(''):'<span class="empty">History builds automatically each month</span>';
+}
+
+function deleteHistoryMonth(mk){
+  if(!confirm(`Delete ${mk} from history? This cannot be undone.`))return;
+  D.history=(D.history||[]).filter(h=>h.mk!==mk);
+  save();cloudPush();renderYearActiveTab();toast('Month deleted ✓');
 }
 
 function renderYearIncome(){
