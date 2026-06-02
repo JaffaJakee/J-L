@@ -919,7 +919,7 @@ body{padding-bottom:calc(68px + var(--sb))}
         <div class="jh-row-val" id="jh-bills-out">−£0.00/mo</div>
       </div>
       <div class="jh-row">
-        <div class="jh-row-lbl">🛒 Food draws (est.)</div>
+        <div class="jh-row-lbl">🛒 Food purse (est.)</div>
         <div class="jh-row-val" id="jh-food-out">−£240.00/mo</div>
       </div>
       <div class="jh-balance surplus" id="jh-balance">
@@ -953,8 +953,8 @@ body{padding-bottom:calc(68px + var(--sb))}
     </div>
     <div class="food-pot">
       <div class="fp-lbl">Food pot — takeaways &amp; date nights</div>
-      <div class="fp-amt" id="fp-amt">£0.00</div>
-      <div class="fp-sub" id="fp-sub">Log food shops in Lauren's tab — savings vs £120/wk show here.</div>
+      <div class="fp-amt" id="fp-amt">£480.00</div>
+      <div class="fp-sub" id="fp-sub">Log food shops in Lauren's tab — purse credit vs £480/mo shows here.</div>
       <div class="fp-chips" id="fp-chips"></div>
     </div>
     <div class="banner">
@@ -1226,36 +1226,43 @@ body{padding-bottom:calc(68px + var(--sb))}
 
     <!-- FOOD SHOP SUB-TAB -->
     <div class="lsec" id="lsec-food">
-      <!-- Hero: total cash spent this month -->
-      <div class="food-hero">
-        <div class="fh-lbl">Cash spent at till this month</div>
-        <div class="fh-amt" id="food-total">£0.00</div>
-        <div class="fh-sub">£120/wk target · £480/month budget</div>
-        <div class="fh-bar-wrap"><div class="fh-bar" id="food-bar" style="width:0%"></div></div>
-        <div class="fh-pct" id="food-pct">0% of £480 budget used</div>
+      <!-- Monthly draw reminder -->
+      <div class="nudge" id="food-draw-nudge" style="display:none">
+        <div class="nudge-ico">💳</div>
+        <div><div class="nudge-title">Log Jake's £240 draw</div><div class="nudge-desc">New month — remember to draw £240 from the joint account to cover Jake's half of the food shop.</div></div>
+        <button class="nudge-close" onclick="dismissDrawNudge()">×</button>
       </div>
 
-      <!-- 4 stat boxes -->
+      <!-- Hero: monthly purse remaining -->
+      <div class="food-hero">
+        <div class="fh-lbl">💰 Monthly purse remaining</div>
+        <div class="fh-amt" id="food-total">£480.00</div>
+        <div class="fh-sub" id="food-hero-sub">£480 in purse this month · log shops to deduct</div>
+        <div class="fh-bar-wrap"><div class="fh-bar" id="food-bar" style="width:0%"></div></div>
+        <div class="fh-pct" id="food-pct">Nothing spent yet · full purse available</div>
+      </div>
+
+      <!-- 3 stat boxes -->
       <div class="food-stat-grid">
         <div class="food-stat">
-          <div class="food-stat-lbl">🛒 Lauren paid</div>
+          <div class="food-stat-lbl">💰 Monthly purse</div>
+          <div class="food-stat-val blue" id="fs-purse-budget">£480.00</div>
+          <div class="food-stat-sub">resets each month</div>
+        </div>
+        <div class="food-stat">
+          <div class="food-stat-lbl">🛒 Spent at till</div>
           <div class="food-stat-val green" id="fs-lauren-paid">£0.00</div>
-          <div class="food-stat-sub">cash at till</div>
+          <div class="food-stat-sub">total this month</div>
+        </div>
+        <div class="food-stat">
+          <div class="food-stat-lbl">✨ Purse left</div>
+          <div class="food-stat-val teal" id="fs-lauren-net">£480.00</div>
+          <div class="food-stat-sub">of £480 remaining</div>
         </div>
         <div class="food-stat">
           <div class="food-stat-lbl">💳 Drawn from joint</div>
-          <div class="food-stat-val blue" id="fs-joint-drawn">£0.00</div>
-          <div class="food-stat-sub">Jake's half back</div>
-        </div>
-        <div class="food-stat">
-          <div class="food-stat-lbl">💜 Lauren's net cost</div>
-          <div class="food-stat-val purple" id="fs-lauren-net">£0.00</div>
-          <div class="food-stat-sub">after joint draws</div>
-        </div>
-        <div class="food-stat">
-          <div class="food-stat-lbl">🤝 Jake's share</div>
-          <div class="food-stat-val teal" id="fs-jake-share">£0.00</div>
-          <div class="food-stat-sub">via joint draws</div>
+          <div class="food-stat-val purple" id="fs-joint-drawn">£0.00</div>
+          <div class="food-stat-sub">Jake's £240 back</div>
         </div>
       </div>
 
@@ -1275,17 +1282,13 @@ body{padding-bottom:calc(68px + var(--sb))}
 
       <!-- Joint draw form -->
       <div class="form-box open" id="food-form-draw" style="display:none;margin-bottom:12px">
-        <div class="fld"><label>Amount drawn from joint (£)</label><input type="number" id="fs-draw-amt" placeholder="60.00" min="0" step="0.01" value="60"></div>
-        <div class="fld"><label>Note — optional</label><input type="text" id="fs-draw-note" placeholder="e.g. Week 3 draw, Jake's half"></div>
+        <div class="fld"><label>Amount drawn from joint (£)</label><input type="number" id="fs-draw-amt" placeholder="240.00" min="0" step="0.01" value="240"></div>
+        <div class="fld"><label>Note — optional</label><input type="text" id="fs-draw-note" placeholder="e.g. Jake's half for the month"></div>
         <button class="go" style="background:var(--blue);color:#fff" onclick="addFoodEntry('draw')">Log draw</button>
       </div>
 
-      <!-- Weekly breakdown -->
-      <div class="slbl">Weekly breakdown <span class="badge green" id="food-wk-badge"></span></div>
-      <div id="food-week-list"></div>
-
       <!-- Full log -->
-      <div class="slbl" style="margin-top:14px">All entries this month</div>
+      <div class="slbl" style="margin-top:4px">All entries this month</div>
       <div id="food-shop-list"><span class="empty">No entries logged yet</span></div>
     </div>
 
@@ -1460,7 +1463,7 @@ let D={
   jake:{income:[],
     savings:[],investments:[],spending:[],payHistory:[],cashIncome:[]},
   lauren:{income:[],savings:[],investments:[],spending:[],cashIncome:[],cashHistory:[],foodShop:[]},
-  history:[],nudgeDismissed:'',lastActiveMK:'',nextId:500,
+  history:[],nudgeDismissed:'',foodDrawNudgeDismissed:'',lastActiveMK:'',nextId:500,
   contributions:{jake:1253.92,lauren:993.92,foodDrawWeekly:60},
 };
 
@@ -1523,7 +1526,7 @@ function sanitise(){
   if(!Array.isArray(D.history))D.history=[];
 }
 
-function load(){setSS('saving');try{const r=localStorage.getItem('jl-v6');if(r){const s=JSON.parse(r);if(s.bills?.length)D.bills=s.bills;if(s.actuals)D.actuals=s.actuals;if(s.jake)D.jake={...D.jake,...s.jake};if(s.lauren)D.lauren={...D.lauren,...s.lauren};if(s.history)D.history=s.history;if(s.nudgeDismissed)D.nudgeDismissed=s.nudgeDismissed;if(s.lastActiveMK)D.lastActiveMK=s.lastActiveMK;if(s.nextId)D.nextId=s.nextId;if(s.contributions)D.contributions={...D.contributions,...s.contributions};
+function load(){setSS('saving');try{const r=localStorage.getItem('jl-v6');if(r){const s=JSON.parse(r);if(s.bills?.length)D.bills=s.bills;if(s.actuals)D.actuals=s.actuals;if(s.jake)D.jake={...D.jake,...s.jake};if(s.lauren)D.lauren={...D.lauren,...s.lauren};if(s.history)D.history=s.history;if(s.nudgeDismissed)D.nudgeDismissed=s.nudgeDismissed;if(s.foodDrawNudgeDismissed)D.foodDrawNudgeDismissed=s.foodDrawNudgeDismissed;if(s.lastActiveMK)D.lastActiveMK=s.lastActiveMK;if(s.nextId)D.nextId=s.nextId;if(s.contributions)D.contributions={...D.contributions,...s.contributions};
   // ── Migrations ──
   if(D.jake.payHistory)D.jake.payHistory=D.jake.payHistory.filter(h=>h.mk!=='2026-3');
   if(D.jake.payHistory)D.jake.payHistory=D.jake.payHistory.filter(h=>!(h.mk==='2026-4'&&(h.net===2745.36||h.net===2745||h.net===2745.00)));
@@ -1600,6 +1603,7 @@ function setSS(s){const d=document.getElementById('sdot'),l=document.getElementB
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2100);}
 function checkNudge(){if(DAY>=26&&D.nudgeDismissed!==MK)document.getElementById('nudge').style.display='flex';}
 function dismissNudge(){document.getElementById('nudge').style.display='none';D.nudgeDismissed=MK;save();}
+function dismissDrawNudge(){document.getElementById('food-draw-nudge').style.display='none';D.foodDrawNudgeDismissed=MK;save();}
 function showSec(id){['joint','jake','lauren','year'].forEach(s=>{document.getElementById('sec-'+s).classList.toggle('on',s===id);document.getElementById('nb-'+s).classList.toggle('on',s===id);});if(id==='joint')setTimeout(renderJChart,60);if(id==='year')setTimeout(()=>renderYearActiveTab(),60);}
 function showYrTab(id){
   ['overview','income','savrate','spending'].forEach(t=>{
@@ -1765,7 +1769,7 @@ function renderJointHealth(){
   // Estimated weekly draws * 4 (use actual this month if available, else estimate)
   const foodDrawsThisMonth=(D.lauren.foodShop||[]).filter(x=>x.mk===MK&&x.type==='draw').reduce((s,x)=>s+x.amount,0);
   const weeksGone=getWeekOfMonth(NOW);
-  const foodOutEstimate=foodDrawsThisMonth>0?foodDrawsThisMonth:c.foodDrawWeekly*4;
+  const foodOutEstimate=foodDrawsThisMonth>0?foodDrawsThisMonth:480;
   const totalIn=c.jake+c.lauren;
   const totalOut=billsOut+foodOutEstimate;
   const balance=totalIn-totalOut;
@@ -1775,8 +1779,8 @@ function renderJointHealth(){
   document.getElementById('jh-lauren-val').textContent=fmt(c.lauren)+'/mo';
   document.getElementById('jh-bills-out').textContent='−'+fmt(billsOut)+'/mo';
   document.getElementById('jh-food-out').textContent=foodDrawsThisMonth>0
-    ?'−'+fmt(foodDrawsThisMonth)+' so far this month'
-    :'−'+fmt(foodOutEstimate)+'/mo (est. 4 wks)';
+    ?'−'+fmt(foodDrawsThisMonth)+' drawn this month'
+    :'−£480.00/mo (est. monthly purse)';
 
   const balEl=document.getElementById('jh-balance');
   const valEl=document.getElementById('jh-balance-val');
@@ -1834,31 +1838,26 @@ function renderJoint(){
       :`<span class="chip over">${b.name}: −${fmt(Math.abs(d))}</span>`;
   }).join('');
 
-  // ── Food pot (weekly savings vs £120/wk budget) ───────────
-  const FOOD_WK_BUDGET=120;
-  const LWKS=getLaurenWeeks(NOW.getFullYear(),NOW.getMonth());
+  // ── Food pot (monthly purse: spend vs £480) ───────────────
+  const FOOD_MONTHLY_BUDGET=480;
   const foodShopsThisMonth=(D.lauren.foodShop||[]).filter(x=>x.mk===MK&&(!x.type||x.type==='shop'));
-  const weeksToShow=LWKS.filter(wk=>wk.start<=NOW.getDate()).length;
-  let foodChips='',foodCreditTotal=0;
-  for(let w=1;w<=weeksToShow;w++){
-    const wShops=foodShopsThisMonth.filter(x=>(x.week||1)===w);
-    if(!wShops.length)continue;
-    const wSpent=wShops.reduce((s,x)=>s+x.amount,0);
-    const wCredit=FOOD_WK_BUDGET-wSpent;
-    foodCreditTotal+=wCredit;
-    if(wCredit>0)foodChips+=`<span class="chip saved">Wk${w}: +${fmt(wCredit)}</span>`;
-    else if(wCredit<0)foodChips+=`<span class="chip over">Wk${w}: −${fmt(Math.abs(wCredit))} over</span>`;
-    else foodChips+=`<span class="chip neutral">Wk${w}: on budget</span>`;
+  const totalFoodSpent=foodShopsThisMonth.reduce((s,x)=>s+x.amount,0);
+  const foodCreditTotal=FOOD_MONTHLY_BUDGET-totalFoodSpent;
+  let foodChips='';
+  if(foodShopsThisMonth.length>0){
+    if(foodCreditTotal>0)foodChips=`<span class="chip saved">+${fmt(foodCreditTotal)} left in purse</span>`;
+    else if(foodCreditTotal<0)foodChips=`<span class="chip over">−${fmt(Math.abs(foodCreditTotal))} over</span>`;
+    else foodChips=`<span class="chip neutral">Exactly on budget</span>`;
   }
   const hasFood=foodShopsThisMonth.length>0;
   const fpEl=document.getElementById('fp-amt');
   fpEl.textContent=fmt(Math.abs(foodCreditTotal));
   fpEl.className='fp-amt'+(foodCreditTotal===0?' zero':foodCreditTotal<0?' neg':'');
   document.getElementById('fp-sub').textContent=!hasFood
-    ?'Log food shops in Lauren\'s tab — savings vs £120/wk show here.'
-    :foodCreditTotal>0?`${fmt(foodCreditTotal)} saved on food — available for takeaways or date nights 🎉`
-    :foodCreditTotal<0?`${fmt(Math.abs(foodCreditTotal))} over food budget so far this month.`
-    :'Food exactly on budget this month.';
+    ?'Log food shops in Lauren\'s tab — purse credit vs £480/mo shows here.'
+    :foodCreditTotal>0?`${fmt(foodCreditTotal)} purse credit — available for takeaways or date nights 🎉`
+    :foodCreditTotal<0?`${fmt(Math.abs(foodCreditTotal))} over purse budget so far this month.`
+    :'Food exactly on purse budget this month.';
   document.getElementById('fp-chips').innerHTML=foodChips;
   const jInc=D.jake.income.reduce((s,i)=>s+i.amount,0)+(D.jake.cashIncome||[]).filter(c=>c.mk===MK).reduce((s,c)=>s+c.amount,0);
   const lInc=(D.lauren.cashIncome||[]).filter(c=>c.mk===MK).reduce((s,c)=>s+c.amount,0);
@@ -1907,14 +1906,28 @@ function renderPartner(who){
     const inv=p.investments.reduce((s,i)=>s+i.amount,0)+(p.extraAlloc?.inv||0);
     const spd=p.spending.reduce((s,i)=>s+i.amount,0)+(p.extraAlloc?.spd||0);
     const personalOut=(D.jake.personalSubs||[]).reduce((s,x)=>s+x.amount,0);
-    const left=inc-sav-inv-spd-share-personalOut;
+    // If no income logged this month, use last month's pay as a reference so
+    // "left to spend" stays positive while Jake is spending from last month's pay
+    const lastPay=(p.payHistory||[]).find(h=>h.mk!==MK);
+    const refInc=inc>0?inc:(lastPay?lastPay.net:0);
+    const usingLastMonth=inc===0&&refInc>0;
+    const left=refInc-sav-inv-spd-share-personalOut;
     const leftCl=left<0?'red':left<200?'amber':'green';
-    document.getElementById('j-tag').textContent=inc===0?'National Highways':left<0?`${fmt(Math.abs(left))} over budget`:left===0?'Balanced this month':`${fmt(left)} left to spend`;
-    document.getElementById('j-inc-b').textContent=fmt(inc);
+    document.getElementById('j-tag').textContent=usingLastMonth
+      ?`Based on last month's pay · log June when paid`
+      :inc===0?'National Highways':left<0?`${fmt(Math.abs(left))} over budget`:left===0?'Balanced this month':`${fmt(left)} left to spend`;
+    document.getElementById('j-inc-b').textContent=usingLastMonth?fmt(refInc)+' (last mo)':fmt(inc);
     document.getElementById('j-sav-b').textContent=fmt(sav)+'/mo';
     document.getElementById('j-inv-b').textContent=fmt(inv)+'/mo';
     document.getElementById('j-spd-b').textContent=fmt(spd);
-    document.getElementById(sId).innerHTML=`<div class="stat"><div class="sl">Monthly income</div><div class="sv blue">${fmt(inc)}</div></div><div class="stat"><div class="sl">Savings + investments</div><div class="sv teal">${fmt(sav+inv)}</div></div><div class="stat"><div class="sl">Joint bills share</div><div class="sv">${fmt(share)}</div><div class="ss">actual this month</div></div><div class="stat"><div class="sl">Personal outgoings</div><div class="sv red">${fmt(personalOut)}</div><div class="ss">subs + DDs</div></div><div class="stat"><div class="sl">Left to spend</div><div class="sv ${leftCl}">${fmt(left)}</div>${credit>0?`<div class="ss">+${fmt(credit)} credit share</div>`:''}</div><div class="stat"><div class="sl">Emergency fund</div><div class="sv ${(D.jake.emergencyFund?.saved||0)>=EF_TARGET?'green':(D.jake.emergencyFund?.saved||0)>0?'teal':'blue'}">${fmt(D.jake.emergencyFund?.saved||0)}</div><div class="ss">${Math.min(100,Math.round((D.jake.emergencyFund?.saved||0)/EF_TARGET*100))}% of ${fmt(EF_TARGET)}</div></div>`;
+    document.getElementById(sId).innerHTML=`
+      <div class="stat"><div class="sl">Monthly income</div><div class="sv blue">${fmt(refInc)}</div><div class="ss">${usingLastMonth?'last month · log June when paid':'this month'}</div></div>
+      <div class="stat"><div class="sl">Savings + investments</div><div class="sv teal">${fmt(sav+inv)}</div></div>
+      <div class="stat"><div class="sl">Joint bills share</div><div class="sv">${fmt(share)}</div><div class="ss">actual this month</div></div>
+      <div class="stat"><div class="sl">Personal outgoings</div><div class="sv red">${fmt(personalOut)}</div><div class="ss">subs + DDs</div></div>
+      <div class="stat"><div class="sl">Left to spend</div><div class="sv ${leftCl}">${fmt(left)}</div>${usingLastMonth?`<div class="ss">est. from last month</div>`:credit>0?`<div class="ss">+${fmt(credit)} credit share</div>`:''}</div>
+      <div class="stat"><div class="sl">Emergency fund</div><div class="sv ${(D.jake.emergencyFund?.saved||0)>=EF_TARGET?'green':(D.jake.emergencyFund?.saved||0)>0?'teal':'blue'}">${fmt(D.jake.emergencyFund?.saved||0)}</div><div class="ss">${Math.min(100,Math.round((D.jake.emergencyFund?.saved||0)/EF_TARGET*100))}% of ${fmt(EF_TARGET)}</div></div>
+    `;
     // Income list
     document.getElementById('j-inc-list').innerHTML=p.income.length?p.income.map(i=>`<div class="item"><div class="idot ${i.type==='extra'?'gold':'inc'}"></div><div class="iname">${i.name}</div><div class="iamt">${fmt(i.amount)}</div><button class="rm" onclick="removeJakeIncome(${i.id})">×</button></div>`).join(''):'<span class="empty">No income logged yet</span>';
     renderPayHistory();
@@ -2218,75 +2231,67 @@ function addFoodEntry(type){
   const week=getWeekOfMonth(NOW);
   if(!D.lauren.foodShop)D.lauren.foodShop=[];
   D.lauren.foodShop.push({id:D.nextId++,type,amount:amt,note,week,mk:MK,date:new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short'})});
-  document.getElementById(amtId).value=type==='draw'?'60':'';
+  document.getElementById(amtId).value=type==='draw'?'240':'';
   document.getElementById(noteId).value='';
+  // Auto-dismiss the draw nudge when a draw is logged
+  if(type==='draw'){D.foodDrawNudgeDismissed=MK;}
   save();renderAll();toast(type==='shop'?'Shop logged ✓':'Joint draw logged ✓');
 }
 function removeFoodShop(id){D.lauren.foodShop=D.lauren.foodShop.filter(s=>s.id!==id);save();renderAll();}
 function renderFoodShop(){
+  const MONTHLY_PURSE=480;
   if(!D.lauren.foodShop)D.lauren.foodShop=[];
   const all=D.lauren.foodShop.filter(s=>s.mk===MK);
-  // Separate shops (cash at till) from joint draws
-  // Legacy entries (no type) treated as shop
   const shops=all.filter(x=>!x.type||x.type==='shop');
   const draws=all.filter(x=>x.type==='draw');
   const totalSpent=shops.reduce((s,x)=>s+x.amount,0);
   const totalDrawn=draws.reduce((s,x)=>s+x.amount,0);
-  const laurenNet=totalSpent-totalDrawn;
-  const budget=480,pct=Math.min(150,Math.round(totalSpent/budget*100));
+  const remaining=MONTHLY_PURSE-totalSpent;
+  const pct=Math.min(110,Math.round(totalSpent/MONTHLY_PURSE*100));
   const barCls=pct>=100?'over':pct>=80?'warn':'';
-  const netCl=laurenNet<0?'red':laurenNet<120?'amber':'purple';
-  // Hero
-  document.getElementById('food-total').textContent=fmt(totalSpent);
-  document.getElementById('food-total').style.color=pct>=100?'var(--red)':pct>=80?'var(--amber)':'var(--green)';
+
+  // Draw nudge — show on day 1-3 of month if no draw logged yet and not dismissed this month
+  const nudgeEl=document.getElementById('food-draw-nudge');
+  if(nudgeEl){
+    const showNudge=DAY<=3&&totalDrawn===0&&D.foodDrawNudgeDismissed!==MK;
+    nudgeEl.style.display=showNudge?'flex':'none';
+  }
+
+  // Hero — shows remaining purse
+  const heroEl=document.getElementById('food-total');
+  heroEl.textContent=fmt(Math.max(0,remaining));
+  heroEl.style.color=remaining<=0?'var(--red)':remaining<100?'var(--amber)':'var(--green)';
+  document.getElementById('food-hero-sub').textContent=`£${MONTHLY_PURSE} in purse this month · ${fmt(totalSpent)} spent so far`;
   document.getElementById('food-bar').style.width=Math.min(100,pct)+'%';
   document.getElementById('food-bar').className='fh-bar'+(barCls?' '+barCls:'');
-  document.getElementById('food-pct').textContent=pct+'% of £480 monthly budget · £'+(budget-totalSpent>0?(budget-totalSpent).toFixed(2)+' remaining':'0.00 — over by £'+Math.abs(budget-totalSpent).toFixed(2));
-  // Stats
-  document.getElementById('fs-lauren-paid').textContent=fmt(totalSpent);
-  document.getElementById('fs-joint-drawn').textContent=fmt(totalDrawn);
-  const netEl=document.getElementById('fs-lauren-net');
-  netEl.textContent=fmt(laurenNet<0?0:laurenNet);
-  netEl.className='food-stat-val '+netCl;
-  document.getElementById('fs-jake-share').textContent=fmt(totalDrawn);
-  // Week badge — Tue–Sat working weeks
-  const LWKS=getLaurenWeeks(NOW.getFullYear(),NOW.getMonth());
-  const currentWk=getWeekOfMonth(NOW);
-  const weeksToShow=LWKS.filter(wk=>wk.start<=NOW.getDate()).length;
-  const wkBadge=document.getElementById('food-wk-badge');
-  if(wkBadge)wkBadge.textContent=`Wk ${currentWk} of ${LWKS.length}`;
-  // Weekly cards
+  document.getElementById('food-pct').textContent=totalSpent===0
+    ?`Nothing spent yet · full £${MONTHLY_PURSE} available`
+    :remaining>0?`${fmt(remaining)} remaining · ${pct}% used`:`Over by ${fmt(Math.abs(remaining))}`;
 
-  let wkHtml='';
-  for(let w=1;w<=weeksToShow;w++){
-    const wShops=shops.filter(x=>(x.week||currentWk)===w);
-    const wDraws=draws.filter(x=>(x.week||currentWk)===w);
-    const wSpent=wShops.reduce((s,x)=>s+x.amount,0);
-    const wDrawn=wDraws.reduce((s,x)=>s+x.amount,0);
-    const wNet=wSpent-wDrawn;
-    const isCurrent=w===currentWk&&!isOffDay(NOW),isFuture=w>currentWk,isEmpty=wShops.length===0&&wDraws.length===0;
-    const drawPending=wShops.length>0&&wDraws.length===0&&!isFuture;
-    const lbl=weekLabel(LWKS[w-1],NOW.getFullYear(),NOW.getMonth());
-    wkHtml+=`<div class="food-week-card${isCurrent?' current-fw':''}${isFuture&&isEmpty?' future-fw':''}">
-      <div class="fwk-top">
-        <div class="fwk-label">Week ${w} <span style="font-size:10px;color:var(--hint);font-family:var(--mono)">· ${lbl}</span>${isCurrent?'<span class="fwk-now">now</span>':''}</div>
-        <div class="fwk-net" style="color:${isEmpty?'var(--hint)':wNet>0?'var(--purple)':'var(--text)'}">${isEmpty?'—':fmt(wNet)+' net'}</div>
-      </div>
-      ${!isEmpty?`<div class="fwk-row">🛒 Cash at till<span class="green">${fmt(wSpent)}</span></div>
-      <div class="fwk-row">💳 Drawn from joint<span class="blue">${wDrawn>0?fmt(wDrawn):'—'}</span></div>
-      <div class="fwk-row" style="border-top:1px solid var(--border);margin-top:4px;padding-top:4px">Lauren's net<span class="purple">${fmt(wNet<0?0:wNet)}</span></div>
-      ${drawPending?'<div class="draw-pending">⚠️ joint draw pending</div>':''}`:
-      isFuture?'<div style="font-size:11px;color:var(--hint)">Not yet</div>':'<div style="font-size:11px;color:var(--hint)">Nothing logged</div>'}
-    </div>`;
-  }
-  const wkList=document.getElementById('food-week-list');
-  if(wkList)wkList.innerHTML=wkHtml;
-  // Full log — newest first, shops and draws together
+  // Stats
+  document.getElementById('fs-purse-budget').textContent=fmt(MONTHLY_PURSE);
+  document.getElementById('fs-lauren-paid').textContent=fmt(totalSpent);
+  const leftEl=document.getElementById('fs-lauren-net');
+  leftEl.textContent=fmt(Math.max(0,remaining));
+  leftEl.className='food-stat-val'+(remaining<=0?' red':remaining<100?' amber':' teal');
+  document.getElementById('fs-joint-drawn').textContent=totalDrawn>0?fmt(totalDrawn):'—';
+
+  // Full log — shops and draws, newest first
   const allSorted=[...all].sort((a,b)=>b.id-a.id);
-  document.getElementById('food-shop-list').innerHTML=allSorted.length?`<div style="padding-bottom:72px">`+allSorted.map(x=>{
-    const isShop=!x.type||x.type==='shop';
-    return `<div class="food-entry"><div class="food-entry-ico ${isShop?'shop':'draw'}">${isShop?'🛒':'💳'}</div><div class="food-entry-info"><div class="food-entry-note">${x.note}</div><div class="food-entry-meta">Wk ${x.week||'?'} · ${x.date} · ${isShop?'Cash at till':'Joint draw'}</div></div><button class="rm" onclick="removeFoodShop(${x.id})" style="margin-right:4px">×</button><div class="food-entry-amt ${isShop?'shop':'draw'}">${isShop?'+':'−'}${fmt(x.amount)}</div></div>`;
-  }).join('')+`</div>`:'<span class="empty">No entries logged yet this month</span>';
+  document.getElementById('food-shop-list').innerHTML=allSorted.length
+    ?`<div style="padding-bottom:72px">`+allSorted.map(x=>{
+      const isShop=!x.type||x.type==='shop';
+      return `<div class="food-entry">
+        <div class="food-entry-ico ${isShop?'shop':'draw'}">${isShop?'🛒':'💳'}</div>
+        <div class="food-entry-info">
+          <div class="food-entry-note">${x.note}</div>
+          <div class="food-entry-meta">${x.date} · ${isShop?'Cash at till':'Joint draw'}</div>
+        </div>
+        <button class="rm" onclick="removeFoodShop(${x.id})" style="margin-right:4px">×</button>
+        <div class="food-entry-amt ${isShop?'shop':'draw'}">${isShop?'−':'💳 '}${fmt(x.amount)}</div>
+      </div>`;
+    }).join('')+`</div>`
+    :'<span class="empty">No entries logged yet this month</span>';
 }
 function addSaving(who){const pre=who==='jake'?'j':'l';const n=document.getElementById(pre+'s-n').value.trim(),a=parseFloat(document.getElementById(pre+'s-a').value),t=parseFloat(document.getElementById(pre+'s-t').value)||0;if(!n||isNaN(a)||a<=0){toast('Fill in name and amount');return;}if(!Array.isArray(D[who].savings))D[who].savings=[];D[who].savings.push({id:D.nextId++,name:n,amount:a,target:t||null,saved:0});document.getElementById(pre+'s-n').value='';document.getElementById(pre+'s-a').value='';document.getElementById(pre+'s-t').value='';save();renderAll();toast('Saving goal added ✓');}
 function addInvestment(who){const pre=who==='jake'?'j':'l';const n=document.getElementById(pre+'inv-n').value.trim(),a=parseFloat(document.getElementById(pre+'inv-a').value),t=document.getElementById(pre+'inv-t').value;if(!n||isNaN(a)||a<=0){toast('Fill in name and amount');return;}if(!Array.isArray(D[who].investments))D[who].investments=[];D[who].investments.push({id:D.nextId++,name:n,amount:a,itype:t});document.getElementById(pre+'inv-n').value='';document.getElementById(pre+'inv-a').value='';save();renderAll();toast('Investment added ✓');}
@@ -2948,7 +2953,7 @@ function renderDashboard(){
   const savRate=totalInc>0?Math.round(totalSav/totalInc*100):0;
   const billPct=Math.round(billActual/billBudget*100);
   const c=D.contributions;
-  const surplus=(c.jake+c.lauren)-billBudget-(c.foodDrawWeekly*4);
+  const surplus=(c.jake+c.lauren)-billBudget-480;
 
   // Score 0-100
   let score=50;
