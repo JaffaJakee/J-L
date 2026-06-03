@@ -854,21 +854,22 @@ body{padding-bottom:calc(68px + var(--sb))}
       <button class="install-banner-close" onclick="dismissInstall()">×</button>
     </div>
 
-    <!-- DASHBOARD HEALTH CARD -->
+    <!-- AT A GLANCE CARD -->
     <div class="dash-health" id="dash-health">
-      <div class="dh-title">📊 Financial health — <span id="dh-month"></span></div>
-      <div class="dh-score-row">
-        <div class="dh-score" id="dh-score-ring"><div class="dh-score-num" id="dh-score-num">—</div></div>
-        <div class="dh-score-info"><div class="dh-score-lbl" id="dh-score-lbl">Calculating…</div><div class="dh-score-sub" id="dh-score-sub"></div></div>
-      </div>
-      <div class="dh-metrics">
-        <div class="dh-metric"><div class="dh-metric-lbl">Savings rate</div><div class="dh-metric-val" id="dh-savrate">—</div><div class="dh-metric-sub">of income</div></div>
-        <div class="dh-metric"><div class="dh-metric-lbl">Bills used</div><div class="dh-metric-val" id="dh-billpct">—</div><div class="dh-metric-sub">of budget</div></div>
-        <div class="dh-metric"><div class="dh-metric-lbl">Surplus</div><div class="dh-metric-val" id="dh-surplus">—</div><div class="dh-metric-sub">joint account</div></div>
-      </div>
-      <div class="dh-vs" id="dh-vs" style="display:none">
-        <span class="dh-vs-lbl" id="dh-vs-lbl">vs last month</span>
-        <span class="dh-vs-val" id="dh-vs-val"></span>
+      <div class="dh-title">👀 At a glance — <span id="dh-month"></span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px">
+        <!-- Joint account balance -->
+        <div style="background:rgba(77,159,255,0.08);border:1px solid rgba(77,159,255,0.22);border-radius:12px;padding:13px 14px">
+          <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--blue);font-family:var(--mono);margin-bottom:6px">🏦 Joint balance</div>
+          <div style="font-size:26px;font-weight:300;letter-spacing:-1px;font-family:var(--mono)" id="glance-joint-bal">—</div>
+          <div style="font-size:10px;color:var(--hint);font-family:var(--mono);margin-top:5px" id="glance-joint-ts">tap ✏️ in joint card to set</div>
+        </div>
+        <!-- Food purse remaining -->
+        <div style="background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.22);border-radius:12px;padding:13px 14px">
+          <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--green);font-family:var(--mono);margin-bottom:6px">🛒 Food purse</div>
+          <div style="font-size:26px;font-weight:300;letter-spacing:-1px;font-family:var(--mono)" id="glance-food-remaining">£480.00</div>
+          <div style="font-size:10px;color:var(--hint);font-family:var(--mono);margin-top:5px" id="glance-food-sub">of £480 remaining</div>
+        </div>
       </div>
     </div>
 
@@ -919,7 +920,7 @@ body{padding-bottom:calc(68px + var(--sb))}
         <div class="jh-row-val" id="jh-bills-out">−£0.00/mo</div>
       </div>
       <div class="jh-row">
-        <div class="jh-row-lbl">🛒 Food purse (est.)</div>
+        <div class="jh-row-lbl">🛒 Jake's food draw</div>
         <div class="jh-row-val" id="jh-food-out">−£240.00/mo</div>
       </div>
       <div class="jh-balance surplus" id="jh-balance">
@@ -1766,12 +1767,11 @@ function renderJointActualBal(){
 function renderJointHealth(){
   const c=D.contributions;
   const billsOut=D.bills.reduce((s,b)=>s+b.budget,0);
-  // Estimated weekly draws * 4 (use actual this month if available, else estimate)
+  // Food draw goes through the joint account (Lauren withdraws Jake's £240 share)
   const foodDrawsThisMonth=(D.lauren.foodShop||[]).filter(x=>x.mk===MK&&x.type==='draw').reduce((s,x)=>s+x.amount,0);
-  const weeksGone=getWeekOfMonth(NOW);
-  const foodOutEstimate=foodDrawsThisMonth>0?foodDrawsThisMonth:480;
+  const foodDrawOut=foodDrawsThisMonth>0?foodDrawsThisMonth:240; // use actual if logged, else expected £240
   const totalIn=c.jake+c.lauren;
-  const totalOut=billsOut+foodOutEstimate;
+  const totalOut=billsOut+foodDrawOut;
   const balance=totalIn-totalOut;
   const pct=Math.round(totalIn>0?totalOut/totalIn*100:0);
 
@@ -1780,7 +1780,7 @@ function renderJointHealth(){
   document.getElementById('jh-bills-out').textContent='−'+fmt(billsOut)+'/mo';
   document.getElementById('jh-food-out').textContent=foodDrawsThisMonth>0
     ?'−'+fmt(foodDrawsThisMonth)+' drawn this month'
-    :'−£480.00/mo (est. monthly purse)';
+    :'−£240.00/mo (expected)';
 
   const balEl=document.getElementById('jh-balance');
   const valEl=document.getElementById('jh-balance-val');
@@ -1807,7 +1807,7 @@ function renderJointHealth(){
     valEl.className='jh-balance-val green';
     valEl.textContent='+'+fmt(balance);
     lblEl.textContent='Monthly surplus';
-    subEl.textContent=fmt(balance)+' buffer after bills + food draws ('+pct+'% of income used)';
+    subEl.textContent=fmt(balance)+' buffer after bills + food draw ('+pct+'% of contributions used)';
     card.className='jh-card ok';
   }
 
@@ -2938,67 +2938,28 @@ function copyCloudDetails(){
 // ── Dashboard health card ─────────────────────────────────
 function renderDashboard(){
   document.getElementById('dh-month').textContent=MLBL;
-  const bills=D.bills;
-  const billBudget=bills.reduce((s,b)=>s+b.budget,0);
-  const billActual=bills.reduce((s,b)=>{const a=getActual(b.id);return s+(a!==null?a:b.budget);},0);
-  const credit=billBudget-billActual;
-  const jInc=D.jake.income.reduce((s,i)=>s+i.amount,0);
-  const lInc=(D.lauren.cashIncome||[]).filter(c=>c.mk===MK).reduce((s,c)=>s+c.amount,0);
-  const totalInc=jInc+lInc;
-  const jSav=(D.jake.savings||[]).reduce((s,i)=>s+i.amount,0)+(D.jake.extraAlloc?.sav||0);
-  const jInv=(D.jake.investments||[]).reduce((s,i)=>s+i.amount,0)+(D.jake.extraAlloc?.inv||0);
-  const lSav=(D.lauren.savings||[]).reduce((s,i)=>s+i.amount,0);
-  const lInv=(D.lauren.investments||[]).reduce((s,i)=>s+i.amount,0);
-  const totalSav=jSav+jInv+lSav+lInv;
-  const savRate=totalInc>0?Math.round(totalSav/totalInc*100):0;
-  const billPct=Math.round(billActual/billBudget*100);
+  // Joint account balance
   const c=D.contributions;
-  const surplus=(c.jake+c.lauren)-billBudget-480;
-
-  // Score 0-100
-  let score=50;
-  if(totalInc>0)score+=10;
-  if(savRate>=20)score+=20;else if(savRate>=10)score+=10;
-  if(credit>=0)score+=10;else score-=15;
-  if(surplus>0)score+=10;else score-=20;
-  score=Math.max(0,Math.min(100,score));
-
-  const ring=document.getElementById('dh-score-ring');
-  const scoreNum=document.getElementById('dh-score-num');
-  const scoreLbl=document.getElementById('dh-score-lbl');
-  const scoreSub=document.getElementById('dh-score-sub');
-  scoreNum.textContent=score;
-  ring.className='dh-score'+(score>=70?'':score>=45?' warn':' bad');
-  scoreLbl.textContent=score>=70?'Looking healthy':score>=45?'Doing OK':'Needs attention';
-  scoreSub.textContent=score>=70?'Savings, bills and surplus all on track':score>=45?'Some areas need attention — check below':'Income or surplus is tight this month';
-
-  // Metrics
-  const savRateEl=document.getElementById('dh-savrate');
-  savRateEl.textContent=totalInc>0?savRate+'%':'—';
-  savRateEl.className='dh-metric-val'+(savRate>=20?'green':savRate>=10?' amber':' red');
-  const billPctEl=document.getElementById('dh-billpct');
-  billPctEl.textContent=billPct+'%';
-  billPctEl.className='dh-metric-val'+(billPct<=100?'green':' red');
-  const surplusEl=document.getElementById('dh-surplus');
-  const actualBal=c.actualBalance;
-  surplusEl.textContent=actualBal!=null?fmt(actualBal):(surplus>0?fmt(surplus):'—');
-  surplusEl.className='dh-metric-val'+(actualBal!=null?(actualBal>500?'teal':actualBal>100?' amber':' red'):(surplus>100?'teal':surplus>0?' amber':' red'));
-  document.querySelector('#dash-health .dh-metric:last-child .dh-metric-sub')?.remove&&null;
-  const subEl=document.querySelector('#dh-surplus')?.closest('.dh-metric')?.querySelector('.dh-metric-sub');
-  if(subEl)subEl.textContent=actualBal!=null?'actual balance':'estimated';
-
-  // vs last month
-  const lastMonth=D.history.find(h=>h.mk!==MK&&h.year===YEAR);
-  if(lastMonth&&lastMonth.credit!==undefined){
-    const diff=credit-(lastMonth.credit||0);
-    const vsEl=document.getElementById('dh-vs');
-    const vsLbl=document.getElementById('dh-vs-lbl');
-    const vsVal=document.getElementById('dh-vs-val');
-    vsEl.style.display='flex';
-    vsLbl.textContent=`vs ${lastMonth.label}`;
-    vsVal.textContent=(diff>=0?'↑ +':'↓ ')+fmt(Math.abs(diff))+' credit';
-    vsVal.className='dh-vs-val'+(diff>=0?' up':' down');
+  const balEl=document.getElementById('glance-joint-bal');
+  const tsEl=document.getElementById('glance-joint-ts');
+  if(c.actualBalance!=null){
+    balEl.textContent=fmt(c.actualBalance);
+    balEl.style.color=c.actualBalance>500?'var(--teal)':c.actualBalance>100?'var(--amber)':'var(--red)';
+    tsEl.textContent='Updated '+c.actualBalanceTs;
+  } else {
+    balEl.textContent='—';
+    balEl.style.color='var(--hint)';
+    tsEl.textContent='tap ✏️ in joint card to set';
   }
+  // Food purse remaining
+  const shops=(D.lauren.foodShop||[]).filter(x=>x.mk===MK&&(!x.type||x.type==='shop'));
+  const spent=shops.reduce((s,x)=>s+x.amount,0);
+  const remaining=480-spent;
+  const foodEl=document.getElementById('glance-food-remaining');
+  const foodSub=document.getElementById('glance-food-sub');
+  foodEl.textContent=fmt(Math.max(0,remaining));
+  foodEl.style.color=remaining<=0?'var(--red)':remaining<100?'var(--amber)':'var(--green)';
+  foodSub.textContent=remaining<=0?`Over by ${fmt(Math.abs(remaining))}`:spent===0?'nothing spent yet':`${fmt(spent)} spent of £480`;
 }
 
 // ── Quick Log FAB ─────────────────────────────────────────
