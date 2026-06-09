@@ -621,6 +621,27 @@ body{padding-bottom:calc(68px + var(--sb))}
   </div>
 </div>
 
+<!-- FIREBASE REQUIRED MODAL -->
+<div id="firebase-required-modal" class="cloud-modal" style="z-index:9999;">
+  <div class="cloud-box" style="text-align:center;">
+    <div style="font-size:2.5rem;margin-bottom:8px;">☁️</div>
+    <h2 style="margin-bottom:8px;">Connect to Firebase</h2>
+    <p style="color:var(--hint);margin-bottom:20px;font-size:0.9rem;">Your data is stored in Firebase — you need to connect before using the app. This keeps everything safe even if you reinstall.</p>
+    <div class="cloud-step" style="text-align:left;margin-bottom:16px;">
+      <b>Your Firebase URL</b><br>
+      <input class="cloud-inp" id="req-url-inp" placeholder="https://your-app-default-rtdb.firebaseio.com" type="url" autocomplete="off" autocorrect="off" spellcheck="false" style="margin-top:8px;">
+    </div>
+    <div class="cloud-step" style="text-align:left;margin-bottom:16px;">
+      <b>Your Room Code</b><br>
+      <input class="cloud-inp" id="req-room-inp" placeholder="e.g. River-apple-4142" type="text" autocomplete="off" autocorrect="off" spellcheck="false" style="margin-top:8px;">
+    </div>
+    <div id="req-connect-err" style="color:var(--red);font-size:0.85rem;margin-bottom:12px;min-height:18px;"></div>
+    <button class="btn-connect" id="req-connect-btn" onclick="connectRequired()" style="width:100%;margin-bottom:0;">Connect & open app</button>
+  </div>
+</div>
+
+
+
 <!-- PIN CHANGE MODAL -->
 <div id="pin-change-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:10000;flex-direction:column;align-items:center;justify-content:center;font-family:var(--font)">
   <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:18px;padding:24px 20px;width:280px;text-align:center">
@@ -2787,7 +2808,22 @@ function cloudPath(){return`${cloudCfg.url.replace(/\/$/,'')}/${cloudCfg.room}/j
 function cloudLoad(){
   try{const s=localStorage.getItem(CLOUD_KEY);if(s)cloudCfg=JSON.parse(s);}catch(e){}
   updateCloudUI();
-  if(cloudCfg)startPolling();
+  if(cloudCfg){
+    startPolling();
+  } else {
+    // No Firebase config — show blocking setup screen
+    showFirebaseRequiredModal();
+  }
+}
+
+function showFirebaseRequiredModal(){
+  const modal=document.getElementById('firebase-required-modal');
+  if(modal)modal.classList.add('open');
+}
+
+function hideFirebaseRequiredModal(){
+  const modal=document.getElementById('firebase-required-modal');
+  if(modal)modal.classList.remove('open');
 }
 
 function startPolling(){
@@ -2890,6 +2926,48 @@ function genRoomCode(){
   document.getElementById('cloud-room-inp').value=`${r()}-${r()}-${n}`;
 }
 
+async function connectRequired(){
+  const url=document.getElementById('req-url-inp').value.trim().replace(/\/$/,'');
+  const room=document.getElementById('req-room-inp').value.trim().replace(/[^a-zA-Z0-9\-_]/g,'');
+  const errEl=document.getElementById('req-connect-err');
+  const btn=document.getElementById('req-connect-btn');
+  if(!url||!url.startsWith('https://')){errEl.textContent='Enter a valid Firebase URL starting with https://';return;}
+  if(!room||room.length<3){errEl.textContent='Room code must be at least 3 characters';return;}
+  btn.disabled=true;btn.textContent='Connecting…';errEl.textContent='';
+  try{
+    const testUrl=`${url}/${room}/jldata.json`;
+    // Try to read first — if data exists in Firebase, pull it down
+    const readR=await fetch(testUrl+'?shallow=false',{cache:'no-store'});
+    if(!readR.ok)throw new Error('bad');
+    const remote=await readR.json();
+    if(remote&&remote._ts){
+      // Data exists in Firebase — pull it down
+      ['bills','actuals','jake','lauren','history','nextId','lastActiveMK'].forEach(k=>{
+        if(remote[k]!==undefined)D[k]=remote[k];
+      });
+      D._ts=remote._ts;
+      sanitise();
+      localStorage.setItem('jl-v6',JSON.stringify(D));
+      renderAll();
+      toast('☁️ Data restored from Firebase!');
+    } else {
+      // No data in Firebase yet — push current local data up
+      D._ts=Date.now();
+      const writeR=await fetch(testUrl,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(D)});
+      if(!writeR.ok)throw new Error('Write failed');
+      toast('☁️ Connected & data saved to Firebase!');
+    }
+    cloudCfg={url,room};
+    localStorage.setItem(CLOUD_KEY,JSON.stringify(cloudCfg));
+    updateCloudUI();
+    startPolling();
+    hideFirebaseRequiredModal();
+  }catch(e){
+    errEl.textContent='Could not connect — check your Firebase URL and room code, then try again';
+  }
+  btn.disabled=false;btn.textContent='Connect & open app';
+}
+
 async function connectCloud(){
   const url=document.getElementById('cloud-url-inp').value.trim().replace(/\/$/,'');
   const room=document.getElementById('cloud-room-inp').value.trim().replace(/[^a-zA-Z0-9\-_]/g,'');
@@ -2917,7 +2995,7 @@ async function connectCloud(){
     document.getElementById('cloud-connected-view').style.display='block';
     document.getElementById('cloud-info-url').textContent=cloudCfg.url;
     document.getElementById('cloud-info-room').textContent=cloudCfg.room;
-    toast('☁️ Live sync connected!');
+    toast('☁️ Live sync connected!');hideFirebaseRequiredModal();
   }catch(e){
     errEl.textContent='Could not connect — check rules are set to true in Firebase and try again';
   }
