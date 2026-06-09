@@ -636,7 +636,8 @@ body{padding-bottom:calc(68px + var(--sb))}
       <input class="cloud-inp" id="req-room-inp" placeholder="e.g. River-apple-4142" value="river-apple-4142" type="text" autocomplete="off" autocorrect="off" spellcheck="false" style="margin-top:8px;">
     </div>
     <div id="req-connect-err" style="color:var(--red);font-size:0.85rem;margin-bottom:12px;min-height:18px;"></div>
-    <button class="btn-connect" id="req-connect-btn" onclick="connectRequired()" style="width:100%;margin-bottom:0;">Connect & open app</button>
+    <button class="btn-connect" id="req-connect-btn" onclick="connectRequired()" style="width:100%;margin-bottom:12px;">Connect & open app</button>
+    <button onclick="hideFirebaseRequiredModal()" style="width:100%;background:none;border:none;color:var(--hint);font-size:0.85rem;cursor:pointer;padding:4px;">Preview only (no sync)</button>
   </div>
 </div>
 
@@ -1040,6 +1041,9 @@ body{padding-bottom:calc(68px + var(--sb))}
       <div class="qp-row">
         <div class="qp-field"><label>Net pay (£) — what hit your bank</label><input type="number" id="qp-net" placeholder="0.00" min="0" step="0.01" oninput="qpPreview()"></div>
         <button class="qp-btn" onclick="quickPaySave()">Save</button>
+      </div>
+      <div class="qp-row" style="margin-top:6px;">
+        <div class="qp-field" style="flex:1;"><label>Pay period</label><select id="qp-month" style="width:100%;background:var(--card2);color:var(--fg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:0.95rem;"><option value="2026-5">May 2026</option><option value="2026-6" selected>June 2026</option></select></div>
       </div>
       <div class="alloc-panel" id="qp-alloc">
         <div class="alloc-title">Any overtime or extras this month?</div>
@@ -1663,15 +1667,24 @@ function quickPaySave(){
   const sav=parseFloat(document.getElementById('qpa-sav').value)||0;
   const inv=parseFloat(document.getElementById('qpa-inv').value)||0;
   const spd=parseFloat(document.getElementById('qpa-spd').value)||0;
+  // Use selected month from dropdown
+  const selMk=document.getElementById('qp-month').value;
+  const selParts=selMk.split('-');
+  const selDate=new Date(parseInt(selParts[0]),parseInt(selParts[1])-1,1);
+  const selLbl=selDate.toLocaleString('en-GB',{month:'long',year:'numeric'});
   const p=D.jake;
-  p.income=[{id:D.nextId++,name:'Net Pay — '+MLBL,amount:net,type:'base',mk:MK}];
-  if(extra>0){p.income.push({id:D.nextId++,name:'Overtime / extras',amount:extra,type:'extra',mk:MK});p.extraAlloc={sav,inv,spd,extra};}else{p.extraAlloc=null;}
+  // Log income to the selected month (keep other months' income intact)
+  p.income=p.income.filter(i=>i.mk!==selMk);
+  p.income.push({id:D.nextId++,name:'Net Pay — '+selLbl,amount:net,type:'base',mk:selMk});
+  if(extra>0){p.income.push({id:D.nextId++,name:'Overtime / extras',amount:extra,type:'extra',mk:selMk});p.extraAlloc={sav,inv,spd,extra};}else{p.extraAlloc=null;}
   if(!p.payHistory)p.payHistory=[];
-  if(!p.payHistory.find(h=>h.mk===MK)){p.payHistory.unshift({mk:MK,period:MLBL,net,extra,sav,inv});if(p.payHistory.length>24)p.payHistory=p.payHistory.slice(0,24);}
+  p.payHistory=p.payHistory.filter(h=>h.mk!==selMk);
+  p.payHistory.unshift({mk:selMk,period:selLbl,net,extra,sav,inv});
+  if(p.payHistory.length>24)p.payHistory=p.payHistory.slice(0,24);
   ['qp-net','qp-extra','qpa-sav','qpa-inv','qpa-spd'].forEach(id=>{document.getElementById(id).value='';});
   document.getElementById('qp-alloc').classList.remove('open');
   document.getElementById('qp-hint').textContent='Enter your net pay and tap Save — period auto-fills';
-  save();renderAll();toast('Pay logged ✓');
+  save();renderAll();toast('Pay logged for '+selLbl+' ✓');
 }
 
 // ── Cash income (Lauren) ──────────────────────────────────
