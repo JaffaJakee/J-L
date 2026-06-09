@@ -2963,7 +2963,7 @@ async function connectRequired(){
     startPolling();
     hideFirebaseRequiredModal();
   }catch(e){
-    errEl.textContent='Could not connect — check your Firebase URL and room code, then try again';
+    errEl.textContent='Could not connect — error: '+e.message+' (status may be auth/rules issue)';
   }
   btn.disabled=false;btn.textContent='Connect & open app';
 }
