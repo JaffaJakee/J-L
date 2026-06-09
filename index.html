@@ -1738,7 +1738,8 @@ function renderPayHistory(){
   const maxNet=Math.max(...hist.map(h=>h.net));
   el.innerHTML=hist.map(h=>{
     const pct=Math.round(h.net/maxNet*100);
-    return `<div class="pay-hist-item">
+    return `<div class="pay-hist-item" style="position:relative;">
+      <button onclick="deletePayHistory('${h.mk}')" style="position:absolute;top:6px;right:6px;background:none;border:none;color:var(--hint);font-size:14px;cursor:pointer;line-height:1;padding:2px 4px;" title="Delete">✕</button>
       <div class="phi-top"><span class="phi-period">${h.period}</span><span class="phi-net">${fmt(h.net)}</span></div>
       <div class="phi-bar-wrap"><div class="phi-bar" style="width:${pct}%"></div></div>
       <div class="phi-chips">
@@ -1746,6 +1747,13 @@ function renderPayHistory(){
       </div>
     </div>`;
   }).join('');
+}
+
+function deletePayHistory(mk){
+  if(!confirm('Delete this pay entry?'))return;
+  D.jake.payHistory=(D.jake.payHistory||[]).filter(h=>h.mk!==mk);
+  D.jake.income=(D.jake.income||[]).filter(i=>i.mk!==mk);
+  save();renderAll();toast('Pay entry deleted');
 }
 
 // ── Render: Joint ─────────────────────────────────────────
