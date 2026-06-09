@@ -11,7 +11,7 @@
 <meta name="application-name" content="J&L Finance">
 <meta name="description" content="Jake & Lauren home finance tracker">
 <!-- PWA Apple touch icons -->
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%230d1117'/><text x='50' y='68' font-family='system-ui,sans-serif' font-weight='700' font-size='42' fill='%2300d4a0' text-anchor='middle' letter-spacing='-2'>JL</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23000000'/><text x='50' y='68' font-family='system-ui,sans-serif' font-weight='700' font-size='44' fill='%23ffffff' text-anchor='middle' letter-spacing='-3'>JL</text></svg>">
 <!-- PWA Manifest (inline) -->
 <link rel="manifest" href="data:application/manifest+json,{&quot;name&quot;:&quot;Jake & Lauren Finance&quot;,&quot;short_name&quot;:&quot;J&L Finance&quot;,&quot;description&quot;:&quot;Home finance tracker&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;%230a0a0f&quot;,&quot;theme_color&quot;:&quot;%230a0a0f&quot;,&quot;orientation&quot;:&quot;portrait&quot;,&quot;icons&quot;:[{&quot;src&quot;:&quot;data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='42' fill='%230a0a0f'/><rect x='24' y='24' width='144' height='144' rx='30' fill='%2300d4a0'/><g transform='translate(58,128) scale(-1,1)'><text x='0' y='0' font-family='system-ui' font-weight='700' font-size='72' fill='%23000' text-anchor='middle'>J</text></g><text x='130' y='128' font-family='system-ui' font-weight='700' font-size='72' fill='%23000' text-anchor='middle'>L</text></svg>&quot;,&quot;sizes&quot;:&quot;192x192&quot;,&quot;type&quot;:&quot;image/svg+xml&quot;}]}">
 <title>Jake &amp; Lauren · Finance v21</title>
@@ -595,8 +595,8 @@ body{padding-bottom:calc(68px + var(--sb))}
       <p>Connects both phones to Firebase so any change either of you makes appears on the other phone instantly — no copy/pasting needed.</p>
       <div class="cloud-step"><b>Step 1</b> — Go to <b>console.firebase.google.com</b><br>Sign in with Google → <b>Add project</b> → name it anything → skip Analytics → Create</div>
       <div class="cloud-step"><b>Step 2</b> — In your project click <b>Build → Realtime Database → Create database → Start in test mode → Enable</b></div>
-      <div class="cloud-step"><b>Step 3</b> — Copy the database URL shown (looks like <b>https://xxx-default-rtdb.firebaseio.com</b>) and paste below</div>
-      <input class="cloud-inp" id="cloud-url-inp" placeholder="https://your-app-default-rtdb.firebaseio.com" type="url" autocomplete="off" autocorrect="off" spellcheck="false">
+      <div class="cloud-step"><b>Step 3</b> — Copy the database URL shown (looks like <b>https://xxx-default-rtdb.europe-west1.firebasedatabase.app</b>) and paste below</div>
+      <input class="cloud-inp" id="cloud-url-inp" placeholder="https://your-app-default-rtdb.europe-west1.firebasedatabase.app" type="url" autocomplete="off" autocorrect="off" spellcheck="false">
       <div class="cloud-step" style="margin-bottom:8px"><b>Step 4</b> — Create a secret room code (keeps your data private — only you and Lauren need it)</div>
       <div class="cloud-row">
         <input class="cloud-inp" id="cloud-room-inp" placeholder="e.g. jake-lauren-2025" autocomplete="off" autocorrect="off" spellcheck="false">
@@ -629,11 +629,11 @@ body{padding-bottom:calc(68px + var(--sb))}
     <p style="color:var(--hint);margin-bottom:20px;font-size:0.9rem;">Your data is stored in Firebase — you need to connect before using the app. This keeps everything safe even if you reinstall.</p>
     <div class="cloud-step" style="text-align:left;margin-bottom:16px;">
       <b>Your Firebase URL</b><br>
-      <input class="cloud-inp" id="req-url-inp" placeholder="https://your-app-default-rtdb.firebaseio.com" type="url" autocomplete="off" autocorrect="off" spellcheck="false" style="margin-top:8px;">
+      <input class="cloud-inp" id="req-url-inp" placeholder="https://your-app-default-rtdb.europe-west1.firebasedatabase.app" value="https://jl-finance-5f8dd-default-rtdb.europe-west1.firebasedatabase.app" type="url" autocomplete="off" autocorrect="off" spellcheck="false" style="margin-top:8px;">
     </div>
     <div class="cloud-step" style="text-align:left;margin-bottom:16px;">
       <b>Your Room Code</b><br>
-      <input class="cloud-inp" id="req-room-inp" placeholder="e.g. River-apple-4142" type="text" autocomplete="off" autocorrect="off" spellcheck="false" style="margin-top:8px;">
+      <input class="cloud-inp" id="req-room-inp" placeholder="e.g. River-apple-4142" value="river-apple-4142" type="text" autocomplete="off" autocorrect="off" spellcheck="false" style="margin-top:8px;">
     </div>
     <div id="req-connect-err" style="color:var(--red);font-size:0.85rem;margin-bottom:12px;min-height:18px;"></div>
     <button class="btn-connect" id="req-connect-btn" onclick="connectRequired()" style="width:100%;margin-bottom:0;">Connect & open app</button>
@@ -845,8 +845,8 @@ body{padding-bottom:calc(68px + var(--sb))}
   <div class="hdr-brand">
     <div class="hdr-logo" style="padding:0;overflow:hidden;">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="30" height="30">
-    <rect width="100" height="100" rx="18" fill="#0d1117"/>
-    <text x="50" y="68" font-family="system-ui,sans-serif" font-weight="700" font-size="42" fill="#00d4a0" text-anchor="middle" letter-spacing="-2">JL</text>
+    <rect width="100" height="100" rx="20" fill="#000000"/>
+    <text x="50" y="68" font-family="system-ui,sans-serif" font-weight="700" font-size="44" fill="#ffffff" text-anchor="middle" letter-spacing="-3">JL</text>
   </svg>
 </div>
     <div>
