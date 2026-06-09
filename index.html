@@ -11,9 +11,9 @@
 <meta name="application-name" content="J&L Finance">
 <meta name="description" content="Jake & Lauren home finance tracker">
 <!-- PWA Apple touch icons -->
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230a0a0f'/><rect x='12' y='12' width='76' height='76' rx='16' fill='%2300d4a0'/><text x='50' y='67' font-family='system-ui' font-weight='700' font-size='38' fill='%23000' text-anchor='middle'>J&amp;L</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230a0a0f'/><rect x='12' y='12' width='76' height='76' rx='16' fill='%2300d4a0'/><text x='32' y='67' font-family='system-ui' font-weight='700' font-size='38' fill='%23000' text-anchor='middle'>J</text><g transform='translate(68,67) scale(-1,1)'><text x='0' y='0' font-family='system-ui' font-weight='700' font-size='38' fill='%23000' text-anchor='middle'>J</text></g></svg>">
 <!-- PWA Manifest (inline) -->
-<link rel="manifest" href="data:application/manifest+json,{&quot;name&quot;:&quot;Jake & Lauren Finance&quot;,&quot;short_name&quot;:&quot;J&L Finance&quot;,&quot;description&quot;:&quot;Home finance tracker&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;%230a0a0f&quot;,&quot;theme_color&quot;:&quot;%230a0a0f&quot;,&quot;orientation&quot;:&quot;portrait&quot;,&quot;icons&quot;:[{&quot;src&quot;:&quot;data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='42' fill='%230a0a0f'/><rect x='24' y='24' width='144' height='144' rx='30' fill='%2300d4a0'/><text x='96' y='128' font-family='system-ui' font-weight='700' font-size='72' fill='%23000' text-anchor='middle'>J&L</text></svg>&quot;,&quot;sizes&quot;:&quot;192x192&quot;,&quot;type&quot;:&quot;image/svg+xml&quot;}]}">
+<link rel="manifest" href="data:application/manifest+json,{&quot;name&quot;:&quot;Jake & Lauren Finance&quot;,&quot;short_name&quot;:&quot;J&L Finance&quot;,&quot;description&quot;:&quot;Home finance tracker&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;%230a0a0f&quot;,&quot;theme_color&quot;:&quot;%230a0a0f&quot;,&quot;orientation&quot;:&quot;portrait&quot;,&quot;icons&quot;:[{&quot;src&quot;:&quot;data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='42' fill='%230a0a0f'/><rect x='24' y='24' width='144' height='144' rx='30' fill='%2300d4a0'/><g transform='translate(58,128) scale(-1,1)'><text x='0' y='0' font-family='system-ui' font-weight='700' font-size='72' fill='%23000' text-anchor='middle'>J</text></g><text x='130' y='128' font-family='system-ui' font-weight='700' font-size='72' fill='%23000' text-anchor='middle'>L</text></svg>&quot;,&quot;sizes&quot;:&quot;192x192&quot;,&quot;type&quot;:&quot;image/svg+xml&quot;}]}">
 <title>Jake &amp; Lauren · Finance v21</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -822,7 +822,16 @@ body{padding-bottom:calc(68px + var(--sb))}
 
 <header class="hdr">
   <div class="hdr-brand">
-    <div class="hdr-logo">J&L</div>
+    <div class="hdr-logo" style="padding:0;overflow:hidden;">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="30" height="30">
+    <rect width="100" height="100" rx="22" fill="#0a0a0f"/>
+    <rect x="12" y="12" width="76" height="76" rx="16" fill="#00d4a0"/>
+    <text x="40" y="67" font-family="system-ui" font-weight="700" font-size="38" fill="#000" text-anchor="middle">J</text>
+    <g transform="translate(60,67) scale(-1,1)">
+      <text x="0" y="0" font-family="system-ui" font-weight="700" font-size="38" fill="#000" text-anchor="middle">J</text>
+    </g>
+  </svg>
+</div>
     <div>
       <div class="hdr-title">Home Finance</div>
       <div class="hdr-sub" id="hdr-sub"></div>
