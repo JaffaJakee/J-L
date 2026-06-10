@@ -1168,13 +1168,8 @@ body{padding-bottom:calc(68px + var(--sb))}
 
       <div class="slbl">Log a payment</div>
       <div class="form-box open" style="margin-bottom:12px">
-        <div class="fld"><label>Amount (£)</label><input type="number" id="lc-amt" placeholder="0.00" min="0" step="0.01"></div>
-        <div class="fld"><label>How paid?</label>
-          <select id="lc-src">
-            <option value="cash">💷 Cash in hand</option>
-            <option value="bank">🏦 Bank transfer</option>
-          </select>
-        </div>
+        <div class="fld"><label>💷 Cash in hand (£)</label><input type="number" id="lc-cash-amt" placeholder="0.00" min="0" step="0.01"></div>
+        <div class="fld"><label>🏦 Bank transfer (£)</label><input type="number" id="lc-bank-amt" placeholder="0.00" min="0" step="0.01"></div>
         <div class="fld"><label>Which week?</label>
           <select id="lc-week"></select>
         </div>
@@ -1716,14 +1711,17 @@ function getWeekOfMonth(d){
 }
 
 function addCashIncome(){
-  const amt=parseFloat(document.getElementById('lc-amt').value)||0;
+  const cashAmt=parseFloat(document.getElementById('lc-cash-amt').value)||0;
+  const bankAmt=parseFloat(document.getElementById('lc-bank-amt').value)||0;
   const note=document.getElementById('lc-note').value.trim()||'Income';
-  const src=document.getElementById('lc-src')?.value||'cash';
   const week=parseInt(document.getElementById('lc-week')?.value)||getWeekOfMonth(NOW);
-  if(amt<=0){toast('Enter an amount');return;}
+  if(cashAmt<=0&&bankAmt<=0){toast('Enter a cash or bank amount');return;}
   if(!D.lauren.cashIncome)D.lauren.cashIncome=[];
-  D.lauren.cashIncome.push({id:D.nextId++,amount:amt,note,source:src,week,mk:MK,date:new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short'})});
-  document.getElementById('lc-amt').value='';
+  const today=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+  if(cashAmt>0){D.lauren.cashIncome.push({id:D.nextId++,amount:cashAmt,note,source:'cash',week,mk:MK,date:today});}
+  if(bankAmt>0){D.lauren.cashIncome.push({id:D.nextId++,amount:bankAmt,note,source:'bank',week,mk:MK,date:today});}
+  document.getElementById('lc-cash-amt').value='';
+  document.getElementById('lc-bank-amt').value='';
   document.getElementById('lc-note').value='';
   save();renderAll();toast('Income logged ✓');
 }
