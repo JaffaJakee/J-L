@@ -1506,6 +1506,7 @@ function sanitise(){
   Object.keys(jDef).forEach(k=>{if(!Array.isArray(D.jake[k])&&D.jake[k]!==null&&typeof D.jake[k]!=='object')D.jake[k]=jDef[k];if(D.jake[k]===undefined)D.jake[k]=jDef[k];});
   Object.keys(lDef).forEach(k=>{if(!Array.isArray(D.lauren[k])&&D.lauren[k]!==null&&typeof D.lauren[k]!=='object')D.lauren[k]=lDef[k];if(D.lauren[k]===undefined)D.lauren[k]=lDef[k];});
   if(!D.contributions)D.contributions={jake:1253.92,lauren:993.92,foodDrawWeekly:60};
+  if(D.contributions.foodPurseCarryover===undefined)D.contributions.foodPurseCarryover=0;
   if(D.contributions.jake===1233.92)D.contributions.jake=1253.92;
   if(!Array.isArray(D.jake.personalSubs)){
     D.jake.personalSubs=[
@@ -1570,10 +1571,19 @@ function load(){setSS('saving');try{const r=localStorage.getItem('jl-v6');if(r){
   // Auto-reset actuals on new month
   if(D.lastActiveMK && D.lastActiveMK!==MK){
     recordHistory();
+    // Carry food purse surplus/deficit into the new month
+    const prevMK=D.lastActiveMK;
+    const prevFoodShops=(D.lauren.foodShop||[]).filter(x=>x.mk===prevMK&&(!x.type||x.type==='shop'));
+    const prevFoodSpent=prevFoodShops.reduce((s,x)=>s+x.amount,0);
+    const prevCarryover=D.contributions.foodPurseCarryover||0;
+    const prevBudgetEffective=480+prevCarryover;
+    const newCarryover=prevBudgetEffective-prevFoodSpent;
+    D.contributions.foodPurseCarryover=Math.round(newCarryover*100)/100;
     D.actuals={};
     D.lastActiveMK=MK;
     save();
-    setTimeout(()=>toast('🗓️ New month — bills reset automatically'),800);
+    const carryMsg=newCarryover>0?` · ${fmt(newCarryover)} food purse carried over`:newCarryover<0?` · ${fmt(Math.abs(newCarryover))} food deficit carried over`:'';
+    setTimeout(()=>toast('🗓️ New month — bills reset'+carryMsg),800);
   } else if(!D.lastActiveMK){
     D.lastActiveMK=MK;
   }
@@ -1883,26 +1893,31 @@ function renderJoint(){
       :`<span class="chip over">${b.name}: −${fmt(Math.abs(d))}</span>`;
   }).join('');
 
-  // ── Food pot (monthly purse: spend vs £480) ───────────────
+  // ── Food pot (monthly purse: spend vs £480 + carryover) ──────
   const FOOD_MONTHLY_BUDGET=480;
+  const foodCarryover=D.contributions.foodPurseCarryover||0;
+  const foodBudgetEffective=FOOD_MONTHLY_BUDGET+foodCarryover;
   const foodShopsThisMonth=(D.lauren.foodShop||[]).filter(x=>x.mk===MK&&(!x.type||x.type==='shop'));
   const totalFoodSpent=foodShopsThisMonth.reduce((s,x)=>s+x.amount,0);
-  const foodCreditTotal=FOOD_MONTHLY_BUDGET-totalFoodSpent;
+  const foodCreditTotal=foodBudgetEffective-totalFoodSpent;
   let foodChips='';
+  if(foodCarryover>0)foodChips+=`<span class="chip saved">+${fmt(foodCarryover)} carried over</span>`;
+  else if(foodCarryover<0)foodChips+=`<span class="chip over">−${fmt(Math.abs(foodCarryover))} carried over</span>`;
   if(foodShopsThisMonth.length>0){
-    if(foodCreditTotal>0)foodChips=`<span class="chip saved">+${fmt(foodCreditTotal)} left in purse</span>`;
-    else if(foodCreditTotal<0)foodChips=`<span class="chip over">−${fmt(Math.abs(foodCreditTotal))} over</span>`;
-    else foodChips=`<span class="chip neutral">Exactly on budget</span>`;
+    if(foodCreditTotal>0)foodChips+=`<span class="chip saved">${fmt(foodCreditTotal)} left this month</span>`;
+    else if(foodCreditTotal<0)foodChips+=`<span class="chip over">−${fmt(Math.abs(foodCreditTotal))} over</span>`;
+    else foodChips+=`<span class="chip neutral">Exactly on budget</span>`;
   }
-  const hasFood=foodShopsThisMonth.length>0;
+  const hasFood=foodShopsThisMonth.length>0||foodCarryover!==0;
   const fpEl=document.getElementById('fp-amt');
   fpEl.textContent=fmt(Math.abs(foodCreditTotal));
   fpEl.className='fp-amt'+(foodCreditTotal===0?' zero':foodCreditTotal<0?' neg':'');
+  const carryoverNote=foodCarryover>0?` (inc. ${fmt(foodCarryover)} from last month)`:foodCarryover<0?` (inc. ${fmt(Math.abs(foodCarryover))} deficit from last month)`:'';
   document.getElementById('fp-sub').textContent=!hasFood
-    ?'Log food shops in Lauren\'s tab — purse credit vs £480/mo shows here.'
-    :foodCreditTotal>0?`${fmt(foodCreditTotal)} purse credit — available for takeaways or date nights 🎉`
-    :foodCreditTotal<0?`${fmt(Math.abs(foodCreditTotal))} over purse budget so far this month.`
-    :'Food exactly on purse budget this month.';
+    ?'Log food shops in Lauren\'s tab — purse credit carries over month to month.'
+    :foodCreditTotal>0?`${fmt(foodCreditTotal)} left in purse${carryoverNote} 🎉`
+    :foodCreditTotal<0?`${fmt(Math.abs(foodCreditTotal))} over purse budget${carryoverNote}.`
+    :'Food exactly on purse budget.';
   document.getElementById('fp-chips').innerHTML=foodChips;
   const jInc=D.jake.income.reduce((s,i)=>s+i.amount,0)+(D.jake.cashIncome||[]).filter(c=>c.mk===MK).reduce((s,c)=>s+c.amount,0);
   const lInc=(D.lauren.cashIncome||[]).filter(c=>c.mk===MK).reduce((s,c)=>s+c.amount,0);
@@ -2866,7 +2881,7 @@ async function cloudPoll(){
     if(Date.now()<ignoreRemoteUntil)return;
     if(remote._ts<=(D._ts||0))return;
     // Apply remote data
-    ['bills','actuals','jake','lauren','history','nextId','lastActiveMK'].forEach(k=>{
+    ['bills','actuals','jake','lauren','history','nextId','lastActiveMK','contributions'].forEach(k=>{
       if(remote[k]!==undefined)D[k]=remote[k];
     });
     D._ts=remote._ts;
