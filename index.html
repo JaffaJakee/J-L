@@ -450,7 +450,18 @@ body{padding-bottom:calc(68px + var(--sb))}
 .phi-bar{height:100%;border-radius:2px;background:var(--blue);transition:width .5s}
 .phi-chips{display:flex;gap:6px;flex-wrap:wrap}
 
-/* ── LAUREN WEEKLY TRACKING ─────────────────────────────── */
+.wk-entries{display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);animation:fi .15s ease}
+.wk-entries.open{display:block}
+.wk-entry-row{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+.wk-entry-row:last-child{border-bottom:none}
+.wk-entry-src{font-size:14px;flex-shrink:0}
+.wk-entry-info{flex:1;min-width:0}
+.wk-entry-note{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wk-entry-meta{font-size:10px;color:var(--hint);font-family:var(--mono);margin-top:1px}
+.wk-entry-amt{font-size:13px;font-weight:600;font-family:var(--mono);flex-shrink:0}
+.wk-entry-amt.cash{color:var(--purple)}.wk-entry-amt.bank{color:var(--blue)}
+.wk-expand-btn{background:none;border:none;cursor:pointer;color:var(--hint);font-size:10px;font-family:var(--mono);padding:2px 6px;border-radius:4px;transition:color .15s;flex-shrink:0;white-space:nowrap}
+.wk-expand-btn:active{color:var(--purple)}
 .week-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);padding:12px 13px;margin-bottom:7px;transition:border-color .15s}
 .week-card.current-wk{border-color:rgba(167,139,250,0.38);background:linear-gradient(135deg,rgba(167,139,250,0.09),transparent)}
 .week-card.future-wk{opacity:.42}
@@ -1179,9 +1190,6 @@ body{padding-bottom:calc(68px + var(--sb))}
 
       <div class="slbl">Weekly breakdown <span class="badge purple" id="l-wk-badge"></span></div>
       <div id="l-week-breakdown"></div>
-
-      <div class="slbl" style="margin-top:14px">All entries this month</div>
-      <div id="l-cash-list"></div>
 
       <!-- LAUREN PERSONAL OUTGOINGS -->
       <div class="slbl">Monthly outgoings <span class="badge red" id="l-out-badge">£0/mo</span></div>
@@ -2027,7 +2035,7 @@ function renderPartner(who){
     if(srcCEl)srcCEl.textContent=fmt(cashTypeTotal);
     if(srcBEl)srcBEl.textContent=fmt(bankTypeTotal);
     document.getElementById(sId).innerHTML=`<div class="stat"><div class="sl">Income this month</div><div class="sv purple">${fmt(cashTotal)}</div></div><div class="stat"><div class="sl">Savings + investments</div><div class="sv teal">${fmt(sav+inv)}</div></div><div class="stat"><div class="sl">Joint bills share</div><div class="sv">${fmt(share)}</div></div><div class="stat"><div class="sl">Personal outgoings</div><div class="sv red">${fmt(lPersonalOut)}</div><div class="ss">salon + other</div></div><div class="stat"><div class="sl">Left to spend</div><div class="sv ${leftCl}">${fmt(left)}</div></div><div class="stat"><div class="sl">Emergency fund</div><div class="sv ${(D.lauren.emergencyFund?.saved||0)>=LEF_TARGET?'green':(D.lauren.emergencyFund?.saved||0)>0?'teal':'blue'}">${fmt(D.lauren.emergencyFund?.saved||0)}</div><div class="ss">${Math.min(100,Math.round((D.lauren.emergencyFund?.saved||0)/LEF_TARGET*100))}% of ${fmt(LEF_TARGET)}</div></div>`;
-    // Weekly breakdown — Tue–Sat working weeks
+    // Weekly breakdown — with expandable entries per week
     const LWKS=getLaurenWeeks(NOW.getFullYear(),NOW.getMonth());
     const currentWk=getWeekOfMonth(NOW);
     const weeksToShow=LWKS.filter(wk=>wk.start<=NOW.getDate()).length;
@@ -2037,9 +2045,29 @@ function renderPartner(who){
       const wkTot=wkE.reduce((s,c)=>s+c.amount,0);
       const wkCash=wkE.filter(c=>c.source==='cash'||!c.source).reduce((s,c)=>s+c.amount,0);
       const wkBank=wkE.filter(c=>c.source==='bank').reduce((s,c)=>s+c.amount,0);
-      const isEmpty=wkE.length===0,isCurrent=w===currentWk&&!isOffDay(NOW),isFuture=w>currentWk;
+      const isEmpty=wkE.length===0,isCurrent=w===currentWk&&!isOffDay(NOW);
       const lbl=weekLabel(LWKS[w-1],NOW.getFullYear(),NOW.getMonth());
-      wkHtml+=`<div class="week-card${isCurrent?' current-wk':''}${isFuture&&isEmpty?' future-wk':''}"><div class="wk-top"><div class="wk-label">Week ${w}<span>· ${lbl}</span>${isCurrent?'<span class="wk-now">now</span>':''}</div><div class="wk-total${isEmpty?' empty-wk':''}">${isEmpty?'—':fmt(wkTot)}</div></div>${!isEmpty?`<div class="wk-sources">${wkCash>0?`<span class="wk-src cash">💷 ${fmt(wkCash)}</span>`:''}${wkBank>0?`<span class="wk-src bank">🏦 ${fmt(wkBank)}</span>`:''}<span style="font-size:10px;color:var(--hint);font-family:var(--mono)">${wkE.length} payment${wkE.length!==1?'s':''}</span></div>`:''}</div>`;
+      const entriesHtml=wkE.length?[...wkE].reverse().map(c=>`
+        <div class="wk-entry-row">
+          <div class="wk-entry-src">${c.source==='bank'?'🏦':'💷'}</div>
+          <div class="wk-entry-info">
+            <div class="wk-entry-note">${c.note}</div>
+            <div class="wk-entry-meta">${c.date}</div>
+          </div>
+          <div class="wk-entry-amt ${c.source==='bank'?'bank':'cash'}">${fmt(c.amount)}</div>
+          <button class="rm" onclick="removeCash(${c.id})" style="padding:2px 5px">×</button>
+        </div>`).join(''):'';
+      wkHtml+=`<div class="week-card${isCurrent?' current-wk':''}">
+        <div class="wk-top" onclick="${!isEmpty?`toggleWkEntries(${w})`:'void(0)'}" style="${!isEmpty?'cursor:pointer':''}">
+          <div class="wk-label">Week ${w}<span>· ${lbl}</span>${isCurrent?'<span class="wk-now">now</span>':''}</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="wk-total${isEmpty?' empty-wk':''}">${isEmpty?'—':fmt(wkTot)}</div>
+            ${!isEmpty?`<button class="wk-expand-btn" id="wk-exp-btn-${w}" onclick="event.stopPropagation();toggleWkEntries(${w})">▾ ${wkE.length}</button>`:''}
+          </div>
+        </div>
+        ${!isEmpty?`<div class="wk-sources">${wkCash>0?`<span class="wk-src cash">💷 ${fmt(wkCash)}</span>`:''}${wkBank>0?`<span class="wk-src bank">🏦 ${fmt(wkBank)}</span>`:''}<span style="font-size:10px;color:var(--hint);font-family:var(--mono)">${wkE.length} payment${wkE.length!==1?'s':''}</span></div>`:''}
+        <div class="wk-entries" id="wk-entries-${w}">${entriesHtml}</div>
+      </div>`;
     }
     const wkBadgeEl=document.getElementById('l-wk-badge');if(wkBadgeEl)wkBadgeEl.textContent=`Wk ${currentWk} of ${LWKS.length}`;
     const wkBreakEl=document.getElementById('l-week-breakdown');if(wkBreakEl)wkBreakEl.innerHTML=wkHtml;
@@ -2048,12 +2076,6 @@ function renderPartner(who){
     if(lWkEl){
       lWkEl.innerHTML=LWKS.slice(0,weeksToShow).map((wk,i)=>`<option value="${i+1}"${i+1===currentWk?' selected':''}>Wk ${i+1} (${weekLabel(wk,NOW.getFullYear(),NOW.getMonth())})</option>`).join('');
     }
-    // Income entries list — newest first, with source + week label
-    document.getElementById('l-cash-list').innerHTML=cashThisMonth.length?[...cashThisMonth].reverse().map(c=>{
-      const srcLbl=c.source==='bank'?'🏦 Bank':'💷 Cash';
-      const wkLbl=c.week?`Wk ${c.week} · `:'';
-      return `<div class="cash-log"><div class="cash-log-info"><div class="cash-log-desc">${c.note}</div><div class="cash-log-date">${wkLbl}${c.date} · ${srcLbl}</div></div><div class="cash-log-amt">${fmt(c.amount)}</div><button class="rm" onclick="removeCash(${c.id})">×</button></div>`;
-    }).join(''):'<span class="empty">No income logged yet this month</span>';
     // Savings
     document.getElementById('l-sav-list').innerHTML=p.savings.length?p.savings.map(i=>{const pct=i.target?Math.min(100,Math.round((i.saved||0)/i.target*100)):0,mo=i.target&&i.amount>0?Math.ceil((i.target-(i.saved||0))/i.amount):null;return `<div class="goal-card" id="gc-lauren-${i.id}"><div class="goal-top"><span class="goal-name">${i.name}</span><span style="display:flex;align-items:center;gap:7px"><span style="font-size:11px;font-family:var(--mono);color:var(--muted)">${fmt(i.amount)}/mo</span><button class="sav-bal-edit" onclick="toggleBalPanel('lauren',${i.id})">💰 update</button><button class="rm" style="padding:0 3px" onclick="removeItem('lauren','savings',${i.id})">×</button></span></div>${i.target?`<div class="goal-bar-wrap"><div class="goal-bar" style="width:${pct}%"></div></div><div class="goal-meta"><span>${fmt(i.saved||0)} saved of ${fmt(i.target)}</span><span>${mo?`~${mo}mo left`:pct>=100?'🎉 Done':''}</span></div>`:''}
       <div class="goal-bal-panel" id="gbp-lauren-${i.id}">
@@ -2266,6 +2288,14 @@ function removeBill(id){
 }
 function removeJakeIncome(id){D.jake.income=D.jake.income.filter(i=>i.id!==id);if(!D.jake.income.find(i=>i.type==='extra'))D.jake.extraAlloc=null;save();renderAll();}
 function removeCash(id){D.lauren.cashIncome=D.lauren.cashIncome.filter(c=>c.id!==id);save();renderAll();}
+
+function toggleWkEntries(w){
+  const el=document.getElementById('wk-entries-'+w);
+  const btn=document.getElementById('wk-exp-btn-'+w);
+  if(!el)return;
+  const isOpen=el.classList.toggle('open');
+  if(btn)btn.textContent=isOpen?'▴ hide':'▾ '+el.querySelectorAll('.wk-entry-row').length;
+}
 
 // ── Lauren sub-tabs ───────────────────────────────────────
 function showLTab(id){
