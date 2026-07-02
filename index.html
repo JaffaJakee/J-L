@@ -1582,6 +1582,14 @@ function load(){setSS('saving');try{const r=localStorage.getItem('jl-v6');if(r){
     +(D.jake.cashIncome||[]).filter(c=>c.mk==='2026-5').reduce((s,c)=>s+c.amount,0)
     +(D.lauren.cashIncome||[]).filter(c=>c.mk==='2026-5').reduce((s,c)=>s+c.amount,0);
   if(juneIncome===0){D.history=(D.history||[]).filter(h=>h.mk!=='2026-5');}
+  // June 2026 end-of-month bill actuals
+  if(!D.actuals)D.actuals={};
+  const JUN_MK='2026-5';
+  if(!D.actuals['water']||D.actuals['water'].mk!==JUN_MK)D.actuals['water']={mk:JUN_MK,amount:54.40};
+  if(!D.actuals['council']||D.actuals['council'].mk!==JUN_MK)D.actuals['council']={mk:JUN_MK,amount:159.95};
+  if(!D.actuals['gas']||D.actuals['gas'].mk!==JUN_MK)D.actuals['gas']={mk:JUN_MK,amount:163.83};
+  if(!D.actuals['sofa']||D.actuals['sofa'].mk!==JUN_MK)D.actuals['sofa']={mk:JUN_MK,amount:102.58};
+  if(!D.actuals['broadband']||D.actuals['broadband'].mk!==JUN_MK)D.actuals['broadband']={mk:JUN_MK,amount:31.99};
   // Auto-reset actuals on new month
   if(D.lastActiveMK && D.lastActiveMK!==MK){
     recordHistory();
