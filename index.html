@@ -995,6 +995,12 @@ body{padding-bottom:calc(68px + var(--sb))}
       <div class="fp-amt" id="fp-amt">£480.00</div>
       <div class="fp-sub" id="fp-sub">Log food shops in Lauren's tab — purse credit vs £480/mo shows here.</div>
       <div class="fp-chips" id="fp-chips"></div>
+      <div style="display:flex;align-items:center;gap:7px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(74,222,128,0.15)">
+        <span style="font-size:10px;color:var(--hint);font-family:var(--mono);white-space:nowrap">Carried over £</span>
+        <input type="number" id="fp-carryover-inp" placeholder="0.00" step="0.01" inputmode="decimal" style="flex:1;min-width:0;padding:6px 9px;background:rgba(0,0,0,0.2);border:1px solid rgba(74,222,128,0.25);border-radius:var(--rs);font-size:13px;color:var(--text);font-family:var(--mono);box-sizing:border-box">
+        <button onclick="saveFoodCarryover()" style="padding:6px 12px;background:var(--green);color:#000;border:none;border-radius:var(--rs);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0">Set</button>
+      </div>
+      <div style="font-size:10px;color:var(--hint);font-family:var(--mono);margin-top:5px" id="fp-carryover-ts"></div>
     </div>
     <div class="banner">
       <div class="banner-block"><div class="bl">Budgeted</div><div class="bv" id="j-budget">£0</div><div class="bm" id="j-budget-meta"></div></div>
@@ -1054,7 +1060,7 @@ body{padding-bottom:calc(68px + var(--sb))}
         <button class="qp-btn" onclick="quickPaySave()">Save</button>
       </div>
       <div class="qp-row" style="margin-top:6px;">
-        <div class="qp-field" style="flex:1;"><label>Pay period</label><select id="qp-month" style="width:100%;background:var(--card2);color:var(--fg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:0.95rem;"><option value="2026-5">May 2026</option><option value="2026-6" selected>June 2026</option></select></div>
+        <div class="qp-field" style="flex:1;"><label>Pay period</label><select id="qp-month" style="width:100%;background:var(--card2);color:var(--fg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:0.95rem;">${(()=>{const opts=[];const now=new Date();for(let i=11;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);const val=`${d.getFullYear()}-${d.getMonth()+1}`;const lbl=d.toLocaleString('en-GB',{month:'long',year:'numeric'});const sel=i===0?' selected':'';opts.push(`<option value="${val}"${sel}>${lbl}</option>`);}return opts.join('');})()}</select></div>
       </div>
       <div class="alloc-panel" id="qp-alloc">
         <div class="alloc-title">Any overtime or extras this month?</div>
@@ -1614,7 +1620,7 @@ function recordHistory(){
   const budget=D.bills.reduce((s,b)=>s+b.budget,0);
   const actual=D.bills.reduce((s,b)=>{const a=getActual(b.id);return s+(a!==null?a:b.budget);},0);
   const credit=budget-actual;
-  const jakeInc=D.jake.income.reduce((s,i)=>s+i.amount,0)+(D.jake.cashIncome||[]).filter(c=>c.mk===MK).reduce((s,c)=>s+c.amount,0);
+  const jakeInc=(D.jake.income||[]).filter(i=>i.mk===MK).reduce((s,i)=>s+i.amount,0)+(D.jake.cashIncome||[]).filter(c=>c.mk===MK).reduce((s,c)=>s+c.amount,0);
   const laurenInc=(D.lauren.cashIncome||[]).filter(c=>c.mk===MK).reduce((s,c)=>s+c.amount,0);
   const jSav=(D.jake.savings||[]).reduce((s,i)=>s+i.amount,0);
   const lSav=(D.lauren.savings||[]).reduce((s,i)=>s+i.amount,0);
@@ -1697,6 +1703,20 @@ function quickPaySave(){
   ['qp-net','qp-extra','qpa-sav','qpa-inv','qpa-spd'].forEach(id=>{document.getElementById(id).value='';});
   document.getElementById('qp-alloc').classList.remove('open');
   document.getElementById('qp-hint').textContent='Enter your net pay and tap Save — period auto-fills';
+  // Backfill past month history entry when pay is backdated
+  if(selMk!==MK){
+    if(!D.history)D.history=[];
+    const selYear=parseInt(selParts[0]);
+    const selTotalInc=net+(extra||0);
+    const existing=D.history.find(h=>h.mk===selMk);
+    if(existing){
+      existing.jakeInc=selTotalInc;
+    } else {
+      const billBudget=D.bills.reduce((s,b)=>s+b.budget,0);
+      D.history.push({mk:selMk,label:selLbl,year:selYear,budget:billBudget,actual:billBudget,credit:0,bills:D.bills.length,jakeInc:selTotalInc,laurenInc:0,jSav:0,lSav:0,jInv:0,lInv:0,jSpd:0,lSpd:0,savingsRate:0,totalSav:0});
+    }
+    D.history.sort((a,b)=>b.mk.localeCompare(a.mk));
+  }
   save();renderAll();toast('Pay logged for '+selLbl+' ✓');
 }
 
@@ -1927,7 +1947,12 @@ function renderJoint(){
     :foodCreditTotal<0?`${fmt(Math.abs(foodCreditTotal))} over purse budget${carryoverNote}.`
     :'Food exactly on purse budget.';
   document.getElementById('fp-chips').innerHTML=foodChips;
-  const jInc=D.jake.income.reduce((s,i)=>s+i.amount,0)+(D.jake.cashIncome||[]).filter(c=>c.mk===MK).reduce((s,c)=>s+c.amount,0);
+  // Update carryover input placeholder and timestamp
+  const fpInp=document.getElementById('fp-carryover-inp');
+  if(fpInp)fpInp.placeholder=(foodCarryover||0).toFixed(2);
+  const fpTs=document.getElementById('fp-carryover-ts');
+  if(fpTs)fpTs.textContent=D.contributions.foodPurseCarryoverTs?'Last set '+D.contributions.foodPurseCarryoverTs:'Enter last month\'s leftover above to carry it forward';
+  const jInc=(D.jake.income||[]).filter(i=>i.mk===MK).reduce((s,i)=>s+i.amount,0)+(D.jake.cashIncome||[]).filter(c=>c.mk===MK).reduce((s,c)=>s+c.amount,0);
   const lInc=(D.lauren.cashIncome||[]).filter(c=>c.mk===MK).reduce((s,c)=>s+c.amount,0);
   const totalInc=jInc+lInc;
   const hhW=document.getElementById('hh-warn');
@@ -2152,7 +2177,10 @@ function renderYearOverview(){
       </div>
       <div class="hist-bar-wrap"><div class="hist-bar ${c>=0?'pos':'neg'}" style="width:${pct}%"></div></div>
       <div class="hist-meta"><span>budget ${fmt(h.budget)}</span><span>actual ${fmt(h.actual||h.budget)}</span></div>
-      ${jInc>0||lInc>0?`<div class="hist-income-row">${jInc>0?`<span class="hist-inc jake">👤 Jake ${fmt(jInc)}</span>`:''}${lInc>0?`<span class="hist-inc lauren">👤 Lauren ${fmt(lInc)}</span>`:''}</div>`:''}
+      ${jInc>0||lInc>0?`<div class="hist-income-row">
+        ${jInc>0?`<span class="hist-inc jake" style="display:inline-flex;align-items:center;gap:5px">👤 Jake ${fmt(jInc)}<button onclick="deleteJakeIncome('${h.mk}')" style="background:none;border:none;cursor:pointer;color:rgba(99,179,237,0.4);font-size:11px;padding:0 2px;line-height:1" title="Clear Jake's income for this month">✕</button></span>`:''}
+        ${lInc>0?`<span class="hist-inc lauren" style="display:inline-flex;align-items:center;gap:5px">👤 Lauren ${fmt(lInc)}<button onclick="deleteLaurenIncome('${h.mk}')" style="background:none;border:none;cursor:pointer;color:rgba(183,148,244,0.4);font-size:11px;padding:0 2px;line-height:1" title="Clear Lauren's income for this month">✕</button></span>`:''}
+      </div>`:''}
     </div>`;
   }).join(''):'<span class="empty">History builds automatically each month</span>';
 }
@@ -2161,6 +2189,30 @@ function deleteHistoryMonth(mk){
   if(!confirm(`Delete ${mk} from history? This cannot be undone.`))return;
   D.history=(D.history||[]).filter(h=>h.mk!==mk);
   save();cloudPush();renderYearActiveTab();toast('Month deleted ✓');
+}
+function deleteJakeIncome(mk){
+  if(!confirm(`Clear Jake's income for ${mk}? This cannot be undone.`))return;
+  // Remove from income array
+  D.jake.income=(D.jake.income||[]).filter(i=>i.mk!==mk);
+  D.jake.payHistory=(D.jake.payHistory||[]).filter(h=>h.mk!==mk);
+  // Update history snapshot
+  const h=D.history.find(h=>h.mk===mk);
+  if(h){
+    h.jakeInc=0;
+    // If both incomes now zero and no actuals recorded, remove the entry entirely
+    if(h.jakeInc===0&&h.laurenInc===0&&h.credit===0)D.history=D.history.filter(x=>x.mk!==mk);
+  }
+  save();cloudPush();renderYearActiveTab();toast('Jake\'s income cleared for '+mk+' ✓');
+}
+function deleteLaurenIncome(mk){
+  if(!confirm(`Clear Lauren's income for ${mk}? This cannot be undone.`))return;
+  D.lauren.cashIncome=(D.lauren.cashIncome||[]).filter(c=>c.mk!==mk);
+  const h=D.history.find(h=>h.mk===mk);
+  if(h){
+    h.laurenInc=0;
+    if(h.jakeInc===0&&h.laurenInc===0&&h.credit===0)D.history=D.history.filter(x=>x.mk!==mk);
+  }
+  save();cloudPush();renderYearActiveTab();toast('Lauren\'s income cleared for '+mk+' ✓');
 }
 
 function renderYearIncome(){
@@ -2855,6 +2907,15 @@ function renderMortgage(){
     alertEl.classList.remove('show');
     card.classList.remove('warn');
   }
+}
+
+function saveFoodCarryover(){
+  const v=parseFloat(document.getElementById('fp-carryover-inp').value);
+  if(isNaN(v)){toast('Enter a valid amount (can be negative)');return;}
+  D.contributions.foodPurseCarryover=Math.round(v*100)/100;
+  D.contributions.foodPurseCarryoverTs=new Date().toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+  document.getElementById('fp-carryover-inp').value='';
+  save();renderJoint();toast('Food carryover set to '+fmt(v)+' ✓');
 }
 
 // ── Sync ──────────────────────────────────────────────────
