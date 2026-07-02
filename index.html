@@ -3162,12 +3162,14 @@ function renderDashboard(){
   // Food purse remaining
   const shops=(D.lauren.foodShop||[]).filter(x=>x.mk===MK&&(!x.type||x.type==='shop'));
   const spent=shops.reduce((s,x)=>s+x.amount,0);
-  const remaining=480-spent;
+  const foodCarryover=D.contributions.foodPurseCarryover||0;
+  const foodBudgetEffective=480+foodCarryover;
+  const remaining=foodBudgetEffective-spent;
   const foodEl=document.getElementById('glance-food-remaining');
   const foodSub=document.getElementById('glance-food-sub');
   foodEl.textContent=fmt(Math.max(0,remaining));
   foodEl.style.color=remaining<=0?'var(--red)':remaining<100?'var(--amber)':'var(--green)';
-  foodSub.textContent=remaining<=0?`Over by ${fmt(Math.abs(remaining))}`:spent===0?'nothing spent yet':`${fmt(spent)} spent of £480`;
+  foodSub.textContent=remaining<=0?`Over by ${fmt(Math.abs(remaining))}`:spent===0?`of ${fmt(foodBudgetEffective)} available`:`${fmt(spent)} spent of ${fmt(foodBudgetEffective)}`;
 }
 
 // ── Quick Log FAB ─────────────────────────────────────────
