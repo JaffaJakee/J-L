@@ -1840,7 +1840,7 @@ function saveActualBal(){
   D.contributions.actualBalance=v;
   D.contributions.actualBalanceTs=new Date().toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
   document.getElementById('jh-actual-form').classList.remove('open');
-  save();renderJointActualBal();toast('Balance updated ✓');
+  save();renderJointActualBal();renderDashboard();toast('Balance updated ✓');
 }
 function renderJointActualBal(){
   const c=D.contributions;
@@ -2923,7 +2923,7 @@ function saveFoodCarryover(){
   D.contributions.foodPurseCarryover=Math.round(v*100)/100;
   D.contributions.foodPurseCarryoverTs=new Date().toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
   document.getElementById('fp-carryover-inp').value='';
-  save();renderJoint();toast('Food carryover set to '+fmt(v)+' ✓');
+  save();renderJoint();renderDashboard();toast('Food carryover set to '+fmt(v)+' ✓');
 }
 
 // ── Sync ──────────────────────────────────────────────────
