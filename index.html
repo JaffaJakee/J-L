@@ -1486,7 +1486,7 @@ const DEFAULT_BILLS=[
   {id:'gas',name:'Gas & Electric',budget:163.84,due:'1st of month'},
   {id:'council',name:'Council Tax',budget:120.00,due:'1st of month'},
   {id:'sofa',name:'Sofa',budget:103.00,due:'Varies'},
-  {id:'water',name:'Water',budget:61.00,due:'Varies'},
+  {id:'water',name:'Water',budget:54.40,due:'Varies'},
   {id:'broadband',name:'Broadband',budget:32.00,due:'Varies'},
 ];
 
@@ -1582,6 +1582,9 @@ function load(){setSS('saving');try{const r=localStorage.getItem('jl-v6');if(r){
   if(!D.actuals['gas']||D.actuals['gas'].mk!==JUN_MK)D.actuals['gas']={mk:JUN_MK,amount:163.83};
   if(!D.actuals['sofa']||D.actuals['sofa'].mk!==JUN_MK)D.actuals['sofa']={mk:JUN_MK,amount:102.58};
   if(!D.actuals['broadband']||D.actuals['broadband'].mk!==JUN_MK)D.actuals['broadband']={mk:JUN_MK,amount:31.99};
+  // July 2026 corrections
+  const waterBill=D.bills.find(b=>b.id==='water');if(waterBill)waterBill.budget=54.40;
+  D.contributions.foodPurseCarryover=257;
   // Auto-reset actuals on new month
   if(D.lastActiveMK && D.lastActiveMK!==MK){
     recordHistory();
